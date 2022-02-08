@@ -12,10 +12,10 @@ RUN apk add \
     g++
 
 # Download all the dependencies
-RUN go get
+RUN go get ./indexer/
 
 # Build image
-RUN go build -o dist/indexer indexer/indexer.go
+RUN go build -o dist/indexer ./indexer/
 
 FROM alpine:latest AS RUNNER
 

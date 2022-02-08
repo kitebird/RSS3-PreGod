@@ -12,10 +12,10 @@ RUN apk add \
     g++
 
 # Download all the dependencies
-RUN go get
+RUN go get ./hub/
 
 # Build image
-RUN go build -o dist/hub hub/hub.go
+RUN go build -o dist/hub ./hub/
 
 FROM alpine:latest AS RUNNER
 
