@@ -9,7 +9,7 @@
 
 > RSS3 is a next-generation feed standard that aims to support efficient and decentralized information distribution.
 
-![RSS3](https://badge.rss3.workers.dev/?version=v0.4.0)
+[![RSS3](https://badge.rss3.workers.dev/?version=v0.4.0)](https://github.com/NaturalSelectionLabs/RSS3/blob/main/versions/v0.4.0)
 
 ## Introduction
 
