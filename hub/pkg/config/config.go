@@ -18,7 +18,6 @@ var Server = &ServerConfig{}
 
 var cfg *ini.File
 
-// Setup initialize the configuration instance
 func Setup() {
 	var err error
 	cfg, err = ini.Load("config/conf.ini")
@@ -29,10 +28,8 @@ func Setup() {
 	mapTo("server", Server)
 	Server.ReadTimeout = Server.ReadTimeout * time.Second
 	Server.WriteTimeout = Server.WriteTimeout * time.Second
-
 }
 
-// mapTo map section
 func mapTo(section string, v interface{}) {
 	err := cfg.Section(section).MapTo(v)
 	if err != nil {

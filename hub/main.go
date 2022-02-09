@@ -1,12 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/modules/config"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/modules/routers"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/routers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,5 +34,26 @@ func main() {
 
 	log.Printf("[info] start http server listening %s", port) // TODO: change to zap
 
-	server.ListenAndServe()
+	go server.ListenAndServe()
+
+	gracefullyExit(server)
+}
+
+func gracefullyExit(server *http.Server) {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
+	sig := <-quit
+
+	log.Println("Shutdown due to a signal", sig)
+
+	now := time.Now()
+
+	cxt, cancel := context.WithTimeout(context.Background(), 5*time.Second) // with a 5s timeout
+	defer cancel()
+
+	if err := server.Shutdown(cxt); err != nil {
+		log.Fatal("Shutdown error:", err)
+	}
+
+	log.Println("Shutdown server successfully in", time.Since(now))
 }

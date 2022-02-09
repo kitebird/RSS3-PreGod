@@ -1,4 +1,4 @@
-package utils
+package mq
 
 import (
 	"github.com/apache/rocketmq-client-go/v2"
