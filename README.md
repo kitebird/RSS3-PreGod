@@ -9,7 +9,7 @@
 
 > RSS3 is a next-generation feed standard that aims to support efficient and decentralized information distribution.
 
-![Version](https://shields.io/badge/Version-v0.4.0-0072ff?style=flat-square) ![RSS3](https://ipfs.rss3.page/ipfs/QmePwn2TTaaZ6ezYFQB4XfohULEFxcqBvLmm3N3tLZMvRG)
+![RSS3](https://badge.rss3.workers.dev/?version=v0.4.0)
 
 ## Introduction
 
