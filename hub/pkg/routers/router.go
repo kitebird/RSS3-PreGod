@@ -11,16 +11,16 @@ func InitRouter() *gin.Engine {
 	r.GET("/ping", api.Ping)
 
 	// instance
-	r.GET("/:signableAccount", api.GetInstance)
+	r.GET("/:instance", api.GetInstance)
 
 	// // items
-	// r.GET("/:signableAccount/:itemType/:itemUuid", api.GetItem)
-	// r.GET("/:signableAccount/list/:itemType/page/:index", api.GetItemPagedList)
-	// r.GET("/:signableAccount/list/:itemType", api.GetItemList)
+	// r.GET("/:instance/:item_type/:item_uuid", api.GetItem)
+	// r.GET("/:instance/list/:item_type/:page_index", api.GetItemPagedList)
+	// r.GET("/:instance/list/:item_type", api.GetItemList)
 
 	// // links
-	// r.GET("/:signableAccount/list/links/:linkUri/:index", api.GetLinkList)
-	// r.GET("/:signableAccount/list/backlinks/:linkUri", api.GetBacklinkList)
+	// r.GET("/:instance/list/links/:link_uri/:page_index", api.GetLinkList)
+	// r.GET("/:instance/list/backlinks/:link_uri", api.GetBacklinkList)
 
 	return r
 }

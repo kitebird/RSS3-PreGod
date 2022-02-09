@@ -10,7 +10,7 @@ import (
 )
 
 type Uri struct {
-	SignableAccount string `uri:"signableAccount" binding:"required"`
+	Instance string `uri:"instance" binding:"required"`
 }
 
 func GetInstance(c *gin.Context) {
@@ -22,7 +22,7 @@ func GetInstance(c *gin.Context) {
 		return
 	}
 
-	s := strings.Split(uri.SignableAccount, "@")
+	s := strings.Split(uri.Instance, "@")
 	if len(s) != 2 {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid signable account")
 		return

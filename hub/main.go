@@ -11,14 +11,14 @@ import (
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/routers"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/redis"
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
 	config.Setup()
-	redis.Setup()
+	cache.Setup()
 }
 
 func main() {
