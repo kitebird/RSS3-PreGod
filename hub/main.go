@@ -10,25 +10,27 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/routers"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/redis"
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
 	config.Setup()
+	redis.Setup()
 }
 
 func main() {
-	gin.SetMode(config.Server.RunMode)
+	gin.SetMode(config.HubServer.RunMode)
 
-	port := fmt.Sprintf(":%d", config.Server.HttpPort)
+	port := fmt.Sprintf(":%d", config.HubServer.HttpPort)
 
 	server := &http.Server{
 		Addr:           port,
 		Handler:        routers.InitRouter(),
-		ReadTimeout:    config.Server.ReadTimeout,
-		WriteTimeout:   config.Server.WriteTimeout,
+		ReadTimeout:    config.HubServer.ReadTimeout,
+		WriteTimeout:   config.HubServer.WriteTimeout,
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 

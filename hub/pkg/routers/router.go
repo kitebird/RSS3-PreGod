@@ -7,7 +7,8 @@ import (
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
-	r.GET("/hello", api.GetHello)
+
+	r.GET("/ping", api.Ping)
 
 	// instance
 	r.GET("/:signableAccount", api.GetInstance)

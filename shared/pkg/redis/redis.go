@@ -1,12 +1,25 @@
 package redis
 
-import "github.com/go-redis/redis/v8"
+import (
+	"context"
 
-func InitRedis(endpoint string) *redis.Client {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     endpoint,
-		Password: "", // no password set
-		DB:       0,  // use default DB
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/go-redis/redis/v8"
+)
+
+var rdb *redis.Client
+
+func Setup() error {
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     config.Redis.Addr,
+		Password: config.Redis.Password,
+		DB:       config.Redis.DB,
 	})
-	return rdb
+
+	_, err := rdb.Ping(context.Background()).Result()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -8,10 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetHello(c *gin.Context) {
+func Ping(c *gin.Context) {
 	w := web.Gin{C: c}
 
-	w.JSONResponse(http.StatusOK, status.SUCCESS, gin.H{
-		"hello": "world",
-	})
+	w.JSONResponse(http.StatusOK, status.SUCCESS, "pong")
 }
