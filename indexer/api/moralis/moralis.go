@@ -1,7 +1,8 @@
-package indexer
+package moralis
 
 import (
 	"fmt"
+
 	jsoniter "github.com/json-iterator/go"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"

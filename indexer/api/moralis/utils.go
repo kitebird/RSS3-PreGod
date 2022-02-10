@@ -1,4 +1,4 @@
-package indexer
+package moralis
 
 import "github.com/go-resty/resty/v2"
 

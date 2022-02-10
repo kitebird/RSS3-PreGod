@@ -9,20 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Request struct {
-	SignableAccount string `uri:"signableAccount" binding:"required"`
+type Uri struct {
+	Instance string `uri:"instance" binding:"required"`
 }
 
 func GetInstance(c *gin.Context) {
 	w := web.Gin{C: c}
 
-	var request Request
-	if err := c.ShouldBindUri(&request); err != nil {
+	var uri Uri
+	if err := c.ShouldBindUri(&uri); err != nil {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid uri")
 		return
 	}
 
-	s := strings.Split(request.SignableAccount, "@")
+	s := strings.Split(uri.Instance, "@")
 	if len(s) != 2 {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid signable account")
 		return

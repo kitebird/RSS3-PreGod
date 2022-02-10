@@ -7,27 +7,37 @@ import (
 	"github.com/go-ini/ini"
 )
 
-type ServerConfig struct {
+type HubServerConfig struct {
 	RunMode      string
 	HttpPort     int
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 }
 
-var Server = &ServerConfig{}
+var HubServer = &HubServerConfig{}
+
+type RedisConfig struct {
+	Addr     string
+	Password string
+	DB       int
+}
+
+var Redis = &RedisConfig{}
 
 var cfg *ini.File
 
 func Setup() {
 	var err error
-	cfg, err = ini.Load("config/conf.ini")
+	cfg, err = ini.Load("config/conf.dev.ini")
 	if err != nil {
 		log.Fatalf("[error] fail to parse 'config/conf.ini': %v", err) // TODO: change to zap
 	}
 
-	mapTo("server", Server)
-	Server.ReadTimeout = Server.ReadTimeout * time.Second
-	Server.WriteTimeout = Server.WriteTimeout * time.Second
+	mapTo("hub-server", HubServer)
+	HubServer.ReadTimeout = HubServer.ReadTimeout * time.Second
+	HubServer.WriteTimeout = HubServer.WriteTimeout * time.Second
+
+	mapTo("redis", Redis)
 }
 
 func mapTo(section string, v interface{}) {
