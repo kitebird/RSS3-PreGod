@@ -57,9 +57,5 @@ func gracefullyExit(server *http.Server) {
 		log.Fatal("Shutdown error:", err)
 	}
 
-	a := 1 // check if linter works
-	a = 2
-	log.Println(a)
-
 	log.Println("Shutdown server successfully in", time.Since(now))
 }

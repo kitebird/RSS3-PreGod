@@ -19,12 +19,14 @@ func GetInstance(c *gin.Context) {
 	var uri Uri
 	if err := c.ShouldBindUri(&uri); err != nil {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid uri")
+
 		return
 	}
 
 	s := strings.Split(uri.Instance, "@")
 	if len(s) != 2 {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid signable account")
+
 		return
 	}
 

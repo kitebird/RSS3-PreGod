@@ -11,7 +11,9 @@ func InitSugaredLogger() *zap.SugaredLogger {
 	if err != nil {
 		log.Fatalf("can't initialize zap logger: %v", err)
 	}
+
 	defer logger.Sync() // ignore error (if any)
 	sugar := logger.Sugar()
+
 	return sugar
 }

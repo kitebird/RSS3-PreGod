@@ -29,6 +29,7 @@ var cfg *ini.File
 func Setup() {
 	var err error
 	cfg, err = ini.Load("config/conf.dev.ini")
+
 	if err != nil {
 		log.Fatalf("[error] fail to parse 'config/conf.ini': %v", err) // TODO: change to zap
 	}

@@ -6,7 +6,7 @@ var MsgFlags = map[int]string{
 	INVALID_PARAMS: "Invalid params",
 }
 
-// Gets error message from Code
+// Gets error message from Code.
 func GetMsg(code int) string {
 	msg, ok := MsgFlags[code]
 	if ok {
