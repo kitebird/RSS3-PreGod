@@ -19,3 +19,6 @@ dist/
 
 # IDE
 .idea/
+
+# Dev Data
+tmp_data

@@ -13,12 +13,22 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/routers"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/db"
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
-	config.Setup()
-	cache.Setup()
+	if err := config.Setup(); err != nil {
+		log.Fatalf("config.Setup err: %v", err)
+	}
+
+	if err := cache.Setup(); err != nil {
+		log.Fatalf("cache.Setup err: %v", err)
+	}
+
+	if err := db.Setup(); err != nil {
+		log.Fatalf("db.Setup err: %v", err)
+	}
 }
 
 func main() {
