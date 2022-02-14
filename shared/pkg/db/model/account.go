@@ -1,6 +1,9 @@
 package model
 
-import "github.com/lib/pq"
+import (
+	"github.com/lib/pq"
+	"gorm.io/datatypes"
+)
 
 // `account` model.
 type Account struct {
@@ -11,7 +14,8 @@ type Account struct {
 	Bio       string         `gorm:"type:text"`
 	Avatars   pq.StringArray `gorm:"type:text[]"`
 
-	// The following fields are stored in `attachments` field:
+	Attachments datatypes.JSON `gorm:"type:jsonb"`
+	// The following fields are stored in `attachments` field above:
 	// Banners   pq.StringArray `gorm:"type:text[]"`
 	// Websites  pq.StringArray `gorm:"type:text[]"`
 
