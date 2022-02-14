@@ -9,5 +9,6 @@ func Get(url string, headers map[string]string) ([]byte, error) {
 
 	// Get url
 	resp, err := request.Get(url)
+
 	return resp.Body(), err
 }

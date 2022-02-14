@@ -9,11 +9,13 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
+var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
+
 func GetMoralisApiKey() string {
-	err := godotenv.Load(".env")
-	if err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		return ""
 	}
+
 	return os.Getenv("MoralisApiKey")
 }
 
@@ -28,7 +30,7 @@ func GetNFTs(userAddress string, chainType string, apiKey string) (types.NFTResu
 	response, _ := Get(apiUrl, headers)
 
 	res := new(types.NFTResult)
-	jsoni := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	err := jsoni.Unmarshal(response, &res)
 	if err != nil {
 		return types.NFTResult{}, err
@@ -44,11 +46,12 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (types
 	}
 
 	// Gets all NFT transfers of user
-	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both", userAddress, chainType)
+	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
+		userAddress, chainType)
 	response, _ := Get(apiUrl, headers)
 
 	res := new(types.NFTTransferResult)
-	jsoni := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	err := jsoni.Unmarshal(response, &res)
 	if err != nil {
 		return types.NFTTransferResult{}, err

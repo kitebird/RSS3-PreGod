@@ -2,7 +2,7 @@ package types
 
 import "fmt"
 
-// NFTItem store all indexed NFTs from moralis api
+// NFTItem store all indexed NFTs from moralis api.
 type NFTItem struct {
 	TokenAddress      string `json:"token_address"`
 	TokenId           string `json:"token_id"`
@@ -34,7 +34,7 @@ func (i NFTItem) String() string {
 		i.TokenAddress, i.TokenId, i.OwnerOf, i.TokenURI)
 }
 
-// NFTTransferItem store the transfers of NFTS
+// NFTTransferItem store the transfers of NFTS.
 type NFTTransferItem struct {
 	BlockNumber      string `json:"block_number"`
 	BlockTimestamp   string `json:"block_timestamp"`

@@ -1,3 +1,16 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  unused:
+    check-exported: true
+  nolintlint:
+    require-explanation: true
+    require-specific: true
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+
 linters: # https://golangci-lint.run/usage/linters
   disable:
     - godox # TODO comments should be allowed
@@ -17,6 +30,8 @@ linters: # https://golangci-lint.run/usage/linters
     - typecheck # type-checks Go code
     - unused # no unused vars, fns, etc.
     - varcheck # no unused global vars
+    - nolintlint
+
   presets:
     - bugs
     - comment
