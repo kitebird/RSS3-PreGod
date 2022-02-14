@@ -24,7 +24,7 @@ func GetNFTs(userAddress string, chainType string, apiKey string) (types.NFTResu
 	}
 
 	// Gets all NFT items of user
-	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft?chain=%s&format=decimal&offset=0&limit=100", userAddress, chainType)
+	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft?chain=%s&format=decimal", userAddress, chainType)
 	response, _ := Get(apiUrl, headers)
 
 	res := new(types.NFTResult)
@@ -44,7 +44,7 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (types
 	}
 
 	// Gets all NFT transfers of user
-	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both&offset=0&limit=100", userAddress, chainType)
+	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both", userAddress, chainType)
 	response, _ := Get(apiUrl, headers)
 
 	res := new(types.NFTTransferResult)

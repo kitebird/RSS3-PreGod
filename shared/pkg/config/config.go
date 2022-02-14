@@ -24,13 +24,20 @@ type RedisConfig struct {
 
 var Redis = &RedisConfig{}
 
+type PostgresConfig struct {
+	DSN string
+}
+
+var Postgres = &PostgresConfig{}
+
 var cfg *ini.File
 
-func Setup() {
+func Setup() error {
 	var err error
 	cfg, err = ini.Load("config/conf.dev.ini")
+
 	if err != nil {
-		log.Fatalf("[error] fail to parse 'config/conf.ini': %v", err) // TODO: change to zap
+		return err
 	}
 
 	mapTo("hub-server", HubServer)
@@ -38,6 +45,10 @@ func Setup() {
 	HubServer.WriteTimeout = HubServer.WriteTimeout * time.Second
 
 	mapTo("redis", Redis)
+
+	mapTo("postgres", Postgres)
+
+	return nil
 }
 
 func mapTo(section string, v interface{}) {

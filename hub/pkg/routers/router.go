@@ -19,8 +19,8 @@ func InitRouter() *gin.Engine {
 	// r.GET("/:instance/list/:item_type", api.GetItemList)
 
 	// // links
-	// r.GET("/:instance/list/links/:link_uri/:page_index", api.GetLinkList)
-	// r.GET("/:instance/list/backlinks/:link_uri", api.GetBacklinkList)
+	// r.GET("/:instance/list/links/:link_type/:page_index", api.GetLinkList)
+	// r.GET("/:instance/list/backlinks/:link_type", api.GetBacklinkList)
 
 	return r
 }
