@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/routers"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/db"
@@ -38,7 +38,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:           port,
-		Handler:        routers.InitRouter(),
+		Handler:        router.InitRouter(),
 		ReadTimeout:    config.HubServer.ReadTimeout,
 		WriteTimeout:   config.HubServer.WriteTimeout,
 		MaxHeaderBytes: 1 << 20, // 1MB

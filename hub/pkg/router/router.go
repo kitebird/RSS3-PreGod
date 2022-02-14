@@ -1,7 +1,7 @@
-package routers
+package router
 
 import (
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/routers/api"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router/api"
 	"github.com/gin-gonic/gin"
 )
 

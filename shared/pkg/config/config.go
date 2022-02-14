@@ -14,23 +14,23 @@ type HubServerConfig struct {
 	WriteTimeout time.Duration
 }
 
-var HubServer = &HubServerConfig{}
-
 type RedisConfig struct {
 	Addr     string
 	Password string
 	DB       int
 }
 
-var Redis = &RedisConfig{}
-
 type PostgresConfig struct {
 	DSN string
 }
 
-var Postgres = &PostgresConfig{}
+var (
+	HubServer = &HubServerConfig{}
+	Redis     = &RedisConfig{}
+	Postgres  = &PostgresConfig{}
 
-var cfg *ini.File
+	cfg *ini.File
+)
 
 func Setup() error {
 	var err error

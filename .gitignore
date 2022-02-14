@@ -22,3 +22,7 @@ dist/
 
 # Dev Data
 *.env
+
+# DB Data
+tmp_data/
+
