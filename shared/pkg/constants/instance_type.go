@@ -21,7 +21,7 @@ var InstanceTypeMap = map[InstanceTypeID]string{
 }
 
 // Converts InstanceTypeID to string.
-func (id InstanceTypeID) InstanceTypeIDToString() string {
+func (id InstanceTypeID) String() string {
 	return InstanceTypeMap[id]
 }
 

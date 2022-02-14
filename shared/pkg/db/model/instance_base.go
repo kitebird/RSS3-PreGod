@@ -11,6 +11,6 @@ type InstanceBase struct {
 
 	UUID              string                   `gorm:"primaryKey;type:text;column:uuid"`
 	ControllerAddress string                   `gorm:"type:text"`
-	InstanceType      constants.InstanceTypeID `gorm:"type:int"`
+	InstanceTypeID    constants.InstanceTypeID `gorm:"type:int;column:instance_type_id"`
 	Attachments       datatypes.JSON           `gorm:"type:jsonb"`
 }

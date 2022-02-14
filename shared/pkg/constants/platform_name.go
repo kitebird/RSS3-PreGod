@@ -31,7 +31,7 @@ var UnsignablePlatformNameMap = map[PlatformNameID]string{
 }
 
 // Converts PlatformName ID to string.
-func (id PlatformNameID) PlatformNameIDToString() string {
+func (id PlatformNameID) String() string {
 	if v, ok := SignablePlatformNameMap[id]; ok {
 		return v
 	}
