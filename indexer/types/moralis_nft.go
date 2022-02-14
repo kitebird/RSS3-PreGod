@@ -2,8 +2,8 @@ package types
 
 import "fmt"
 
-// NFTItem store all indexed NFTs from moralis api.
-type NFTItem struct {
+// MoralisNFTItem store all indexed NFTs from moralis api.
+type MoralisNFTItem struct {
 	TokenAddress      string `json:"token_address"`
 	TokenId           string `json:"token_id"`
 	BLockNumberMinted string `json:"block_number_minted"`
@@ -21,21 +21,21 @@ type NFTItem struct {
 	Frozen            int64  `json:"frozen"`
 }
 
-type NFTResult struct {
-	Total    int64     `json:"total"`
-	Page     int64     `json:"page"`
-	PageSize int64     `json:"page_size"`
-	Result   []NFTItem `json:"result"`
-	Status   string    `json:"status"`
+type MoralisNFTResult struct {
+	Total    int64            `json:"total"`
+	Page     int64            `json:"page"`
+	PageSize int64            `json:"page_size"`
+	Result   []MoralisNFTItem `json:"result"`
+	Status   string           `json:"status"`
 }
 
-func (i NFTItem) String() string {
+func (i MoralisNFTItem) String() string {
 	return fmt.Sprintf(`TokenAddress: %s, TokenId: %s, OwnerOf: %s, TokenURI: %s`,
 		i.TokenAddress, i.TokenId, i.OwnerOf, i.TokenURI)
 }
 
-// NFTTransferItem store the transfers of NFTS.
-type NFTTransferItem struct {
+// MoralisNFTTransferItem store the transfers of NFTS.
+type MoralisNFTTransferItem struct {
 	BlockNumber      string `json:"block_number"`
 	BlockTimestamp   string `json:"block_timestamp"`
 	BlockHash        string `json:"block_hash"`
@@ -54,16 +54,16 @@ type NFTTransferItem struct {
 	Operator         string `json:"operator"`
 }
 
-type NFTTransferResult struct {
-	Total       int64             `json:"total"`
-	Page        int64             `json:"page"`
-	PageSize    int64             `json:"page_size"`
-	Result      []NFTTransferItem `json:"result"`
-	Cursor      string            `json:"cursor"`
-	BlockExists bool              `json:"block_exists"`
+type MoralisNFTTransferResult struct {
+	Total       int64                    `json:"total"`
+	Page        int64                    `json:"page"`
+	PageSize    int64                    `json:"page_size"`
+	Result      []MoralisNFTTransferItem `json:"result"`
+	Cursor      string                   `json:"cursor"`
+	BlockExists bool                     `json:"block_exists"`
 }
 
-func (i NFTTransferItem) String() string {
+func (i MoralisNFTTransferItem) String() string {
 	return fmt.Sprintf(`From: %s, To: %s, TokenAddress: %s, ContractType: %s, TokenId: %s`,
 		i.FromAddress, i.ToAddress, i.TokenAddress, i.ContractType, i.TokenId)
 }
