@@ -19,6 +19,6 @@ type Account struct {
 	// Banners   pq.StringArray `gorm:"type:text[]"`
 	// Websites  pq.StringArray `gorm:"type:text[]"`
 
-	InstanceBase    InstanceBase
-	AccountPlatform []AccountPlatform
+	InstanceBase    InstanceBase      `gorm:"foreignkey:AccountID"` // belongs to
+	AccountPlatform []AccountPlatform `gorm:"foreignkey:AccountID"` // has many
 }

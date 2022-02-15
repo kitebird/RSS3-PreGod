@@ -6,13 +6,13 @@ import (
 )
 
 // `link_metadata` model.
-type Link_Metadata struct {
+type LinkMetadata struct {
 	Base BaseModel `gorm:"embedded"`
 
 	LinkMetadataID string `gorm:"primaryKey;type:text;column:link_metadata_id"`
 
-	RSS3ID       string `gorm:"type:text"`
-	TargetRSS3ID string `gorm:"type:text"`
+	RSS3ID       string `gorm:"type:text;column:rss3_id"`
+	TargetRSS3ID string `gorm:"type:text;column:target_rss3_id"`
 
 	LinkType constants.LinkTypeID `gorm:"type:int"`
 

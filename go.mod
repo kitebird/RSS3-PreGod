@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
+	github.com/arl/statsviz v0.4.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-ini/ini v1.66.3
 	github.com/go-redis/redis/v8 v8.11.4
@@ -30,6 +31,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.10.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

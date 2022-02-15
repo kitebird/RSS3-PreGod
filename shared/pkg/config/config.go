@@ -25,7 +25,11 @@ type RedisConfig struct {
 }
 
 type PostgresConfig struct {
-	DSN string
+	DSN             string
+	MaxOpenConns    int
+	MaxIdleConns    int
+	ConnMaxIdleTime time.Duration
+	ConnMaxLifetime time.Duration
 }
 
 var (
@@ -51,6 +55,8 @@ func Setup() error {
 	mapTo("redis", Redis)
 
 	mapTo("postgres", Postgres)
+	Postgres.ConnMaxIdleTime = Postgres.ConnMaxIdleTime * time.Second
+	Postgres.ConnMaxLifetime = Postgres.ConnMaxLifetime * time.Second
 
 	return nil
 }

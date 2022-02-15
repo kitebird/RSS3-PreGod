@@ -5,5 +5,5 @@ type Note struct {
 	Base BaseModel `gorm:"embedded"`
 
 	NoteID string `gorm:"primaryKey;type:text;column:note_id"`
-	ItemID string `gorm:"type:text"` // TODO: association
+	ItemID string `gorm:"type:text;column:item_id"`
 }

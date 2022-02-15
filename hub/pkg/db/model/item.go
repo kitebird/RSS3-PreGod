@@ -10,7 +10,7 @@ type Item struct {
 
 	ItemID string `gorm:"primaryKey;type:text;column:item_id"`
 
-	ObjectID string `gorm:"type:text"` // TODO: association
+	ObjectID string `gorm:"type:text;column:object_id"`
 
 	Proof     string               `gorm:"type:text"`
 	Type      constants.ItemTypeID `gorm:"type:int"`

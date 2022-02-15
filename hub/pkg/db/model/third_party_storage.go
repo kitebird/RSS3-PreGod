@@ -5,11 +5,11 @@ import (
 )
 
 // `third_party_storage` model.
-type Third_Party_Storage struct {
+type ThirdPartyStorage struct {
 	Base BaseModel `gorm:"embedded"`
 
 	StorageID string `gorm:"primaryKey;type:text;column:storage_id"`
-	RSS3ID    string `gorm:"type:text"`
+	RSS3ID    string `gorm:"type:text;column:rss3_id"`
 
 	AppName     string         `gorm:"type:text"`
 	Key         string         `gorm:"type:text"`

@@ -29,6 +29,10 @@ func init() {
 	if err := db.Setup(); err != nil {
 		log.Fatalf("db.Setup err: %v", err)
 	}
+
+	if err := db.AutoMigrate(); err != nil {
+		log.Fatalf("db.AutoMigrate err: %v", err)
+	}
 }
 
 func main() {
@@ -60,10 +64,10 @@ func gracefullyExit(server *http.Server) {
 
 	now := time.Now()
 
-	cxt, cancel := context.WithTimeout(context.Background(), 5*time.Second) // with a 5s timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) // with a 5s timeout
 	defer cancel()
 
-	if err := server.Shutdown(cxt); err != nil {
+	if err := server.Shutdown(ctx); err != nil {
 		log.Fatal("Shutdown error:", err)
 	}
 

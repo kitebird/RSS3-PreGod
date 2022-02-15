@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router/api"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router/monitor"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,6 +22,9 @@ func InitRouter() *gin.Engine {
 	// // links
 	// r.GET("/:instance/list/links/:link_type/:page_index", api.GetLinkList)
 	// r.GET("/:instance/list/backlinks/:link_type", api.GetBacklinkList)
+
+	// monitor
+	r.GET("/debug/statsviz/*filepath", monitor.Statsviz)
 
 	return r
 }
