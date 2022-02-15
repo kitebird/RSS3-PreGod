@@ -7,6 +7,10 @@ import (
 	"github.com/go-ini/ini"
 )
 
+type ProtocolConfig struct {
+	CurrentVersion string
+}
+
 type HubServerConfig struct {
 	RunMode      string
 	HttpPort     int

@@ -8,7 +8,7 @@ import (
 type InstanceBase struct {
 	Base BaseModel `gorm:"embedded"`
 
-	UUID              string                   `gorm:"primaryKey;type:text;column:uuid"`
+	RSS3ID            string                   `gorm:"primaryKey;type:text;column:rss3_id"`
 	ControllerAddress string                   `gorm:"type:text"`
 	InstanceTypeID    constants.InstanceTypeID `gorm:"type:int;column:instance_type_id"`
 }
