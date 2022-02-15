@@ -4,8 +4,6 @@ package logger
 // The Sugare mode of the zap library is used by default.
 // You can customize the encapsulation here to use other log libraries.
 func Logger(config LoggerConfig) (log LoggerCore, err error) {
-	log = nil
-	err = nil
 
 	if config.LoggerType == "" {
 		config.LoggerType = "zap"
@@ -13,11 +11,10 @@ func Logger(config LoggerConfig) (log LoggerCore, err error) {
 
 	if config.LoggerType == "zap" {
 		logger, err := GetZapLogger(config)
-		if err == nil {
-			log = &ZapLogger{
-				SugaredLogger: *logger,
-			}
+		if err != nil {
+			return nil, err
 		}
+		log = &ZapLogger{SugaredLogger: *logger}
 	}
 
 	return log, err

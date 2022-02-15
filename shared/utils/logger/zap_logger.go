@@ -44,7 +44,7 @@ func GetZapLogger(loggerConfig LoggerConfig) (*zap.SugaredLogger, error) {
 		Development:      true,
 		Encoding:         loggerConfig.Encoding,
 		EncoderConfig:    getDefaultEncoderCfg(),
-		InitialFields:    map[string]interface{}{"MyName": "kainhuck"},
+		InitialFields:    map[string]interface{}{"app": loggerConfig.AppName},
 		OutputPaths:      outputPaths,
 		ErrorOutputPaths: []string{},
 	}
@@ -82,11 +82,12 @@ func getDefaultEncoderCfg() zapcore.EncoderConfig {
 		NameKey:        "logger",
 		CallerKey:      "caller",
 		MessageKey:     "message",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     "\n",
+		FunctionKey:    zapcore.OmitKey,
+		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.StringDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 }
 
@@ -96,11 +97,11 @@ func parseOutputPaths(loggerConfig LoggerConfig) ([]string, error) {
 		if outputConfig.OutputType == "file" {
 			outputPaths = append(outputPaths, outputConfig.Filepath)
 		} else if outputConfig.OutputType == "syslog" {
-			outputPaths = append(outputPaths, "syslog")
+			outputPaths = append(outputPaths, "Syslog://127.0.0.1")
 			sysLogFactory := func(u *url.URL) (zap.Sink, error) {
 				w, err := GetSysLogger(outputConfig)
 
-				if err == nil {
+				if err != nil {
 					return nil, err
 				}
 
@@ -110,7 +111,7 @@ func parseOutputPaths(loggerConfig LoggerConfig) ([]string, error) {
 
 				return s, nil
 			}
-			if err := zap.RegisterSink("syslog", sysLogFactory); err != nil {
+			if err := zap.RegisterSink("Syslog", sysLogFactory); err != nil {
 				return nil, err
 			}
 		}

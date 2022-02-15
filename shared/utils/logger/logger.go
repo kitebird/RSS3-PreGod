@@ -1,19 +1,20 @@
 package logger
 
+import "log/syslog"
+
 type LoggerOutputConfig struct {
 	OutputType string
-	Tag        string
 
 	// The outputType is "file"
 	Filepath string
 
 	// The outputType is "syslog"
-	Network  string
-	Ipv4Addr string
-	Port     string
+	Priority syslog.Priority
 }
 
 type LoggerConfig struct {
+	AppName string
+
 	// Basic log configuration
 	LoggerType string
 	Level      string
@@ -41,10 +42,3 @@ type StandardLogger interface {
 type LoggerCore interface {
 	StandardLogger
 }
-
-// func InitSugaredLogger() *zap.SugaredLogger {
-// 	logger, _ := zap.NewProduction()
-// 	defer logger.Sync() // ignore error (if any)
-// 	sugar := logger.Sugar()
-// 	return sugar
-// }
