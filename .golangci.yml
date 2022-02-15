@@ -1,0 +1,57 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  unused:
+    check-exported: true
+  nolintlint:
+    require-explanation: true
+    require-specific: true
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+  misspell:
+    # Correct spellings using locale preferences for US or UK.
+    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+    # Default is to use a neutral variety of English.
+    locale: US
+    ignore-words:
+      - someword
+
+linters: # https://golangci-lint.run/usage/linters
+  disable:
+    - godox # TODO comments should be allowed
+    - gochecknoglobals # global vars should be allowed
+    - gomnd # magic numbers should be allowed
+    - scopelint # deprecated, replaced by exportloopref
+    - gochecknoinits # `init` functions should be] allowed
+    - gofumpt # too strict so far
+  enable:
+    - exportloopref # in replacement of scopelint
+    - deadcode # no dead code
+    - gosimple # for simplified code
+    - govet # reports suspicious constructs; e.g. Printf arguments alignment
+    - ineffassign # no ineffective assignments
+    - staticcheck # static analysis
+    - structcheck # no unused struct fields
+    - typecheck # type-checks Go code
+    - unused # no unused vars, fns, etc.
+    - varcheck # no unused global vars
+    - nolintlint
+    - misspell # finds commonly misspelled English words in comments
+
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - style
+    - test
+    - unused
+  fast: true

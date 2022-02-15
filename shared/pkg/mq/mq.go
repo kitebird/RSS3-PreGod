@@ -1,4 +1,4 @@
-package utils
+package mq
 
 import (
 	"github.com/apache/rocketmq-client-go/v2"
@@ -17,6 +17,7 @@ func InitMQProducer(endpoint string, gid string) rocketmq.Producer {
 	if err != nil {
 		panic(err)
 	}
+
 	return p // TODO: with entity or with pointer ?
 }
 
@@ -33,5 +34,6 @@ func InitMQPushConsumer(endpoint string, gid string) rocketmq.PushConsumer {
 	if err != nil {
 		panic(err)
 	}
+
 	return c // TODO: ...?
 }

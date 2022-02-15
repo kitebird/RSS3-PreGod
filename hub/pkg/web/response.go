@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/modules/status"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/gin-gonic/gin"
 )
 
