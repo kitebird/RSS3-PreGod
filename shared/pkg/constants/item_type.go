@@ -8,7 +8,7 @@ const (
 	ItemType_Custom ItemTypeID = 1
 
 	// AutoAssetType
-	// 'evm_gitcoin_donation' | 'evm_xdai_poap' | 'evm_bsc_nft' | 'evm_ethereum_nft' | 'evm_polygon_nft'
+	// 'evm_gitcoin_donation' | 'evm_xdai_poap' | 'evm_bsc_nft' | 'evm_ethereum_nft' | 'evm_polygon_nft'.
 	ItemType_Gitcoin      ItemTypeID = 2
 	ItemType_Xdai_Poap    ItemTypeID = 3
 	ItemType_Bsc_Nft      ItemTypeID = 4
@@ -16,7 +16,7 @@ const (
 	ItemType_Polygon_Nft  ItemTypeID = 6
 
 	// AutoNoteType
-	// 'evm_mirror_entry' | 'twitter_tweet' | 'misskey_note' | 'jike_node'
+	// 'evm_mirror_entry' | 'twitter_tweet' | 'misskey_note' | 'jike_node'.
 	ItemType_Evm_Mirror_Entry ItemTypeID = 7
 	ItemType_Twitter_Tweet    ItemTypeID = 8
 	ItemType_Misskey_Note     ItemTypeID = 9

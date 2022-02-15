@@ -10,10 +10,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/db"
 	"github.com/gin-gonic/gin"
 )
 
