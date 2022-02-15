@@ -10,6 +10,13 @@ linters-settings:
     case:
       rules:
         json: snake
+  misspell:
+    # Correct spellings using locale preferences for US or UK.
+    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+    # Default is to use a neutral variety of English.
+    locale: US
+    ignore-words:
+      - someword
 
 linters: # https://golangci-lint.run/usage/linters
   disable:
@@ -31,6 +38,7 @@ linters: # https://golangci-lint.run/usage/linters
     - unused # no unused vars, fns, etc.
     - varcheck # no unused global vars
     - nolintlint
+    - misspell # finds commonly misspelled English words in comments
 
   presets:
     - bugs
