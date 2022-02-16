@@ -2,15 +2,15 @@ package api
 
 import (
 	"net/http"
-	"strings"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/rss3_uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
 	"github.com/gin-gonic/gin"
 )
 
 type Uri struct {
-	Instance string `uri:"instance" binding:"required"`
+	Authority string `uri:"authority" binding:"required"`
 }
 
 func GetInstance(c *gin.Context) {
@@ -23,20 +23,16 @@ func GetInstance(c *gin.Context) {
 		return
 	}
 
-	s := strings.Split(uri.Instance, "@")
-	if len(s) != 2 {
-		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid signable account")
+	authority, err := rss3_uri.ParseAuthority(uri.Authority)
+	if err != nil {
+		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid uri: "+err.Error())
 
 		return
 	}
 
-	address := s[0]
-	platform := s[1]
-
 	// TODO: get instance from db
 
 	w.JSONResponse(http.StatusOK, status.SUCCESS, gin.H{
-		"address":  address,
-		"platform": platform,
+		"authority": authority,
 	})
 }

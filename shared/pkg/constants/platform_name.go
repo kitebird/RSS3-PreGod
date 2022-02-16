@@ -1,61 +1,99 @@
 package constants
 
 type PlatformNameID int32
+type PlatformName string
 
 const (
-	PlatformName_Unknown PlatformNameID = 0
+	PlatformNameID_Unknown PlatformNameID = 0
 
-	PlatformName_Rss3   PlatformNameID = 1 // not yet so far
-	PlatformName_Evm    PlatformNameID = 2
-	PlatformName_Solana PlatformNameID = 3
-	PlatformName_Flow   PlatformNameID = 4
+	PlatformNameID_Rss3   PlatformNameID = 1 // not yet so far
+	PlatformNameID_Evm    PlatformNameID = 2
+	PlatformNameID_Solana PlatformNameID = 3
+	PlatformNameID_Flow   PlatformNameID = 4
 
-	PlatformName_Twitter PlatformNameID = 5
-	PlatformName_Misskey PlatformNameID = 6
-	PlatformName_Jike    PlatformNameID = 7
+	PlatformNameID_Twitter PlatformNameID = 5
+	PlatformNameID_Misskey PlatformNameID = 6
+	PlatformNameID_Jike    PlatformNameID = 7
 )
 
-var SignablePlatformNameMap = map[PlatformNameID]string{
-	PlatformName_Rss3:   "rss3",
-	PlatformName_Evm:    "evm",
-	PlatformName_Solana: "solana",
-	PlatformName_Flow:   "flow",
+const (
+	PlatformName_Unknown PlatformName = "unknown"
+
+	PlatformName_Rss3   PlatformName = "rss3"
+	PlatformName_Evm    PlatformName = "evm"
+	PlatformName_Solana PlatformName = "solana"
+	PlatformName_Flow   PlatformName = "flow"
+
+	PlatformName_Twitter PlatformName = "twitter"
+	PlatformName_Misskey PlatformName = "misskey"
+	PlatformName_Jike    PlatformName = "jike"
+)
+
+var signablePlatformNameMap = map[PlatformNameID]PlatformName{
+	PlatformNameID_Rss3:   PlatformName_Rss3,
+	PlatformNameID_Evm:    PlatformName_Evm,
+	PlatformNameID_Solana: PlatformName_Solana,
+	PlatformNameID_Flow:   PlatformName_Flow,
 }
 
-var UnsignablePlatformNameMap = map[PlatformNameID]string{
-	PlatformName_Unknown: "unknown",
+var unsignablePlatformNameMap = map[PlatformNameID]PlatformName{
+	PlatformNameID_Unknown: PlatformName_Unknown,
 
-	PlatformName_Twitter: "twitter",
-	PlatformName_Misskey: "misskey",
-	PlatformName_Jike:    "jike",
+	PlatformNameID_Twitter: PlatformName_Twitter,
+	PlatformNameID_Misskey: PlatformName_Misskey,
+	PlatformNameID_Jike:    PlatformName_Jike,
 }
 
 // Converts PlatformName ID to string.
-func (id PlatformNameID) String() string {
-	if v, ok := SignablePlatformNameMap[id]; ok {
+func (id PlatformNameID) String() PlatformName {
+	if v, ok := signablePlatformNameMap[id]; ok {
 		return v
 	}
 
-	if v, ok := UnsignablePlatformNameMap[id]; ok {
+	if v, ok := unsignablePlatformNameMap[id]; ok {
 		return v
 	}
 
-	return "unknown"
+	return PlatformName_Unknown
+}
+
+// Checks if the platform is signable.
+func (id PlatformNameID) IsSignable() bool {
+	_, ok := signablePlatformNameMap[id]
+
+	return ok
+}
+
+// Checks if a platform name is valid.
+func IsValidPlatformName(platformName string) bool {
+	for _, v := range signablePlatformNameMap {
+		if string(v) == platformName {
+			return true
+		}
+	}
+
+	for _, v := range unsignablePlatformNameMap {
+		if string(v) == platformName {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Converts string to PlatformName ID.
 func StringToPlatformNameID(platformName string) PlatformNameID {
-	for k, v := range SignablePlatformNameMap {
-		if v == platformName {
+	for k, v := range signablePlatformNameMap {
+		if string(v) == platformName {
 			return k
 		}
 	}
 
-	for k, v := range UnsignablePlatformNameMap {
-		if v == platformName {
+	for k, v := range unsignablePlatformNameMap {
+		if string(v) == platformName {
 			return k
 		}
 	}
 
-	return PlatformName_Unknown
+	return PlatformNameID_Unknown
 }
