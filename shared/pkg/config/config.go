@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log/syslog"
 	"time"
 
 	"github.com/knadh/koanf"
@@ -33,11 +34,27 @@ type PostgresStruct struct {
 	ConnMaxLifetime time.Duration `koanf:"conn_max_lifetime"`
 }
 
+type LoggerOutputConfig struct {
+	Type     string          `koanf:"type"`     // available values: `stdout`, `file`, `syslog`
+	Filepath string          `koanf:"filepath"` // only for file
+	Priority syslog.Priority `koanf:"priority"`
+}
+
+type LoggerStruct struct {
+	PrefixTag string `koanf:"prefix_tag"`
+	Engine    string `koanf:"engine"`   // available values: `zap`
+	Level     string `koanf:"level"`    // available values: `debug`, `info`, `warn`, `error`, `panic`, `fatal`
+	Encoding  string `koanf:"encoding"` // available values: `json`, `console`
+
+	Output []LoggerOutputConfig `koanf:"output"`
+}
+
 type ConfigStruct struct {
 	Protocol  ProtocolStruct  `koanf:"protocol"`
 	HubServer HubServerStruct `koanf:"hub_server"`
 	Redis     RedisStruct     `koanf:"redis"`
 	Postgres  PostgresStruct  `koanf:"postgres"`
+	Logger    LoggerStruct    `koanf:"logger"`
 }
 
 var (

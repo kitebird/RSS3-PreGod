@@ -1,9 +1,11 @@
-package logger
+package engine
 
 import (
 	"log/syslog"
 	"net/url"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger/util"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -30,7 +32,7 @@ type ZapLogger struct {
 	zap.SugaredLogger
 }
 
-func GetZapLogger(loggerConfig LoggerConfig) (*zap.SugaredLogger, error) {
+func InitZapLogger(loggerConfig config.LoggerStruct) (*zap.SugaredLogger, error) {
 	outputPaths, err := parseOutputPaths(loggerConfig)
 	if err != nil {
 		return nil, err
@@ -45,7 +47,7 @@ func GetZapLogger(loggerConfig LoggerConfig) (*zap.SugaredLogger, error) {
 		Development:      true,
 		Encoding:         loggerConfig.Encoding,
 		EncoderConfig:    getDefaultEncoderCfg(),
-		InitialFields:    map[string]interface{}{"app": loggerConfig.AppName},
+		InitialFields:    map[string]interface{}{"prefix_tag": loggerConfig.PrefixTag},
 		OutputPaths:      outputPaths,
 		ErrorOutputPaths: []string{},
 	}
@@ -86,26 +88,26 @@ func getDefaultEncoderCfg() zapcore.EncoderConfig {
 		MessageKey:     "message",
 		FunctionKey:    zapcore.OmitKey,
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 }
 
-func parseOutputPaths(loggerConfig LoggerConfig) ([]string, error) {
+func parseOutputPaths(loggerConfig config.LoggerStruct) ([]string, error) {
 	var outputPaths []string
 
 	for _, outputConfig := range loggerConfig.Output {
-		if outputConfig.OutputType == "stdout" ||
-			outputConfig.OutputType == "stderr" {
-			outputPaths = append(outputPaths, outputConfig.OutputType)
-		} else if outputConfig.OutputType == "file" {
+		if outputConfig.Type == "stdout" ||
+			outputConfig.Type == "stderr" {
+			outputPaths = append(outputPaths, outputConfig.Type)
+		} else if outputConfig.Type == "file" {
 			outputPaths = append(outputPaths, outputConfig.Filepath)
-		} else if outputConfig.OutputType == "syslog" {
+		} else if outputConfig.Type == "syslog" {
 			outputPaths = append(outputPaths, "Syslog://127.0.0.1")
 			sysLogFactory := func(u *url.URL) (zap.Sink, error) {
-				w, err := GetSysLogger(outputConfig, loggerConfig.AppName)
+				w, err := util.GetSysLogger(outputConfig, loggerConfig.PrefixTag)
 
 				if err != nil {
 					return nil, err

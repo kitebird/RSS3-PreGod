@@ -16,5 +16,16 @@
     "max_idle_conns": 20,
     "conn_max_idle_time": -1,
     "conn_max_life_time": -1
+  },
+  "logger": {
+    "prefix_tag": "pregod",
+    "engine": "zap",
+    "level": "debug",
+    "encoding": "console",
+    "output": [
+      {
+        "type": "stdout"
+      }
+    ]
   }
 }

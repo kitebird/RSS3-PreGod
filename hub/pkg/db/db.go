@@ -3,6 +3,7 @@ package db
 import (
 	"time"
 
+	dblogger "github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"gorm.io/driver/postgres"
@@ -13,8 +14,13 @@ import (
 var db *gorm.DB
 
 func Setup() error {
-	// Establish a connection to the database
 	var err error
+
+	// Use custom logger
+	logger := dblogger.New()
+	logger.SetAsDefault()
+
+	// Establish a connection to the database
 	db, err = gorm.Open(postgres.New(postgres.Config{
 		DSN: config.Config.Postgres.DSN,
 	}), &gorm.Config{
@@ -22,6 +28,7 @@ func Setup() error {
 		NamingStrategy:                           schema.NamingStrategy{SingularTable: true},
 		NowFunc:                                  func() time.Time { return time.Now().UTC() },
 		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger:                                   logger,
 	})
 
 	if err != nil {
