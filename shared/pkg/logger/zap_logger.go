@@ -94,12 +94,15 @@ func getDefaultEncoderCfg() zapcore.EncoderConfig {
 func parseOutputPaths(loggerConfig LoggerConfig) ([]string, error) {
 	var outputPaths []string
 	for _, outputConfig := range loggerConfig.Output {
-		if outputConfig.OutputType == "file" {
+		if outputConfig.OutputType == "stdout" ||
+			outputConfig.OutputType == "stderr" {
+			outputPaths = append(outputPaths, outputConfig.OutputType)
+		} else if outputConfig.OutputType == "file" {
 			outputPaths = append(outputPaths, outputConfig.Filepath)
 		} else if outputConfig.OutputType == "syslog" {
 			outputPaths = append(outputPaths, "Syslog://127.0.0.1")
 			sysLogFactory := func(u *url.URL) (zap.Sink, error) {
-				w, err := GetSysLogger(outputConfig)
+				w, err := GetSysLogger(outputConfig, loggerConfig.AppName)
 
 				if err != nil {
 					return nil, err

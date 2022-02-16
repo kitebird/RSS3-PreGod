@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/go-redis/redis/v8"
 )
 
 var rdb *redis.Client
+var log = logger.Logger()
 
 func Setup() error {
 	rdb = redis.NewClient(&redis.Options{

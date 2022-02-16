@@ -1,44 +1,78 @@
 package logger
 
-import "log/syslog"
+import (
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger/model"
+)
 
-type LoggerOutputConfig struct {
-	OutputType string
+var log model.LoggerCore
+var isSetup = false
 
-	// The outputType is "file"
-	Filepath string
+func Logger() model.LoggerCore {
+	// Only possible when calling for initialization,
+	// if an exception occurs, the process will be closed directly
+	if !isSetup {
+		config := defaultLoggerConfig()
+		logger, err := GetZapLogger(config)
+		if err != nil {
+			panic(err)
+		}
+		log = &ZapLogger{SugaredLogger: *logger}
+	}
 
-	// The outputType is "syslog"
-	Priority syslog.Priority
+	return log
 }
 
-type LoggerConfig struct {
-	AppName string
+// Some simple encapsulations are made for the upper layer.
+// The Sugare mode of the zap library is used by default.
+// You can customize the encapsulation here to use other log libraries.
+func Setup() (err error) {
 
-	// Basic log configuration
-	LoggerType string
-	Level      string
-	Encoding   string
+	// Since there is no suitable nested configuration,
+	// the configuration of the logger is writtn to death first,
+	// and then called using the configuration file.
+	config := LoggerConfig{
+		AppName:    "PreGod",
+		LoggerType: "zap",
+		Level:      "debug",
+		Encoding:   "json",
+		Output: []LoggerOutputConfig{
+			// {
+			// 	OutputType: "stdout",
+			// },
+			{
+				OutputType: "file",
+				Filepath:   "./logs/PreGod.log",
+			},
+		},
+	}
 
-	// Configurable to options such as syslog or stdout
-	Output []LoggerOutputConfig
+	if config.LoggerType == "" {
+		config.LoggerType = "zap"
+	}
+
+	if config.LoggerType == "zap" {
+		logger, err := GetZapLogger(config)
+		if err != nil {
+			return err
+		}
+		log = &ZapLogger{SugaredLogger: *logger}
+	}
+
+	isSetup = true
+
+	return nil
 }
 
-type StandardLogger interface {
-	Debug(args ...interface{})
-	Debugf(format string, args ...interface{})
-	Error(args ...interface{})
-	Errorf(format string, args ...interface{})
-	Fatal(args ...interface{})
-	Fatalf(format string, args ...interface{})
-	Info(args ...interface{})
-	Infof(format string, args ...interface{})
-	Panic(args ...interface{})
-	Panicf(format string, args ...interface{})
-	Warn(args ...interface{})
-	Warnf(format string, args ...interface{})
-}
-
-type LoggerCore interface {
-	StandardLogger
+func defaultLoggerConfig() LoggerConfig {
+	return LoggerConfig{
+		AppName:    "PreGod",
+		LoggerType: "zap",
+		Level:      "debug",
+		Encoding:   "json",
+		Output: []LoggerOutputConfig{
+			{
+				OutputType: "stdout",
+			},
+		},
+	}
 }
