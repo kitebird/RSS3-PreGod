@@ -14,8 +14,7 @@ all:
 	make clean
 	make fmt
 	make lint
-	make build_go
-	make build_docker
+	make build
 	make test
 
 fmt:
@@ -35,6 +34,9 @@ dev_docker:
 dev_go_hub:
 	@echo "  >  \033[32mHappy coding! 😄😄😄 \033[0m "
 	go run hub/main.go
+
+build:
+	make build_go
 
 build_go:
 	@echo "  >  \033[32mBuilding binary...\033[0m "
