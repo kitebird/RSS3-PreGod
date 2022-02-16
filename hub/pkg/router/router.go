@@ -1,6 +1,9 @@
 package router
 
 import (
+	"net/http"
+
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/middleware"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router/api"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router/monitor"
 	"github.com/gin-gonic/gin"
@@ -9,7 +12,10 @@ import (
 func InitRouter() *gin.Engine {
 	r := gin.New()
 
-	r.GET("/ping", api.Ping)
+	// Apply middlewares
+	r.Use(middleware.Logger(), gin.Recovery())
+
+	// === APIs ===
 
 	// instance
 	r.GET("/:authority", api.GetInstance)
@@ -23,8 +29,14 @@ func InitRouter() *gin.Engine {
 	// r.GET("/:authority/list/links/:link_type/:page_index", api.GetLinkList)
 	// r.GET("/:authority/list/backlinks/:link_type", api.GetBacklinkList)
 
-	// monitor
+	// === Monitor ===
+	r.GET("/ping", api.Ping)
 	r.GET("/debug/statsviz/*filepath", monitor.Statsviz)
+
+	// === Static ===
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "https://rss3.io/favicon.ico")
+	})
 
 	return r
 }

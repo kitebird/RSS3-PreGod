@@ -3,7 +3,7 @@ package db
 import (
 	"time"
 
-	dblogger "github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/logger"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/dblogger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"gorm.io/driver/postgres"

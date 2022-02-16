@@ -3,10 +3,10 @@ package logger
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger/engine"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger/model"
+	"go.uber.org/zap"
 )
 
-var Logger model.LoggerCore
+var Logger *zap.SugaredLogger
 
 // Some simple encapsulations are made for the upper layer.
 // The Sugared mode of the zap library is used by default.

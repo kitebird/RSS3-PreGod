@@ -53,7 +53,8 @@ func main() {
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 
-	logger.Info("Start http server listening on localhost:", port)
+	logger.Info("Start http server listening on http://localhost", port)
+	defer logger.Logger.Sync()
 
 	go server.ListenAndServe()
 

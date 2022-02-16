@@ -1,19 +1,20 @@
-package logger
+package dblogger
 
 import (
 	"context"
 	"errors"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
-	logger_model "github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	gorm_logger "gorm.io/gorm/logger"
 )
 
 type Logger struct {
-	CoreLogger                logger_model.LoggerCore
+	CoreLogger                *zap.SugaredLogger
 	LogLevel                  gorm_logger.LogLevel
 	SlowThreshold             time.Duration
 	SkipCallerLookup          bool
@@ -49,7 +50,7 @@ func (l Logger) Info(ctx context.Context, str string, args ...interface{}) {
 		return
 	}
 
-	l.CoreLogger.Debugf(str, args...)
+	l.logger().Infof(str, args...)
 }
 
 func (l Logger) Warn(ctx context.Context, str string, args ...interface{}) {
@@ -57,7 +58,7 @@ func (l Logger) Warn(ctx context.Context, str string, args ...interface{}) {
 		return
 	}
 
-	l.CoreLogger.Warnf(str, args...)
+	l.logger().Warnf(str, args...)
 }
 
 func (l Logger) Error(ctx context.Context, str string, args ...interface{}) {
@@ -65,7 +66,7 @@ func (l Logger) Error(ctx context.Context, str string, args ...interface{}) {
 		return
 	}
 
-	l.CoreLogger.Errorf(str, args...)
+	l.logger().Errorf(str, args...)
 }
 
 func (l Logger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
@@ -79,13 +80,29 @@ func (l Logger) Trace(ctx context.Context, begin time.Time, fc func() (string, i
 	case err != nil && l.LogLevel >= gorm_logger.Error &&
 		(!l.IgnoreRecordNotFoundError || !errors.Is(err, gorm.ErrRecordNotFound)):
 		sql, rows := fc()
-		l.CoreLogger.Error("trace",
+		l.logger().Error("trace",
 			zap.Error(err), zap.Duration("elapsed", elapsed), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.SlowThreshold != 0 && elapsed > l.SlowThreshold && l.LogLevel >= gorm_logger.Warn:
 		sql, rows := fc()
-		l.CoreLogger.Warn("trace", zap.Duration("elapsed", elapsed), zap.Int64("rows", rows), zap.String("sql", sql))
+		l.logger().Warn("trace", zap.Duration("elapsed", elapsed), zap.Int64("rows", rows), zap.String("sql", sql))
 	case l.LogLevel >= gorm_logger.Info:
 		sql, rows := fc()
-		l.CoreLogger.Debug("trace", zap.Duration("elapsed", elapsed), zap.Int64("rows", rows), zap.String("sql", sql))
+		l.logger().Debug("trace", zap.Duration("elapsed", elapsed), zap.Int64("rows", rows), zap.String("sql", sql))
 	}
+}
+
+func (l Logger) logger() *zap.SugaredLogger {
+	for i := 2; i < 15; i++ {
+		_, file, _, ok := runtime.Caller(i)
+
+		switch {
+		case !ok:
+		case strings.HasSuffix(file, "_test.go"):
+		case strings.HasSuffix(file, "dblogger.go"):
+		default:
+			return l.CoreLogger.Desugar().WithOptions(zap.AddCallerSkip(i)).Sugar()
+		}
+	}
+
+	return l.CoreLogger
 }
