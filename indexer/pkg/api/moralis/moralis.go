@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/joho/godotenv"
 	jsoniter "github.com/json-iterator/go"
 )
+
+const endpoint = "https://deep-index.moralis.io"
 
 var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 
@@ -26,8 +29,9 @@ func GetNFTs(userAddress string, chainType string, apiKey string) (types.Moralis
 	}
 
 	// Gets all NFT items of user
-	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft?chain=%s&format=decimal", userAddress, chainType)
-	response, _ := Get(apiUrl, headers)
+	url := fmt.Sprintf("%s/api/v2/%s/nft?chain=%s&format=decimal",
+		endpoint, userAddress, chainType)
+	response, _ := util.GetURL(url, headers)
 
 	res := new(types.MoralisNFTResult)
 
@@ -46,9 +50,9 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (types
 	}
 
 	// Gets all NFT transfers of user
-	apiUrl := fmt.Sprintf("https://deep-index.moralis.io/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
-		userAddress, chainType)
-	response, _ := Get(apiUrl, headers)
+	url := fmt.Sprintf("%s/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
+		endpoint, userAddress, chainType)
+	response, _ := util.GetURL(url, headers)
 
 	res := new(types.MoralisNFTTransferResult)
 

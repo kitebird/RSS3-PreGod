@@ -1,59 +1,66 @@
 package config
 
 import (
-	"log"
 	"time"
 
-	"github.com/go-ini/ini"
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/json"
+	"github.com/knadh/koanf/providers/file"
 )
 
-type HubServerConfig struct {
-	RunMode      string
-	HttpPort     int
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
+type ProtocolStruct struct {
+	Version string `koanf:"version"`
 }
 
-type RedisConfig struct {
-	Addr     string
-	Password string
-	DB       int
+type HubServerStruct struct {
+	RunMode      string        `koanf:"run_mode"`
+	HttpPort     int           `koanf:"http_port"`
+	ReadTimeout  time.Duration `koanf:"read_timeout"`
+	WriteTimeout time.Duration `koanf:"write_timeout"`
 }
 
-type PostgresConfig struct {
-	DSN string
+type RedisStruct struct {
+	Addr     string `koanf:"addr"`
+	Password string `koanf:"password"`
+	DB       int    `koanf:"db"`
+}
+
+type PostgresStruct struct {
+	DSN             string        `koanf:"dsn"`
+	MaxOpenConns    int           `koanf:"max_open_conns"`
+	MaxIdleConns    int           `koanf:"max_idle_conns"`
+	ConnMaxIdleTime time.Duration `koanf:"conn_max_idle_time"`
+	ConnMaxLifetime time.Duration `koanf:"conn_max_lifetime"`
+}
+
+type ConfigStruct struct {
+	Protocol  ProtocolStruct  `koanf:"protocol"`
+	HubServer HubServerStruct `koanf:"hub_server"`
+	Redis     RedisStruct     `koanf:"redis"`
+	Postgres  PostgresStruct  `koanf:"postgres"`
 }
 
 var (
-	HubServer = &HubServerConfig{}
-	Redis     = &RedisConfig{}
-	Postgres  = &PostgresConfig{}
+	Config = &ConfigStruct{}
 
-	cfg *ini.File
+	k = koanf.New(".")
 )
 
 func Setup() error {
-	var err error
-	cfg, err = ini.Load("config/conf.dev.ini")
-
-	if err != nil {
+	// Read user config
+	if err := k.Load(file.Provider("config/config.dev.json"), json.Parser()); err != nil {
 		return err
 	}
 
-	mapTo("hub-server", HubServer)
-	HubServer.ReadTimeout = HubServer.ReadTimeout * time.Second
-	HubServer.WriteTimeout = HubServer.WriteTimeout * time.Second
+	if err := k.Unmarshal("", Config); err != nil {
+		return err
+	}
 
-	mapTo("redis", Redis)
+	Config.HubServer.ReadTimeout = Config.HubServer.ReadTimeout * time.Second
+	Config.HubServer.WriteTimeout = Config.HubServer.WriteTimeout * time.Second
 
-	mapTo("postgres", Postgres)
+	Config.Postgres.ConnMaxIdleTime = Config.Postgres.ConnMaxIdleTime * time.Second
+	Config.Postgres.ConnMaxLifetime = Config.Postgres.ConnMaxLifetime * time.Second
 
 	return nil
-}
-
-func mapTo(section string, v interface{}) {
-	err := cfg.Section(section).MapTo(v)
-	if err != nil {
-		log.Fatalf("Cfg.MapTo %s err: %v", section, err) // TODO: change to zap
-	}
 }

@@ -26,3 +26,5 @@ dist/
 # DB Data
 tmp_data/
 
+.vscode/
+
