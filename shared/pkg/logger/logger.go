@@ -37,13 +37,16 @@ func Setup() error {
 		Level:      "debug",
 		Encoding:   "json",
 		Output: []LoggerOutputConfig{
-			// {
-			// 	OutputType: "stdout",
-			// },
 			{
-				OutputType: "file",
-				Filepath:   "./logs/PreGod.log",
+				OutputType: "stdout",
 			},
+			// {
+			// 	OutputType: "file",
+			// 	Filepath:   "/root/rss3_dev/RSS3-PreGod/PreGod.log",
+			// },
+			// {
+			// 	OutputType: "syslog",
+			// },
 		},
 	}
 
