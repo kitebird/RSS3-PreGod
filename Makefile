@@ -10,6 +10,20 @@ help: Makefile
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 	@echo
 
+all:
+	make clean
+	make fmt
+	make lint
+	make build_go
+	make build_docker
+	make test
+
+fmt:
+	go fmt ./...
+
+lint:
+	golangci-lint run ./...
+
 get:
 	@echo "  >  \033[32mDownloading & Installing all the modules...\033[0m "
 	go mod tidy && go mod download
