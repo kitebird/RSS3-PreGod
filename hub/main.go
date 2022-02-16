@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,13 +13,22 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/router"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
+
+var log = logger.Logger()
 
 func init() {
 	if err := config.Setup(); err != nil {
 		log.Fatalf("config.Setup err: %v", err)
 	}
+
+	if err := logger.Setup(); err != nil {
+		log.Fatalf("config.Setup err: %v", err)
+	}
+
+	log = logger.Logger()
 
 	if err := cache.Setup(); err != nil {
 		log.Fatalf("cache.Setup err: %v", err)
@@ -48,7 +56,7 @@ func main() {
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 
-	log.Printf("[info] start http server listening %s", port) // TODO: change to zap
+	log.Infof("[info] start http server listening %s", port) // TODO: change to zap
 
 	go server.ListenAndServe()
 
@@ -60,7 +68,7 @@ func gracefullyExit(server *http.Server) {
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 	sig := <-quit
 
-	log.Println("Shutdown due to a signal", sig)
+	log.Infof("Shutdown due to a signal", sig)
 
 	now := time.Now()
 
@@ -71,5 +79,5 @@ func gracefullyExit(server *http.Server) {
 		log.Fatal("Shutdown error:", err)
 	}
 
-	log.Println("Shutdown server successfully in", time.Since(now))
+	log.Infof("Shutdown server successfully in", time.Since(now))
 }
