@@ -22,6 +22,7 @@ func (s sysLogSink) Close() error {
 
 func (s sysLogSink) Write(p []byte) (n int, err error) {
 	s.sysLogWriter.Write(p)
+
 	return len(p), nil
 }
 
@@ -30,11 +31,11 @@ type ZapLogger struct {
 }
 
 func GetZapLogger(loggerConfig LoggerConfig) (*zap.SugaredLogger, error) {
-
 	outputPaths, err := parseOutputPaths(loggerConfig)
 	if err != nil {
 		return nil, err
 	}
+
 	if len(outputPaths) == 0 {
 		outputPaths = append(outputPaths, "stdout")
 	}
@@ -55,6 +56,7 @@ func GetZapLogger(loggerConfig LoggerConfig) (*zap.SugaredLogger, error) {
 	}
 
 	sugaredLogger := zaplog.Sugar()
+
 	return sugaredLogger, nil
 }
 
@@ -93,6 +95,7 @@ func getDefaultEncoderCfg() zapcore.EncoderConfig {
 
 func parseOutputPaths(loggerConfig LoggerConfig) ([]string, error) {
 	var outputPaths []string
+
 	for _, outputConfig := range loggerConfig.Output {
 		if outputConfig.OutputType == "stdout" ||
 			outputConfig.OutputType == "stderr" {
@@ -119,5 +122,6 @@ func parseOutputPaths(loggerConfig LoggerConfig) ([]string, error) {
 			}
 		}
 	}
+
 	return outputPaths, nil
 }

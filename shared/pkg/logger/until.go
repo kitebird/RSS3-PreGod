@@ -8,6 +8,7 @@ import (
 func GetSysLogger(config LoggerOutputConfig, appName string) (w *syslog.Writer, err error) {
 	if config.OutputType != "syslog" {
 		err = fmt.Errorf("invalid syslog config")
+
 		return nil, err
 	}
 

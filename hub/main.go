@@ -24,6 +24,12 @@ func init() {
 		log.Fatalf("config.Setup err: %v", err)
 	}
 
+	if err := logger.Setup(); err != nil {
+		log.Fatalf("config.Setup err: %v", err)
+	}
+
+	log = logger.Logger()
+
 	if err := cache.Setup(); err != nil {
 		log.Fatalf("cache.Setup err: %v", err)
 	}

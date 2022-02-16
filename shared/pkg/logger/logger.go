@@ -13,9 +13,11 @@ func Logger() model.LoggerCore {
 	if !isSetup {
 		config := defaultLoggerConfig()
 		logger, err := GetZapLogger(config)
+
 		if err != nil {
 			panic(err)
 		}
+
 		log = &ZapLogger{SugaredLogger: *logger}
 	}
 
@@ -25,8 +27,7 @@ func Logger() model.LoggerCore {
 // Some simple encapsulations are made for the upper layer.
 // The Sugare mode of the zap library is used by default.
 // You can customize the encapsulation here to use other log libraries.
-func Setup() (err error) {
-
+func Setup() error {
 	// Since there is no suitable nested configuration,
 	// the configuration of the logger is writtn to death first,
 	// and then called using the configuration file.
@@ -55,6 +56,7 @@ func Setup() (err error) {
 		if err != nil {
 			return err
 		}
+
 		log = &ZapLogger{SugaredLogger: *logger}
 	}
 
