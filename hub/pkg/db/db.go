@@ -16,7 +16,7 @@ func Setup() error {
 	// Establish a connection to the database
 	var err error
 	db, err = gorm.Open(postgres.New(postgres.Config{
-		DSN: config.Postgres.DSN,
+		DSN: config.Config.Postgres.DSN,
 	}), &gorm.Config{
 		SkipDefaultTransaction:                   true,
 		NamingStrategy:                           schema.NamingStrategy{SingularTable: true},
@@ -35,10 +35,10 @@ func Setup() error {
 	}
 
 	// Set config
-	sqlDB.SetMaxOpenConns(config.Postgres.MaxOpenConns)
-	sqlDB.SetMaxIdleConns(config.Postgres.MaxIdleConns)
-	sqlDB.SetConnMaxIdleTime(config.Postgres.ConnMaxIdleTime)
-	sqlDB.SetConnMaxLifetime(config.Postgres.ConnMaxLifetime)
+	sqlDB.SetMaxOpenConns(config.Config.Postgres.MaxOpenConns)
+	sqlDB.SetMaxIdleConns(config.Config.Postgres.MaxIdleConns)
+	sqlDB.SetConnMaxIdleTime(config.Config.Postgres.ConnMaxIdleTime)
+	sqlDB.SetConnMaxLifetime(config.Config.Postgres.ConnMaxLifetime)
 
 	// defer sqlDB.Close()
 

@@ -11,9 +11,9 @@ var rdb *redis.Client
 
 func Setup() error {
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     config.Redis.Addr,
-		Password: config.Redis.Password,
-		DB:       config.Redis.DB,
+		Addr:     config.Config.Redis.Addr,
+		Password: config.Config.Redis.Password,
+		DB:       config.Config.Redis.DB,
 	})
 
 	_, err := rdb.Ping(context.Background()).Result()

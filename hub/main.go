@@ -36,15 +36,15 @@ func init() {
 }
 
 func main() {
-	gin.SetMode(config.HubServer.RunMode)
+	gin.SetMode(config.Config.HubServer.RunMode)
 
-	port := fmt.Sprintf(":%d", config.HubServer.HttpPort)
+	port := fmt.Sprintf(":%d", config.Config.HubServer.HttpPort)
 
 	server := &http.Server{
 		Addr:           port,
 		Handler:        router.InitRouter(),
-		ReadTimeout:    config.HubServer.ReadTimeout,
-		WriteTimeout:   config.HubServer.WriteTimeout,
+		ReadTimeout:    config.Config.HubServer.ReadTimeout,
+		WriteTimeout:   config.Config.HubServer.WriteTimeout,
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 
