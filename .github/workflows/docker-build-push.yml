@@ -58,6 +58,8 @@ jobs:
         if: always()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "Build Hub"
+          description: "Build RSS3-PreGod Hub"
           username: 'GitHub Actions'
           avatar_url: 'https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg'
 
@@ -110,6 +112,8 @@ jobs:
         if: always()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "Build Indexer"
+          description: "Build RSS3-PreGod Indexer"
           username: 'GitHub Actions'
           avatar_url: 'https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg'
 
