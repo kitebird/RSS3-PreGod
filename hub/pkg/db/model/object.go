@@ -16,6 +16,7 @@ type Object struct {
 	Title       string         `gorm:"type:text"`
 	Summary     string         `gorm:"type:text"`
 	Authors     pq.StringArray `gorm:"type:text[]"`
+	Tags        pq.StringArray `gorm:"type:text[]"`
 	Attachments datatypes.JSON `gorm:"type:jsonb"`
 
 	PlatformNameID    constants.PlatformNameID `gorm:"type:int;column:platform_name_id"`
