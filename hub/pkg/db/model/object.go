@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/lib/pq"
 	"gorm.io/datatypes"
@@ -19,7 +17,6 @@ type Object struct {
 	Tags        pq.StringArray `gorm:"type:text[]"`
 	Attachments datatypes.JSON `gorm:"type:jsonb"`
 
-	PlatformNameID    constants.PlatformNameID `gorm:"type:int;column:platform_name_id"`
-	PlatformObjectID  string                   `gorm:"type:text;column:platform_object_id"` // object ID on the platform
-	PlatformCreatedAt time.Time                `gorm:"index"`                               // create time on the platform
+	PlatformNameID   constants.PlatformNameID `gorm:"type:int;column:platform_name_id"`
+	PlatformObjectID string                   `gorm:"type:text;column:platform_object_id"` // object ID on the platform
 }
