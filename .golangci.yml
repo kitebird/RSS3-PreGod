@@ -64,3 +64,9 @@ linters-settings:
     case:
       rules:
         json: snake
+  gci:
+    sections:
+      - standard # Captures all standard packages if they do not match another section.
+      - default # Contains all imports that could not be matched to another section type.
+      - newLine # Prints an empty line
+      - prefix(github.com/NaturalSelectionLabs/RSS3-PreGod) # Groups all imports with the specified Prefix.
