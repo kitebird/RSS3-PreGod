@@ -64,3 +64,5 @@ linters-settings:
     case:
       rules:
         json: snake
+  lll:
+    line-length: 150
