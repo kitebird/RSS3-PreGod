@@ -6,11 +6,8 @@ var (
 	fromDirectory string
 )
 
-func init() {
-	flag.StringVar(&fromDirectory, "from", "", "Directory to read v0.3.1 files from")
-}
-
 func Start() {
+	flag.StringVar(&fromDirectory, "from", "", "Directory to read v0.3.1 files from")
 	flag.Parse()
 	if fromDirectory == "" {
 		flag.PrintDefaults()
