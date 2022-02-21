@@ -28,3 +28,5 @@ tmp_data/
 
 .vscode/
 
+# import data directory
+import_data/
