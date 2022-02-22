@@ -1,9 +1,8 @@
 package data_migration
 
 import (
-	"encoding/json"
 	"errors"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/model"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/handler"
 	"log"
 	"os"
 	"path/filepath"
@@ -36,13 +35,13 @@ func migrate(fromDir string, delete bool) error {
 		var errInHandle error = nil
 		if !strings.Contains(filename, "-") {
 			// is main index
-			errInHandle = handleMainIndex(filebytes)
+			errInHandle = handler.MainIndex(filebytes)
 		} else if strings.Contains(filename, "-list-assets") {
-			errInHandle = handleAutoAssetList(filebytes)
+			errInHandle = handler.AssetListAuto(filebytes)
 		} else if strings.Contains(filename, "-list-links") {
-			errInHandle = handleLinkList(filebytes)
+			errInHandle = handler.LinkList(filebytes)
 		} else if strings.Contains(filename, "-list-backlinks") {
-			errInHandle = handleLinkBackList(filebytes)
+			errInHandle = handler.LinkBackList(filebytes)
 		} else {
 			errInHandle = errors.New("Unknown file: " + filename)
 		}
@@ -58,52 +57,4 @@ func migrate(fromDir string, delete bool) error {
 
 	})
 
-}
-
-func handleMainIndex(filebytes []byte) error {
-	// handle main index
-	var mainIndex model.RSS3Index031
-	// Unmarshal
-	if err := json.Unmarshal(filebytes, &mainIndex); err != nil {
-		return err
-	}
-	// Split & save into db
-
-	return nil
-}
-
-func handleLinkList(filebytes []byte) error {
-	// handle link list
-	var linkList model.RSS3Links031
-	// Unmarshal
-	if err := json.Unmarshal(filebytes, &linkList); err != nil {
-		return err
-	}
-	// Split & save into db
-
-	return nil
-}
-
-func handleLinkBackList(filebytes []byte) error {
-	// handle link back list
-	var linkBackList model.RSS3Backlinks031
-	// Unmarshal
-	if err := json.Unmarshal(filebytes, &linkBackList); err != nil {
-		return err
-	}
-	// Split & save into db
-
-	return nil
-}
-
-func handleAutoAssetList(filebytes []byte) error {
-	// handle auto asset list
-	var autoAssetList model.RSS3AutoAssets031
-	// Unmarshal
-	if err := json.Unmarshal(filebytes, &autoAssetList); err != nil {
-		return err
-	}
-	// Split & save into db
-
-	return nil
 }
