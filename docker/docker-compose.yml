@@ -48,7 +48,7 @@ services:
             - ./config/rocketmq/broker.conf:/home/rocketmq/rocketmq-4.9.2/broker.conf
         command: sh mqbroker -c /home/rocketmq/rocketmq-4.9.2/broker.conf
         depends_on:
-            - rocketmq.nameserve
+            - rocketmq.nameserver
 
     rocketmq.dashboard:
         image: apacherocketmq/rocketmq-dashboard:latest
