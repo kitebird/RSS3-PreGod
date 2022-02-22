@@ -6,7 +6,8 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 )
 
-const endpoint = "https://arweave.net"
+const arweaveEndpoint string = "https://arweave.net"
+const arweaveGraphqlEndpoint string = "https://arweave.net/graphql"
 
 // GetContentByTxHash gets transaction content by tx hash.
 func GetContentByTxHash(hash string) ([]byte, error) {
@@ -15,19 +16,15 @@ func GetContentByTxHash(hash string) ([]byte, error) {
 		"Referer": "https://viewblock.io",
 	}
 
-	url := fmt.Sprintf("%s/%s", endpoint, hash)
-
-	return util.Get(url, headers)
+	return util.Get(arweaveEndpoint+"/"+hash, headers)
 }
 
-// GetTransacitons gets all transactions using filters.
-func GetTransacitons(from, to uint64, owner string) ([]byte, error) {
+// GetTransactions gets all transactions using filters.
+func GetTransactions(from, to uint64, owner string) ([]byte, error) {
 	var headers = map[string]string{
 		"Accept-Encoding": "gzip, deflate, br",
 		"Content-Type":    "application/json",
 		"Accept":          "application/json",
-		"Connection":      "keep-alive",
-		"DNT":             "1",
 		"Origin":          "https://arweave.net",
 	}
 
@@ -38,7 +35,6 @@ func GetTransacitons(from, to uint64, owner string) ([]byte, error) {
 			"sort: HEIGHT_ASC ) { edges { node {id tags { name value } } } }" +
 			"}\"}"
 	data := fmt.Sprintf(queryVariables, from, to, owner)
-	url := fmt.Sprintf("%s/graphql", endpoint)
 
-	return util.Post(url, headers, data)
+	return util.Post(arweaveGraphqlEndpoint, headers, data)
 }

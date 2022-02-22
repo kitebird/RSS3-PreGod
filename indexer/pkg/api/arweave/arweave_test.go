@@ -39,7 +39,7 @@ func TestGetTransacitons(t *testing.T) {
 	t.Parallel()
 
 	owner := "Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c"
-	response, err := arweave.GetTransacitons(877250, 877250, owner)
+	response, err := arweave.GetTransactions(877250, 877250, owner)
 	// assert for nil
 	assert.Nil(t, err)
 	assert.True(t, len(response) > 0)
