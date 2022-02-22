@@ -63,8 +63,9 @@ func TestGetTransacitons(t *testing.T) {
 		tags := edge.GetArray("node", "tags")
 		for _, tag := range tags {
 			name := tag.GetStringBytes("name")
-			value := tag.GetStringBytes("value")
 			assert.NotEmpty(t, name)
+
+			value := tag.GetStringBytes("value")
 			assert.NotEmpty(t, value)
 		}
 	}

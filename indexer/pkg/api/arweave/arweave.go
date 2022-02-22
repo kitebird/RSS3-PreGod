@@ -3,11 +3,9 @@ package arweave
 import (
 	"fmt"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
-
-	"github.com/valyala/fastjson"
-
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
+	"github.com/valyala/fastjson"
 )
 
 const arweaveEndpoint string = "https://arweave.net"
@@ -46,6 +44,7 @@ func GetTransactions(from, to uint64, owner string) ([]byte, error) {
 
 func ParseGraphqlNode(node string) (types.MirrorArticle, error) {
 	var parser fastjson.Parser
+
 	parsedJson, err := parser.Parse(node)
 	if err != nil {
 		return types.MirrorArticle{}, err
@@ -53,24 +52,24 @@ func ParseGraphqlNode(node string) (types.MirrorArticle, error) {
 
 	article := new(types.MirrorArticle)
 
-	id := parsedJson.GetStringBytes("node", "id")
 	tags := parsedJson.GetArray("node", "tags")
 	for _, tag := range tags {
-		name := tag.GetStringBytes("name")
-		value := tag.GetStringBytes("value")
+		name := string(tag.GetStringBytes("name"))
+		value := string(tag.GetStringBytes("value"))
 
-		v := string(value)
-		switch string(name) {
+		switch name {
 		case "Contributor":
-			article.Author = v
+			article.Author = value
 		case "Content-Digest":
-			article.Digest = v
+			article.Digest = value
 		case "Original-Content-Digest":
-			article.OriginalDigest = v
+			article.OriginalDigest = value
 		}
-		article.Link = mirrorHost + "/" + article.Author + "/" + article.OriginalDigest
 
+		article.Link = mirrorHost + "/" + article.Author + "/" + article.OriginalDigest
 	}
+
+	id := parsedJson.GetStringBytes("node", "id")
 
 	content, err := GetContentByTxHash(string(id))
 	if err != nil {
