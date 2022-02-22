@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/model"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -50,6 +51,8 @@ func migrate(fromDir string, delete bool) error {
 			// delete
 			errInHandle = os.Remove(path)
 		}
+
+		log.Println("Success: ", filename)
 
 		return errInHandle
 
