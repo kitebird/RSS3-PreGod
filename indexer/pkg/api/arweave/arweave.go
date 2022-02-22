@@ -12,6 +12,10 @@ const arweaveEndpoint string = "https://arweave.net"
 const arweaveGraphqlEndpoint string = "https://arweave.net/graphql"
 const mirrorHost = "https://mirror.xyz/"
 
+type (
+	MirrorArticle = types.MirrorArticle
+)
+
 // GetContentByTxHash gets transaction content by tx hash.
 func GetContentByTxHash(hash string) ([]byte, error) {
 	var headers = map[string]string{
@@ -42,15 +46,15 @@ func GetTransactions(from, to uint64, owner string) ([]byte, error) {
 	return util.Post(arweaveGraphqlEndpoint, headers, data)
 }
 
-func ParseGraphqlNode(node string) (types.MirrorArticle, error) {
+func ParseGraphqlNode(node string) (MirrorArticle, error) {
 	var parser fastjson.Parser
 
 	parsedJson, err := parser.Parse(node)
 	if err != nil {
-		return types.MirrorArticle{}, err
+		return MirrorArticle{}, err
 	}
 
-	article := new(types.MirrorArticle)
+	article := new(MirrorArticle)
 
 	tags := parsedJson.GetArray("node", "tags")
 	for _, tag := range tags {
@@ -89,4 +93,31 @@ func ParseGraphqlNode(node string) (types.MirrorArticle, error) {
 	article.Content = string(parsedJson.GetStringBytes("content", "body")) // timestamp
 
 	return *article, nil
+}
+
+func GetArticles(from, to uint64, owner string) ([]MirrorArticle, error) {
+	response, err := GetTransactions(from, to, owner)
+	if err != nil {
+		return nil, nil
+	}
+
+	var parser fastjson.Parser
+
+	parsedJson, parseErr := parser.Parse(string(response))
+	if parseErr != nil {
+		return nil, nil
+	}
+
+	// edges
+	edges := parsedJson.GetArray("data", "transactions", "edges")
+	result := make([]MirrorArticle, len(edges))
+
+	for i := 0; i < len(edges); i++ {
+		result[i], err = ParseGraphqlNode(edges[i].String())
+		if err != nil {
+			return nil, nil
+		}
+	}
+
+	return result, nil
 }

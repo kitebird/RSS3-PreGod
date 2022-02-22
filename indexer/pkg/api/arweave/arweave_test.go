@@ -52,21 +52,24 @@ func TestGetTransacitons(t *testing.T) {
 
 	edges := parsedJson.GetArray("data", "transactions", "edges")
 	assert.NotEmpty(t, edges)
+}
 
-	// edges
-	for _, edge := range edges {
-		// id
-		id := edge.GetStringBytes("node", "id")
-		assert.NotEmpty(t, id)
+func TestGetArticles(t *testing.T) {
+	t.Parallel()
 
-		// tags
-		tags := edge.GetArray("node", "tags")
-		for _, tag := range tags {
-			name := tag.GetStringBytes("name")
-			assert.NotEmpty(t, name)
+	owner := "Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c"
+	articles, err := arweave.GetArticles(877250, 877250, owner)
+	// assert for nil
+	assert.Nil(t, err)
+	assert.NotEmpty(t, articles)
 
-			value := tag.GetStringBytes("value")
-			assert.NotEmpty(t, value)
-		}
+	for _, article := range articles {
+		assert.NotEmpty(t, article.Title)
+		assert.NotEmpty(t, article.TimeStamp)
+		assert.NotEmpty(t, article.Content)
+		assert.NotEmpty(t, article.Author)
+		assert.NotEmpty(t, article.Link)
+		assert.NotEmpty(t, article.Digest)
+		assert.NotEmpty(t, article.OriginalDigest)
 	}
 }
