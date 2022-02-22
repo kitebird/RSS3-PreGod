@@ -5,9 +5,6 @@ services:
     restart: always
     image: redis:latest
     container_name: rss3_pregod_redis
-    networks:
-      - internal_network
-      - external_network
     volumes:
       - ./tmp_data/redis:/data
     ports:
@@ -21,15 +18,7 @@ services:
       POSTGRES_DB: pregod
       POSTGRES_USER: rss3
       POSTGRES_PASSWORD: rss3rocks
-    networks:
-      - internal_network
-      - external_network
     volumes:
       - ./tmp_data/pg:/var/lib/postgresql/data
     ports:
       - 5432:5432
-
-networks:
-  internal_network:
-    internal: true
-  external_network:
