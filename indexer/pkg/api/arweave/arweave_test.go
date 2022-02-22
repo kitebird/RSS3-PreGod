@@ -15,7 +15,7 @@ func TestGetContentByTxHash(t *testing.T) {
 	response, err := arweave.GetContentByTxHash(hash)
 	// assert for nil
 	assert.Nil(t, err)
-	assert.True(t, len(response) > 0)
+	assert.NotEmpty(t, response)
 
 	var parser fastjson.Parser
 	parsedJson, parseErr := parser.Parse(string(response))
@@ -23,16 +23,18 @@ func TestGetContentByTxHash(t *testing.T) {
 
 	// check title
 	title := parsedJson.GetStringBytes("content", "title")
-	assert.True(t, len(title) > 0)
+	assert.NotEmpty(t, title)
+
 	// check body
 	body := parsedJson.GetStringBytes("content", "body")
-	assert.True(t, len(body) > 0)
+	assert.NotEmpty(t, body)
+
 	// check contributor
 	contributor := parsedJson.GetStringBytes("authorship", "contributor")
-	assert.True(t, len(contributor) > 0)
+	assert.NotEmpty(t, contributor)
 	// check originalDigest
 	originalDigest := parsedJson.GetStringBytes("originalDigest")
-	assert.True(t, len(originalDigest) > 0)
+	assert.NotEmpty(t, originalDigest)
 }
 
 func TestGetTransacitons(t *testing.T) {
@@ -42,18 +44,28 @@ func TestGetTransacitons(t *testing.T) {
 	response, err := arweave.GetTransactions(877250, 877250, owner)
 	// assert for nil
 	assert.Nil(t, err)
-	assert.True(t, len(response) > 0)
+	assert.NotEmpty(t, response)
 
 	var parser fastjson.Parser
 	parsedJson, parseErr := parser.Parse(string(response))
 	assert.Nil(t, parseErr)
 
 	edges := parsedJson.GetArray("data", "transactions", "edges")
-	assert.True(t, len(edges) > 0)
+	assert.NotEmpty(t, edges)
 
 	// edges
 	for _, edge := range edges {
+		// id
 		id := edge.GetStringBytes("node", "id")
-		assert.True(t, len(id) > 0)
+		assert.NotEmpty(t, id)
+
+		// tags
+		tags := edge.GetArray("node", "tags")
+		for _, tag := range tags {
+			name := tag.GetStringBytes("name")
+			value := tag.GetStringBytes("value")
+			assert.NotEmpty(t, name)
+			assert.NotEmpty(t, value)
+		}
 	}
 }
