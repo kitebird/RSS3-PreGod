@@ -1,4 +1,4 @@
-package model
+package protocol
 
 type RSS3Index031 struct {
 	Version        string `json:"version"`      // "rss3.io/version/v0.3.1"
