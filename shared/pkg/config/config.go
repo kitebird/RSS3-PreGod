@@ -33,6 +33,13 @@ type PostgresStruct struct {
 	ConnMaxLifetime time.Duration `koanf:"conn_max_lifetime"`
 }
 
+type MongoStruct struct {
+	URI         string `koanf:"uri"`
+	DB          string `koanf:"db"`
+	MaxPoolSize int    `koanf:"max_pool_size"`
+	MinPoolSize int    `koanf:"min_pool_size"`
+}
+
 type LoggerOutputConfig struct {
 	Type     string `koanf:"type"`     // available values: `stdout`, `file`, `syslog`
 	Filepath string `koanf:"filepath"` // only for file
@@ -53,6 +60,7 @@ type ConfigStruct struct {
 	HubServer HubServerStruct `koanf:"hub_server"`
 	Redis     RedisStruct     `koanf:"redis"`
 	Postgres  PostgresStruct  `koanf:"postgres"`
+	Mongo     MongoStruct     `koanf:"mongo"`
 	Logger    LoggerStruct    `koanf:"logger"`
 }
 
