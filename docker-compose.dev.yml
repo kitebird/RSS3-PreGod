@@ -29,6 +29,15 @@ services:
     ports:
       - 5432:5432
 
+  mongo:
+    restart: always
+    image: mongo:latest
+    container_name: rss3_pregod_mongo
+    volumes:
+      - ./tmp_data/mongo:/data
+    ports:
+      - "27017:27017"
+
 networks:
   internal_network:
     internal: true
