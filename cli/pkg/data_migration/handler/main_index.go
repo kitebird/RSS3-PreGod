@@ -41,7 +41,7 @@ func MainIndex(filebytes []byte) error {
 
 	var instanceBase model.InstanceBase
 
-	newID := "rss3://account:" + mainIndex.ID + "@evm"
+	newID := mainIndex.ID + "@" + string(constants.PlatformName_Evm)
 
 	if err := db.DB.First(&instanceBase, "RSS3ID = ?", newID).Error; !errors.Is(err, gorm.ErrRecordNotFound) {
 		// Already exists
@@ -50,9 +50,9 @@ func MainIndex(filebytes []byte) error {
 
 	// New instance
 	instanceBase = model.InstanceBase{
-		RSS3ID:            newID,
-		ControllerAddress: newID,
-		InstanceTypeID:    constants.InstanceType_Account,
+		RSS3ID:         newID,
+		Prefix:         constants.Prefix_Account,
+		InstanceTypeID: constants.InstanceType_Account,
 	}
 
 	// Accounts
@@ -67,7 +67,7 @@ func MainIndex(filebytes []byte) error {
 	for _, additionalAccount := range mainIndex.Profile.Accounts {
 		splits := strings.Split(additionalAccount.ID, "-")
 		accounts = append(accounts, model.AccountPlatform{
-			AccountID:         "rss3://account:" + splits[0] + "@" + splits[1],
+			AccountID:         splits[0] + "@" + splits[1],
 			PlatformNameID:    getAccountPlatform(splits[0]),
 			PlatformAccountID: splits[1],
 		})

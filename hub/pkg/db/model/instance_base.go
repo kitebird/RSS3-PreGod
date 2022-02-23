@@ -9,6 +9,7 @@ type InstanceBase struct {
 	Base BaseModel `gorm:"embedded"`
 
 	RSS3ID            string                   `gorm:"primaryKey;type:text;column:rss3_id"`
+	Prefix            constants.Prefix         `gorm:"type:text;column:prefix"`
 	ControllerAddress string                   `gorm:"type:text"`
 	InstanceTypeID    constants.InstanceTypeID `gorm:"type:int;column:instance_type_id"`
 }

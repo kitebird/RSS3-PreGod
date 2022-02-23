@@ -41,7 +41,7 @@ func LinkList(filebytes []byte) error {
 	listID := strings.Split(splits[2], ".")[1]
 	pageNumberStr := splits[3]
 
-	instanceID := "rss3://account:" + account + "@evm"
+	instanceID := account + "@" + string(constants.PlatformName_Evm)
 	linkListID := instanceID + "/list/links/" + listID + "/" + pageNumberStr
 
 	pageNumber, err := strconv.Atoi(pageNumberStr)
@@ -53,7 +53,7 @@ func LinkList(filebytes []byte) error {
 	var links []model.Link
 
 	for _, link := range linkList.List {
-		targetInstanceID := "rss3://account:" + link + "@evm"
+		targetInstanceID := link + "@" + string(constants.PlatformName_Evm)
 		links = append(links, model.Link{
 			LinkID: linkListID, // todo: what is this ? uuid ?
 			//ItemID:       "",
