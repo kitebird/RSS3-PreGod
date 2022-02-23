@@ -8,6 +8,14 @@ import (
 	"github.com/valyala/fastjson"
 )
 
+func TestGetLatestBlockHeight(t *testing.T) {
+	t.Parallel()
+
+	blockHeight, err := arweave.GetLatestBlockHeight()
+	assert.Nil(t, err)
+	assert.NotEqual(t, 0, blockHeight)
+}
+
 func TestGetContentByTxHash(t *testing.T) {
 	t.Parallel()
 

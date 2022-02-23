@@ -16,6 +16,24 @@ type (
 	MirrorArticle = types.MirrorArticle
 )
 
+// GetLatestBlockHeight gets the latest block height for arweave
+func GetLatestBlockHeight() (int64, error) {
+	response, err := util.Get(arweaveEndpoint, nil)
+	if err != nil {
+		return 0, nil
+	}
+
+	var parser fastjson.Parser
+
+	parsedJson, parseErr := parser.Parse(string(response))
+	if parseErr != nil {
+		return 0, nil
+	}
+
+	blockHeight := parsedJson.GetInt64("height")
+	return blockHeight, nil
+}
+
 // GetContentByTxHash gets transaction content by tx hash.
 func GetContentByTxHash(hash string) ([]byte, error) {
 	var headers = map[string]string{
