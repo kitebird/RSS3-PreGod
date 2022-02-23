@@ -24,13 +24,14 @@ func GetLatestBlockHeight() (int64, error) {
 	}
 
 	var parser fastjson.Parser
-
 	parsedJson, parseErr := parser.Parse(string(response))
+
 	if parseErr != nil {
 		return 0, nil
 	}
 
 	blockHeight := parsedJson.GetInt64("height")
+
 	return blockHeight, nil
 }
 
