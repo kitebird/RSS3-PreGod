@@ -21,12 +21,14 @@ dist/
 .idea/
 
 # Dev Data
-*.env
+**/*.env
 
 # DB Data
 tmp_data/
 
 .vscode/
+
+docker/volume
 
 # import data directory
 import_data/
