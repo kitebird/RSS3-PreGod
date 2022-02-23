@@ -46,7 +46,35 @@ func GetTransactions(from, to uint64, owner string) ([]byte, error) {
 	return util.Post(arweaveGraphqlEndpoint, headers, data)
 }
 
-func ParseGraphqlNode(node string) (MirrorArticle, error) {
+// GetArticles gets all articles from arweave using filters.
+func GetArticles(from, to uint64, owner string) ([]MirrorArticle, error) {
+	response, err := GetTransactions(from, to, owner)
+	if err != nil {
+		return nil, nil
+	}
+
+	var parser fastjson.Parser
+
+	parsedJson, parseErr := parser.Parse(string(response))
+	if parseErr != nil {
+		return nil, nil
+	}
+
+	// edges
+	edges := parsedJson.GetArray("data", "transactions", "edges")
+	result := make([]MirrorArticle, len(edges))
+
+	for i := 0; i < len(edges); i++ {
+		result[i], err = parseGraphqlNode(edges[i].String())
+		if err != nil {
+			return nil, nil
+		}
+	}
+
+	return result, nil
+}
+
+func parseGraphqlNode(node string) (MirrorArticle, error) {
 	var parser fastjson.Parser
 
 	parsedJson, err := parser.Parse(node)
@@ -54,7 +82,7 @@ func ParseGraphqlNode(node string) (MirrorArticle, error) {
 		return MirrorArticle{}, err
 	}
 
-	article := new(MirrorArticle)
+	article := MirrorArticle{}
 
 	tags := parsedJson.GetArray("node", "tags")
 	for _, tag := range tags {
@@ -74,15 +102,15 @@ func ParseGraphqlNode(node string) (MirrorArticle, error) {
 	}
 
 	id := parsedJson.GetStringBytes("node", "id")
-
 	content, err := GetContentByTxHash(string(id))
+
 	if err != nil {
-		return *article, err
+		return article, err
 	}
 
 	parsedJson, err = parser.Parse(string(content))
 	if err != nil {
-		return *article, err
+		return article, err
 	}
 
 	// title
@@ -92,32 +120,5 @@ func ParseGraphqlNode(node string) (MirrorArticle, error) {
 	// content
 	article.Content = string(parsedJson.GetStringBytes("content", "body")) // timestamp
 
-	return *article, nil
-}
-
-func GetArticles(from, to uint64, owner string) ([]MirrorArticle, error) {
-	response, err := GetTransactions(from, to, owner)
-	if err != nil {
-		return nil, nil
-	}
-
-	var parser fastjson.Parser
-
-	parsedJson, parseErr := parser.Parse(string(response))
-	if parseErr != nil {
-		return nil, nil
-	}
-
-	// edges
-	edges := parsedJson.GetArray("data", "transactions", "edges")
-	result := make([]MirrorArticle, len(edges))
-
-	for i := 0; i < len(edges); i++ {
-		result[i], err = ParseGraphqlNode(edges[i].String())
-		if err != nil {
-			return nil, nil
-		}
-	}
-
-	return result, nil
+	return article, nil
 }
