@@ -32,3 +32,28 @@ func TestGetGrants(t *testing.T) {
 		}
 	}
 }
+
+func TestGetProject(t *testing.T) {
+	t.Parallel()
+
+	adminAddress := "0xf634ec94939efd57cb888fa8451c1e0d0f973c23"
+	res, err := gitcoin.GetProject(adminAddress)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, res)
+}
+
+func TestGetGrantsInfo(t *testing.T) {
+	t.Parallel()
+
+	res, err := gitcoin.GetGrantsInfo()
+	assert.Nil(t, err)
+	assert.NotEmpty(t, res)
+}
+
+func TestGetProjectsInfo(t *testing.T) {
+	t.Parallel()
+
+	res, err := gitcoin.GetProjectsInfo("0x8c23B96f2fb77AaE1ac2832debEE30f09da7af3C", "RSS3")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, res)
+}
