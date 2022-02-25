@@ -61,7 +61,7 @@ func TestGetProjectsInfo(t *testing.T) {
 func TestGetDonations(t *testing.T) {
 	t.Parallel()
 
-	_, err := gitcoin.GetDonations(12605342, 12605343)
+	res, err := gitcoin.GetDonations(12605342, 12605343)
 	assert.Nil(t, err)
-	//assert.NotEmpty(t, res)
+	assert.NotEmpty(t, res)
 }

@@ -99,11 +99,13 @@ func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
 	chainType := "eth"
 	apiKey := "" // TODO, read api key from config
 	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, chainType, apiKey)
+
 	if err != nil {
 		return nil, err
 	}
 
 	donations := make([]DonationInfo, len(logs.Result))
+
 	for _, item := range logs.Result {
 		donor := "0x" + item.Topic3[26:]
 		donation := DonationInfo{
@@ -111,7 +113,7 @@ func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
 		}
 
 		donations = append(donations, donation)
-
 	}
-	return nil, nil
+
+	return donations, nil
 }

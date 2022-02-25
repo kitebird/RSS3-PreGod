@@ -43,8 +43,8 @@ func TestGetLogs(t *testing.T) {
 		apiKey)
 	// assert for nil
 	assert.Nil(t, err)
-
 	assert.NotEmpty(t, result.Result)
+
 	for _, item := range result.Result {
 		assert.NotEmpty(t, item)
 	}
