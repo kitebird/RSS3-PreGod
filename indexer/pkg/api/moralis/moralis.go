@@ -13,6 +13,7 @@ import (
 type (
 	MoralisNFTResult         = types.MoralisNFTResult
 	MoralisNFTTransferResult = types.MoralisNFTTransferResult
+	MoralisGetLogsResult     = types.MoralisGetLogsResult
 )
 
 const endpoint = "https://deep-index.moralis.io"
@@ -64,6 +65,27 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (Moral
 	err := jsoni.Unmarshal(response, &res)
 	if err != nil {
 		return MoralisNFTTransferResult{}, err
+	}
+
+	return *res, nil
+}
+
+func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chainType string, apiKey string) (MoralisGetLogsResult, error) {
+	var headers = map[string]string{
+		"accept":    "application/json",
+		"X-API-Key": apiKey,
+	}
+
+	url := fmt.Sprintf("%s/api/v2/%s/logs?chain=%s&from_block=%d&to_block=%d&topic0=%s",
+		endpoint, address, chainType, fromBlock, toBlock, topic)
+	response, _ := util.Get(url, headers)
+	//fmt.Println(string(response))
+
+	res := new(MoralisGetLogsResult)
+
+	err := jsoni.Unmarshal(response, &res)
+	if err != nil {
+		return MoralisGetLogsResult{}, err
 	}
 
 	return *res, nil

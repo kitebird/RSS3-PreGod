@@ -1,6 +1,7 @@
 package gitcoin
 
 import (
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/valyala/fastjson"
@@ -8,10 +9,13 @@ import (
 
 const grantUrl = "https://gitcoin.co/grants/grants.json"
 const grantsApi = "https://gitcoin.co/api/v0.1/grants/"
+const donationSentTopic = "0x3bb7428b25f9bdad9bd2faa4c6a7a9e5d5882657e96c1d24cc41c1d6c1910a98"
+const bulkCheckoutAddress = "0x7d655c57f71464B6f83811C55D84009Cd9f5221C"
 
 type (
-	GrantInfo   = types.GrantInfo
-	ProjectInfo = types.ProjectInfo
+	GrantInfo    = types.GrantInfo
+	ProjectInfo  = types.ProjectInfo
+	DonationInfo = types.DonationInfo
 )
 
 // GetGrants returns all grant projects.
@@ -89,4 +93,25 @@ func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 	}
 
 	return project, nil
+}
+
+func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
+	chainType := "eth"
+	apiKey := "" // TODO, read api key from config
+	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, chainType, apiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	donations := make([]DonationInfo, len(logs.Result))
+	for _, item := range logs.Result {
+		donor := "0x" + item.Topic3[26:]
+		donation := DonationInfo{
+			Donor: donor,
+		}
+
+		donations = append(donations, donation)
+
+	}
+	return nil, nil
 }
