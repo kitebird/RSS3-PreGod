@@ -10,8 +10,5 @@ func Setup() error {
 	err := mgm.SetDefaultConfig(nil, config.Config.Mongo.DB, options.Client().ApplyURI(config.Config.Mongo.URI))
 	// TODO: Create Indexes
 	// Reference: https://github.com/Kamva/mgm/issues/35
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

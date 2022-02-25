@@ -39,7 +39,15 @@ func NewAttachment(content string, address []string, mimetype string, name strin
 	}
 }
 
-func NewObject(authors []string, uid string, itemType constants.ItemTypeID, title string, summary string, tags []string, attachments []Attachement) *Object {
+func NewObject(
+	authors []string,
+	uid string,
+	itemType constants.ItemTypeID,
+	title string,
+	summary string,
+	tags []string,
+	attachments []Attachement,
+) *Object {
 	return &Object{
 		Authors:      authors,
 		Uid:          uid,
@@ -52,7 +60,12 @@ func NewObject(authors []string, uid string, itemType constants.ItemTypeID, titl
 }
 
 func InsertObjectDoc(object *Object) *mongo.SingleResult {
-	return mgm.Coll(&Object{}).FindOneAndReplace(mgm.Ctx(), bson.M{"uid": object.Uid, "item_type": object.ItemType}, object, options.FindOneAndReplace().SetUpsert(true))
+	return mgm.Coll(&Object{}).FindOneAndReplace(
+		mgm.Ctx(),
+		bson.M{"uid": object.Uid, "item_type": object.ItemType},
+		object,
+		options.FindOneAndReplace().SetUpsert(true),
+	)
 }
 
 // TODO: getter

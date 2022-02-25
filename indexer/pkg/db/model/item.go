@@ -10,12 +10,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type ItemId struct {
+	ItemType constants.ItemTypeID `json:"item_type:int" bson:"item_type"`
+	Proof    string               `json:"proof" bson:"proof"`
+}
 type Item struct {
 	mgm.DefaultModel `bson:",inline"`
 
-	ObjectUid  string               `json:"object_uid" bson:"object_uid"`
-	ObjectType constants.ItemTypeID `json:"object_type:int" bson:"object_type"`
-	Proof      string               `json:"proof" bson:"proof"` // Indexes: (Proof, ObjectType)
+	ItemId ItemId `json:"item_id" bson:"item_id"` // Index
+
+	ObjectUid string `json:"object_uid" bson:"object_uid"`
 
 	From              string    `json:"from" bson:"from"`
 	To                string    `json:"to" bson:"to"`
@@ -24,9 +28,12 @@ type Item struct {
 
 func NewItem(objectUid string, objectType constants.ItemTypeID, from string, to string, proof string, platformCreatedAt time.Time) *Item {
 	return &Item{
-		ObjectUid:  objectUid,
-		ObjectType: objectType,
-		Proof:      proof,
+		ItemId: ItemId{
+			ItemType: objectType,
+			Proof:    proof,
+		},
+
+		ObjectUid: objectUid,
 
 		From:              from,
 		To:                to,
@@ -35,7 +42,12 @@ func NewItem(objectUid string, objectType constants.ItemTypeID, from string, to 
 }
 
 func InsertItemDoc(item *Item) *mongo.SingleResult {
-	return mgm.Coll(&Item{}).FindOneAndReplace(mgm.Ctx(), bson.M{"object_type": item.ObjectType, "proof": item.Proof}, item, options.FindOneAndReplace().SetUpsert(true))
+	return mgm.Coll(&Item{}).FindOneAndReplace(
+		mgm.Ctx(),
+		bson.M{"item_id.item_type": item.ItemId.ItemType, "item_id.proof": item.ItemId.Proof},
+		item,
+		options.FindOneAndReplace().SetUpsert(true),
+	)
 }
 
 // TODO: getter
