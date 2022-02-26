@@ -11,10 +11,9 @@ import (
 )
 
 var (
-	jsoni  = jsoniter.ConfigCompatibleWithStandardLibrary
-	rdb    *redis.Client
-	ctx    = context.Background()
-	ErrNil = errors.New("no matching record found in redis database")
+	jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
+	rdb   *redis.Client
+	ctx   = context.Background()
 )
 
 func Setup() error {
@@ -37,13 +36,7 @@ func Get(key string, data interface{}) error {
 		return err
 	}
 
-	err = jsoni.Unmarshal([]byte(value), data)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return jsoni.Unmarshal([]byte(value), &data)
 }
 
 func Set(key string, data interface{}, expire time.Duration) error {
@@ -62,7 +55,7 @@ func Exists(key string) (bool, error) {
 		return false, err
 	}
 
-	return exist == 0, nil
+	return exist == 1, nil
 }
 
 func ZAdd(key string, data interface{}, score float64) error {
@@ -82,24 +75,33 @@ func ZAdd(key string, data interface{}, score float64) error {
 }
 
 // zrange in pre-node
-
-func ZRevRange(key string, min string, max string, offset int64, count int64) ([]string, error) {
-	result, err := rdb.ZRevRangeByScore(ctx, key, &redis.ZRangeBy{
+func ZRevRange(key string, min string, max string, offset int64, count int64) ([]interface{}, error) {
+	res := rdb.ZRevRangeByScore(ctx, key, &redis.ZRangeBy{
 		Min:    min,
 		Max:    max,
 		Offset: offset,
 		Count:  count,
-	}).Result()
+	})
 
-	if err != nil {
-		return nil, err
+	if res == nil {
+		return nil, res.Err()
+	}
+
+	result := make([]interface{}, len(res.Val()))
+
+	for i, val := range res.Val() {
+		err := jsoni.Unmarshal([]byte(val), &result[i])
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return result, nil
 }
 
 // zrangeWithScore in pre-node
-func ZRevRangeWithScore(key string, min string, max string, offset int64, count int64) ([]string, error) {
+func ZRevRangeWithScore(key string, min string, max string, offset int64, count int64) ([]interface{}, error) {
 	// go-redis will check for Offset and Count
 	res := rdb.ZRevRangeByScoreWithScores(ctx, key, &redis.ZRangeBy{
 		Min:    min,
@@ -109,19 +111,19 @@ func ZRevRangeWithScore(key string, min string, max string, offset int64, count 
 	})
 
 	if res == nil {
-		return nil, ErrNil
+		return nil, res.Err()
 	}
 
-	result := make([]string, len(res.Val()))
+	result := make([]interface{}, len(res.Val()))
 
-	for i, member := range res.Val() {
-		val, ok := member.Member.(string)
+	for i, v := range res.Val() {
+		val, ok := v.Member.(string)
 
 		if ok {
-			err := jsoni.Unmarshal([]byte(val), result[i])
+			err := jsoni.Unmarshal([]byte(val), &result[i])
 
 			if err != nil {
-				return nil, errors.New("Unable to Unmarshal " + val)
+				return nil, err
 			}
 		} else {
 			return nil, errors.New("Unable to convert to string")
@@ -171,17 +173,17 @@ func SAdd(key string, data interface{}) error {
 	return nil
 }
 
-func SGet(key string, data interface{}) ([]string, error) {
+func SGet(key string, data interface{}) ([]interface{}, error) {
 	res := rdb.SMembers(ctx, key)
 
 	if res == nil {
-		return nil, ErrNil
+		return nil, res.Err()
 	}
 
-	result := make([]string, len(res.Val()))
+	result := make([]interface{}, len(res.Val()))
 
 	for i, val := range res.Val() {
-		if err := jsoni.Unmarshal([]byte(val), result[i]); err != nil {
+		if err := jsoni.Unmarshal([]byte(val), &result[i]); err != nil {
 			return nil, err
 		}
 	}
