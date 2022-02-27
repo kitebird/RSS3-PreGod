@@ -70,12 +70,13 @@ type ConfigStruct struct {
 var (
 	Config = &ConfigStruct{}
 
-	k = koanf.New(".")
+	k         = koanf.New("/")
+	configDir = "../../../config/"
 )
 
 func Setup() error {
 	// Read user config
-	if err := k.Load(file.Provider("config/config.dev.json"), json.Parser()); err != nil {
+	if err := k.Load(file.Provider(configDir+"/config.dev.json"), json.Parser()); err != nil {
 		return err
 	}
 
