@@ -67,11 +67,12 @@ type ConfigStruct struct {
 	Logger    LoggerStruct    `koanf:"logger"`
 }
 
+//nolint:tagliatelle // format is required by Jike API
 type JikeStruct struct {
-	AreaCode          string `koanf:"area_code"`
-	MobilePhoneNumber string `koanf:"mobile_phone_number"`
-	Password          string `koanf:"password"`
-	AppVersion        string `koanf:"app_version"`
+	AreaCode          string `koanf:"area_code" json:"areaCode"`
+	MobilePhoneNumber string `koanf:"mobile_phone_number" json:"mobilePhoneNumber"`
+	Password          string `koanf:"password" json:"password"`
+	AppVersion        string `koanf:"app_version" json:"appVersion"`
 }
 
 type ThirdPartyConfigStruct struct {
@@ -83,7 +84,7 @@ var (
 	ThirdPartyConfig = &ThirdPartyConfigStruct{}
 
 	k         = koanf.New("/")
-	configDir = "../../../config/"
+	configDir = "../../../../config/"
 )
 
 func Setup() error {
