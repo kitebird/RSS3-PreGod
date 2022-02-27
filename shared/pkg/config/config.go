@@ -67,8 +67,20 @@ type ConfigStruct struct {
 	Logger    LoggerStruct    `koanf:"logger"`
 }
 
+type JikeStruct struct {
+	AreaCode          string `koanf:"area_code"`
+	MobilePhoneNumber string `koanf:"mobile_phone_number"`
+	Password          string `koanf:"password"`
+	AppVersion        string `koanf:"app_version"`
+}
+
+type ThirdPartyConfigStruct struct {
+	Jike JikeStruct `koanf:"jike"`
+}
+
 var (
-	Config = &ConfigStruct{}
+	Config           = &ConfigStruct{}
+	ThirdPartyConfig = &ThirdPartyConfigStruct{}
 
 	k         = koanf.New("/")
 	configDir = "../../../config/"
@@ -89,6 +101,14 @@ func Setup() error {
 
 	Config.Postgres.ConnMaxIdleTime = Config.Postgres.ConnMaxIdleTime * time.Second
 	Config.Postgres.ConnMaxLifetime = Config.Postgres.ConnMaxLifetime * time.Second
+
+	if err := k.Load(file.Provider(configDir+"/thirdParty.json"), json.Parser()); err != nil {
+		return err
+	}
+
+	if err := k.Unmarshal("", ThirdPartyConfig); err != nil {
+		return err
+	}
 
 	return nil
 }
