@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,23 +19,23 @@ import (
 
 func init() {
 	if err := config.Setup(); err != nil {
-		log.Fatalf("config.Setup err: %v", err)
+		logger.Fatalf("config.Setup err: %v", err)
 	}
 
 	if err := logger.Setup(); err != nil {
-		log.Fatalf("config.Setup err: %v", err)
+		logger.Fatalf("config.Setup err: %v", err)
 	}
 
 	if err := cache.Setup(); err != nil {
-		log.Fatalf("cache.Setup err: %v", err)
+		logger.Fatalf("cache.Setup err: %v", err)
 	}
 
 	if err := db.Setup(); err != nil {
-		log.Fatalf("db.Setup err: %v", err)
+		logger.Fatalf("db.Setup err: %v", err)
 	}
 
 	if err := db.AutoMigrate(); err != nil {
-		log.Fatalf("db.AutoMigrate err: %v", err)
+		logger.Fatalf("db.AutoMigrate err: %v", err)
 	}
 }
 
