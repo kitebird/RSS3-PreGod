@@ -17,14 +17,15 @@ type PoapEventInfo struct {
 }
 
 type PoapAction struct {
-	PoapEventInfo PoapEventInfo
-	TokenId       string
-	Owner         string
+	PoapEventInfo PoapEventInfo `json:"event"`
+	TokenId       string        `json:"tokenId"` // nolint:tagliatelle // cause the json field just named "tokenId"
+	Owner         string        `json:"owner"`
+	Chain         string        `json:"chain"`
 }
 
 type PoapResponse struct {
-	PoapAction PoapAction
-	Created    string
+	PoapAction
+	Created string `json:"created"`
 }
 
 type PoapSupply struct {
@@ -33,6 +34,6 @@ type PoapSupply struct {
 }
 
 type TokenResponse struct {
-	PoapEventInfo PoapEventInfo
-	PoapSupply    PoapSupply
+	PoapEventInfo PoapEventInfo `json:"event"`
+	PoapSupply    PoapSupply    `json:"supply"`
 }
