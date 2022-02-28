@@ -15,6 +15,7 @@ var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 func GetActions(user string) ([]types.PoapResponse, error) {
 	if len(user) == 0 {
 		var err = fmt.Errorf("user address is empty")
+
 		return []types.PoapResponse{}, err
 	}
 
