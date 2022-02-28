@@ -65,6 +65,7 @@ type ConfigStruct struct {
 	Redis     RedisStruct     `koanf:"redis"`
 	Postgres  PostgresStruct  `koanf:"postgres"`
 	Logger    LoggerStruct    `koanf:"logger"`
+	Indexer   IndexerStruct   `koanf:"indexer"`
 }
 
 //nolint:tagliatelle // format is required by Jike API
@@ -75,21 +76,20 @@ type JikeStruct struct {
 	AppVersion        string `koanf:"app_version" json:"appVersion"`
 }
 
-type ThirdPartyConfigStruct struct {
+type IndexerStruct struct {
 	Jike JikeStruct `koanf:"jike"`
 }
 
 var (
-	Config           = &ConfigStruct{}
-	ThirdPartyConfig = &ThirdPartyConfigStruct{}
+	Config  = &ConfigStruct{}
+	Indexer = &IndexerStruct{}
 
-	k         = koanf.New("/")
-	configDir = "../../../../config/"
+	k = koanf.New(".")
 )
 
 func Setup() error {
 	// Read user config
-	if err := k.Load(file.Provider(configDir+"/config.dev.json"), json.Parser()); err != nil {
+	if err := k.Load(file.Provider("config/config.local.json"), json.Parser()); err != nil {
 		return err
 	}
 
@@ -102,14 +102,6 @@ func Setup() error {
 
 	Config.Postgres.ConnMaxIdleTime = Config.Postgres.ConnMaxIdleTime * time.Second
 	Config.Postgres.ConnMaxLifetime = Config.Postgres.ConnMaxLifetime * time.Second
-
-	if err := k.Load(file.Provider(configDir+"/thirdParty.json"), json.Parser()); err != nil {
-		return err
-	}
-
-	if err := k.Unmarshal("", ThirdPartyConfig); err != nil {
-		return err
-	}
 
 	return nil
 }
