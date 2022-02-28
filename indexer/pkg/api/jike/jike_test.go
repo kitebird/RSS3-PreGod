@@ -10,15 +10,29 @@ import (
 func TestLogin(t *testing.T) {
 	t.Parallel()
 
-	// fmt.Printf("Jike config: %v\n", config.ThirdPartyConfig.Jike)
-
 	err := jike.Login()
 
 	assert.Nil(t, err)
+	assert.NotEmpty(t, jike.AccessToken)
 
-	t.Log(jike.RefreshToken)
-	t.Log(jike.AccessToken)
+	previousRefreshToken := jike.RefreshToken
+
+	err = jike.RefreshJikeToken()
+	assert.Nil(t, err)
 
 	assert.True(t,
-		len(jike.RefreshToken) > 0)
+		previousRefreshToken != jike.RefreshToken)
 }
+
+// func TestGetUserProfile(t *testing.T) {
+// 	t.Parallel()
+
+// 	err := jike.Login()
+
+// 	assert.Nil(t, err)
+// 	assert.NotEmpty(t, jike.AccessToken)
+
+// 	userId := "C05E4867-4251-4F11-9096-C1D720B41710"
+
+// 	jike.GetUserProfile(userId)
+// }
