@@ -1,5 +1,7 @@
 package types
 
+import "math/big"
+
 type GrantInfo struct {
 	Title        string
 	AdminAddress string
@@ -26,7 +28,7 @@ type DonationInfo struct {
 	TokenAddress   string
 	Amount         string
 	Symbol         string
-	FormatedAmount string
+	FormatedAmount *big.Int
 	Decimals       int64
 	Timestamp      string
 	TxHash         string
