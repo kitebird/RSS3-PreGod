@@ -68,6 +68,10 @@ type ConfigStruct struct {
 	Indexer   IndexerStruct   `koanf:"indexer"`
 }
 
+type MiscStruct struct {
+	UserAgent string `koanf:"user_agent"`
+}
+
 //nolint:tagliatelle // format is required by Jike API
 type JikeStruct struct {
 	AreaCode          string `koanf:"area_code" json:"areaCode"`
@@ -77,6 +81,7 @@ type JikeStruct struct {
 }
 
 type IndexerStruct struct {
+	Misc MiscStruct `koanf:"misc"`
 	Jike JikeStruct `koanf:"jike"`
 }
 
@@ -89,7 +94,7 @@ var (
 
 func Setup() error {
 	// Read user config
-	if err := k.Load(file.Provider("config/config.local.json"), json.Parser()); err != nil {
+	if err := k.Load(file.Provider("config/config.dev.json"), json.Parser()); err != nil {
 		return err
 	}
 
