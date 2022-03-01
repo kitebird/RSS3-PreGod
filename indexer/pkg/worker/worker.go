@@ -1,14 +1,13 @@
 package worker
 
 import (
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawlers/moralis"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawlers"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
-func ProcessResult(userAddress string, itemType constants.ItemTypeID) error {
-	mw := moralis.NewMoralisCrawler()
-	err := mw.Work(userAddress, itemType)
+func ProcessTask(t *Task) error {
+	mw := crawlers.NewMoralisCrawler()
+	err := mw.Work(t.Identity, t.Network)
 	if err != nil {
 		panic(err)
 	}
@@ -20,8 +19,9 @@ func ProcessResult(userAddress string, itemType constants.ItemTypeID) error {
 	for _, object := range objects {
 		db.InsertObjectDoc(object)
 	}
-	db.SetAssets(userAddress, assets)
-	db.AppendNotes(userAddress, notes)
+	//TODO: save by account: <identity>@<platform>
+	db.SetAssets(t.Identity, assets)
+	db.AppendNotes(t.Identity, notes)
 
 	return nil
 }
