@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,11 +20,11 @@ import (
 
 func init() {
 	if err := config.Setup(); err != nil {
-		logger.Fatalf("config.Setup err: %v", err)
+		log.Fatalf("config.Setup err: %v", err)
 	}
 
 	if err := logger.Setup(); err != nil {
-		logger.Fatalf("config.Setup err: %v", err)
+		log.Fatalf("config.Setup err: %v", err)
 	}
 
 	if err := cache.Setup(); err != nil {
