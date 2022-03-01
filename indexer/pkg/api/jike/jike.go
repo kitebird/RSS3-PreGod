@@ -2,13 +2,13 @@ package jike
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/robfig/cron/v3"
 	"github.com/valyala/fastjson"
@@ -32,7 +32,7 @@ func Login() error {
 	json, err := jsoni.MarshalToString(config.Config.Indexer.Jike)
 
 	if err != nil {
-		log.Fatalf("Jike Config read err: %v", err)
+		logger.Fatalf("Jike Config read err: %v", err)
 
 		return err
 	}
@@ -47,7 +47,7 @@ func Login() error {
 	response, err := util.PostRaw(url, headers, json)
 
 	if err != nil {
-		log.Fatalf("Jike Login err: %v", err)
+		logger.Fatalf("Jike Login err: %v", err)
 
 		return err
 	}
@@ -70,7 +70,7 @@ func RefreshJikeToken() error {
 	response, err := util.Get(url, headers)
 
 	if err != nil {
-		log.Fatalf("Jike RefreshToken err: %v", err)
+		logger.Fatalf("Jike RefreshToken err: %v", err)
 
 		return err
 	}
@@ -86,12 +86,12 @@ func RefreshJikeToken() error {
 
 			return nil
 		} else {
-			log.Fatalf("Jike RefreshToken err: %v", "Jike refresh token endpoint returned a failed response")
+			logger.Fatalf("Jike RefreshToken err: %v", "Jike refresh token endpoint returned a failed response")
 
 			return err
 		}
 	} else {
-		log.Fatalf("Jike RefreshToken err: %v", err)
+		logger.Fatalf("Jike RefreshToken err: %v", err)
 
 		return err
 	}
@@ -115,7 +115,7 @@ func GetUserProfile(name string) (*types.UserProfileStruct, error) {
 	response, err := util.Get(url, headers)
 
 	if err != nil {
-		log.Fatalf("Jike GetUserProfile err: %v", err)
+		logger.Fatalf("Jike GetUserProfile err: %v", err)
 
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func GetUserProfile(name string) (*types.UserProfileStruct, error) {
 	parsedJson, err := parser.Parse(string(response))
 
 	if err != nil {
-		log.Fatalf("Jike GetUserProfile err: %v", "error parsing response")
+		logger.Fatalf("Jike GetUserProfile err: %v", "error parsing response")
 
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
 	response, err := util.PostRaw(url, headers, json)
 
 	if err != nil {
-		log.Fatalf("Jike GetUserTimeline err: %v", err)
+		logger.Fatalf("Jike GetUserTimeline err: %v", err)
 
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
 	for i, node := range parsedObject {
 		t, timeErr := time.Parse(time.RFC3339, trimQuote(node.Get("createdAt").String()))
 		if err != nil {
-			log.Fatalf("Jike GetUserTimeline timestamp parsing err: %v", timeErr)
+			logger.Fatalf("Jike GetUserTimeline timestamp parsing err: %v", timeErr)
 
 			return nil, timeErr
 		}
@@ -195,7 +195,7 @@ func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
 	}
 
 	if err != nil {
-		log.Fatalf("Jike GetUserTimeline err: %v", "error parsing response")
+		logger.Fatalf("Jike GetUserTimeline err: %v", "error parsing response")
 
 		return nil, err
 	}
