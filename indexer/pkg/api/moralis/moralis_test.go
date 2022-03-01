@@ -32,7 +32,7 @@ func TestGetNFTTransfers(t *testing.T) {
 func TestGetLogs(t *testing.T) {
 	t.Parallel()
 
-	apiKey := "" // TODO, read api key from config
+	apiKey := moralis.GetMoralisApiKey()
 
 	result, err := moralis.GetLogs(
 		12605342,

@@ -27,5 +27,14 @@
         "type": "stdout"
       }
     ]
+  },
+  "indexer": {
+    "misc": {
+      "user_agent": "RSS3-PreGod"
+    },
+    "moralis": {
+      "api_key": "+1"
+
+    }
   }
 }

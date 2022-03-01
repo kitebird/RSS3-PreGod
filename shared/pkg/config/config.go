@@ -48,12 +48,21 @@ type LoggerStruct struct {
 	Output []LoggerOutputConfig `koanf:"output"`
 }
 
+type MoralisStruct struct {
+	ApiKey string `koanf:"api_key"`
+}
+
+type IndexerStruct struct {
+	Moralis MoralisStruct `koanf:"moralis"`
+}
+
 type ConfigStruct struct {
 	Protocol  ProtocolStruct  `koanf:"protocol"`
 	HubServer HubServerStruct `koanf:"hub_server"`
 	Redis     RedisStruct     `koanf:"redis"`
 	Postgres  PostgresStruct  `koanf:"postgres"`
 	Logger    LoggerStruct    `koanf:"logger"`
+	Indexer   IndexerStruct   `koanf:"indexer"`
 }
 
 var (

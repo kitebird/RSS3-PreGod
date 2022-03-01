@@ -169,7 +169,7 @@ func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 
 func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
 	chainType := "eth"
-	apiKey := "" // TODO, read api key from config
+	apiKey := moralis.GetMoralisApiKey()
 	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, chainType, apiKey)
 
 	if err != nil {

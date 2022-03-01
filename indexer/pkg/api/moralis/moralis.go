@@ -2,11 +2,11 @@ package moralis
 
 import (
 	"fmt"
-	"os"
+	"strings"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
-	"github.com/joho/godotenv"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -21,11 +21,16 @@ const endpoint = "https://deep-index.moralis.io"
 var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func GetMoralisApiKey() string {
-	if err := godotenv.Load(".env"); err != nil {
+	if err := config.Setup(); err != nil {
 		return ""
 	}
 
-	return os.Getenv("MoralisApiKey")
+	apiKey, err := jsoni.MarshalToString(config.Config.Indexer.Moralis.ApiKey)
+	if err != nil {
+		return ""
+	}
+
+	return strings.Trim(apiKey, "\"")
 }
 
 func GetNFTs(userAddress string, chainType string, apiKey string) (MoralisNFTResult, error) {
@@ -37,11 +42,15 @@ func GetNFTs(userAddress string, chainType string, apiKey string) (MoralisNFTRes
 	// Gets all NFT items of user
 	url := fmt.Sprintf("%s/api/v2/%s/nft?chain=%s&format=decimal",
 		endpoint, userAddress, chainType)
-	response, _ := util.Get(url, headers)
+
+	response, err := util.Get(url, headers)
+	if err != nil {
+		return MoralisNFTResult{}, err
+	}
 
 	res := new(MoralisNFTResult)
 
-	err := jsoni.Unmarshal(response, &res)
+	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
 		return MoralisNFTResult{}, err
 	}
@@ -58,11 +67,15 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (Moral
 	// Gets all NFT transfers of user
 	url := fmt.Sprintf("%s/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
 		endpoint, userAddress, chainType)
-	response, _ := util.Get(url, headers)
+
+	response, err := util.Get(url, headers)
+	if err != nil {
+		return MoralisNFTTransferResult{}, err
+	}
 
 	res := new(MoralisNFTTransferResult)
 
-	err := jsoni.Unmarshal(response, &res)
+	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
 		return MoralisNFTTransferResult{}, err
 	}
