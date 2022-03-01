@@ -19,9 +19,11 @@ import (
 )
 
 func init() {
+	// to avoid a "cold init", we init databases here as they are required for almost all other packages
+
+	// redis cache is not mission critical, so we do not need to panic here
 	if err := cache.Setup(); err != nil {
 		log.Fatalf("cache.Setup err: %v", err)
-		panic(err)
 	}
 
 	if err := db.AutoMigrate(); err != nil {
