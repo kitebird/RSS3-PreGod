@@ -183,7 +183,6 @@ func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
 		tokenAddress := "0x" + item.Topic1[26:]
 		adminAddress := "0x" + item.Data[26:]
 		amount := item.Topic2
-		txHash := item.TransactionHash
 		formatedAmount := big.NewInt(1)
 		formatedAmount.SetString(amount[2:], 16)
 
