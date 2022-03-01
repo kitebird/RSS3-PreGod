@@ -6,7 +6,7 @@ import (
 )
 
 type Crawler interface {
-	Work(string, constants.ItemTypeID) error
+	Work(string, constants.NetworkName) error
 	// GetResult return assets, notes, items, objects
 	GetResult() ([]*model.ItemId, []*model.ItemId, []*model.Item, []*model.Object)
 

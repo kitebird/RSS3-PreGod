@@ -16,8 +16,9 @@ func Setup() error {
 	return err
 }
 
-// SetAssets refresh users' all assets
+// SetAssets refresh users' all assets by network
 func SetAssets(instance string, assets []*model.ItemId) {
+	//TODO: refresh by network
 	mgm.Coll(&model.AccountItemList{}).FindOneAndUpdate(
 		mgm.Ctx(), bson.M{"account_instance": instance},
 		bson.M{"$set": bson.M{"assets": assets}},
@@ -45,7 +46,7 @@ func AppendNotes(instance string, notes []*model.ItemId) {
 func InsertObjectDoc(object *model.Object) *mongo.SingleResult {
 	return mgm.Coll(&model.Object{}).FindOneAndReplace(
 		mgm.Ctx(),
-		bson.M{"uid": object.Uid, "item_type": object.ItemType},
+		bson.M{"uid": object.Uid, "item_type_id": object.ItemTypeID},
 		object,
 		options.FindOneAndReplace().SetUpsert(true),
 	)
@@ -56,7 +57,7 @@ func InsertObjectDoc(object *model.Object) *mongo.SingleResult {
 func InsertItemDoc(item *model.Item) *mongo.SingleResult {
 	return mgm.Coll(&model.Item{}).FindOneAndReplace(
 		mgm.Ctx(),
-		bson.M{"item_id.item_type": item.ItemId.ItemType, "item_id.proof": item.ItemId.Proof},
+		bson.M{"item_id.item_type_id": item.ItemId.ItemTypeID, "item_id.proof": item.ItemId.Proof},
 		item,
 		options.FindOneAndReplace().SetUpsert(true),
 	)

@@ -8,8 +8,8 @@ import (
 )
 
 type ItemId struct {
-	ItemType constants.ItemTypeID `json:"item_type:int" bson:"item_type"`
-	Proof    string               `json:"proof" bson:"proof"`
+	ItemTypeID constants.ItemTypeID `json:"item_type_id:int" bson:"item_type_id"`
+	Proof      string               `json:"proof" bson:"proof"`
 }
 type Item struct {
 	mgm.DefaultModel `bson:",inline"`
@@ -23,11 +23,11 @@ type Item struct {
 	PlatformCreatedAt time.Time `json:"date_created" bson:"date_created"`
 }
 
-func NewItem(objectUid string, objectType constants.ItemTypeID, from string, to string, proof string, platformCreatedAt time.Time) *Item {
+func NewItem(objectUid string, objectTypeId constants.ItemTypeID, from string, to string, proof string, platformCreatedAt time.Time) *Item {
 	return &Item{
 		ItemId: ItemId{
-			ItemType: objectType,
-			Proof:    proof,
+			ItemTypeID: objectTypeId,
+			Proof:      proof,
 		},
 
 		ObjectUid: objectUid,

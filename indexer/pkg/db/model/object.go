@@ -16,8 +16,8 @@ type Attachement struct {
 type Object struct {
 	mgm.DefaultModel `bson:",inline"`
 
-	Uid      string               `json:"uid" bson:"uid"` // Index: (Uid, ItemType)
-	ItemType constants.ItemTypeID `json:"item_type" bson:"item_type"`
+	Uid        string               `json:"uid" bson:"uid"` // Index: (Uid, ItemType)
+	ItemTypeID constants.ItemTypeID `json:"item_type_id" bson:"item_type_id"`
 
 	Authors      []string      `json:"authors" bson:"authors"`
 	Title        string        `json:"title" bson:"title"`
@@ -39,7 +39,7 @@ func NewAttachment(content string, address []string, mimetype string, name strin
 func NewObject(
 	authors []string,
 	uid string,
-	itemType constants.ItemTypeID,
+	itemTypeID constants.ItemTypeID,
 	title string,
 	summary string,
 	tags []string,
@@ -48,7 +48,7 @@ func NewObject(
 	return &Object{
 		Authors:      authors,
 		Uid:          uid,
-		ItemType:     itemType,
+		ItemTypeID:   itemTypeID,
 		Title:        title,
 		Summary:      summary,
 		Tags:         tags,
