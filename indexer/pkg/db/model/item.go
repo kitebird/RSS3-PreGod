@@ -5,9 +5,6 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ItemId struct {
@@ -40,14 +37,3 @@ func NewItem(objectUid string, objectType constants.ItemTypeID, from string, to 
 		PlatformCreatedAt: platformCreatedAt,
 	}
 }
-
-func InsertItemDoc(item *Item) *mongo.SingleResult {
-	return mgm.Coll(&Item{}).FindOneAndReplace(
-		mgm.Ctx(),
-		bson.M{"item_id.item_type": item.ItemId.ItemType, "item_id.proof": item.ItemId.Proof},
-		item,
-		options.FindOneAndReplace().SetUpsert(true),
-	)
-}
-
-// TODO: getter

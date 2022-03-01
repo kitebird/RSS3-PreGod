@@ -3,9 +3,6 @@ package model
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Attachement struct {
@@ -58,14 +55,3 @@ func NewObject(
 		Attachements: attachments,
 	}
 }
-
-func InsertObjectDoc(object *Object) *mongo.SingleResult {
-	return mgm.Coll(&Object{}).FindOneAndReplace(
-		mgm.Ctx(),
-		bson.M{"uid": object.Uid, "item_type": object.ItemType},
-		object,
-		options.FindOneAndReplace().SetUpsert(true),
-	)
-}
-
-// TODO: getter

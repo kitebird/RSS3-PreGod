@@ -3,7 +3,7 @@ package moralis_test
 import (
 	"testing"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawlers/moralis"
 	"github.com/stretchr/testify/assert"
 )
 
