@@ -1,22 +1,15 @@
-package moralis
+package crawlers
 
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawlers"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
-	"github.com/joho/godotenv"
-	jsoniter "github.com/json-iterator/go"
 )
-
-const endpoint = "https://deep-index.moralis.io"
 
 type moralisCralwer struct {
 	rss3Items   []*model.Item
@@ -25,7 +18,7 @@ type moralisCralwer struct {
 	rss3Assets, rss3Notes []*model.ItemId
 }
 
-func NewMoralisCrawler() crawlers.Crawler {
+func NewMoralisCrawler() Crawler {
 	return &moralisCralwer{
 		rss3Items:   []*model.Item{},
 		rss3Objects: []*model.Object{},
@@ -35,15 +28,21 @@ func NewMoralisCrawler() crawlers.Crawler {
 	}
 }
 
-func (mc *moralisCralwer) Work(userAddress string, itemType constants.ItemTypeID) error {
-	nftTransfers, err := GetNFTTransfers(userAddress, ETH, GetMoralisApiKey())
+func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkName) error {
+	chainType := moralis.GetChainType(itemType)
+	if chainType == moralis.Unknown {
+		return fmt.Errorf("unsupporetd network: %s", itemType)
+	}
+
+	itemTypeID := chainType.GetNFTItemTypeID()
+	nftTransfers, err := moralis.GetNFTTransfers(userAddress, chainType, moralis.GetMoralisApiKey())
 	if err != nil {
 		return err
 	}
 	log.Println(nftTransfers.Total)
 	//TODO: tsp
 
-	assets, err := GetNFTs(userAddress, ETH, GetMoralisApiKey())
+	assets, err := moralis.GetNFTs(userAddress, chainType, moralis.GetMoralisApiKey())
 	if err != nil {
 		return err
 	}
@@ -57,7 +56,7 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.ItemTypeID
 		}
 		ni := model.NewItem(
 			nftTransfer.GetUid(),
-			itemType,
+			itemTypeID,
 			nftTransfer.FromAddress,
 			nftTransfer.ToAddress,
 			nftTransfer.TransactionHash,
@@ -65,21 +64,21 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.ItemTypeID
 		)
 		mc.rss3Items = append(mc.rss3Items, ni)
 		mc.rss3Notes = append(mc.rss3Notes, &model.ItemId{
-			ItemType: itemType,
-			Proof:    nftTransfer.TransactionHash,
+			ItemTypeID: itemTypeID,
+			Proof:      nftTransfer.TransactionHash,
 		})
 	}
 	for _, asset := range assets.Result {
 		// TODO: make attachments and authors
-		no := model.NewObject(nil, asset.GetUid(), itemType, "", "", nil, nil)
+		no := model.NewObject(nil, asset.GetUid(), itemTypeID, "", "", nil, nil)
 		mc.rss3Objects = append(mc.rss3Objects, no)
 		hasProof := false
 		for _, nftTransfer := range nftTransfers.Result {
 			if nftTransfer.EqualsToToken(asset) {
 				hasProof = true
 				mc.rss3Assets = append(mc.rss3Assets, &model.ItemId{
-					ItemType: itemType,
-					Proof:    nftTransfer.TransactionHash,
+					ItemTypeID: itemTypeID,
+					Proof:      nftTransfer.TransactionHash,
 				})
 			}
 		}
@@ -123,56 +122,4 @@ func (mc *moralisCralwer) GetItems() []*model.Item {
 
 func (mc *moralisCralwer) GetObjects() []*model.Object {
 	return mc.rss3Objects
-}
-
-var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
-
-func GetMoralisApiKey() string {
-	if err := godotenv.Load(".env"); err != nil {
-		return ""
-	}
-
-	return os.Getenv("MoralisApiKey")
-}
-
-func GetNFTs(userAddress string, chainType MoralisChainType, apiKey string) (types.MoralisNFTResult, error) {
-	var headers = map[string]string{
-		"accept":    "application/json",
-		"X-API-Key": apiKey,
-	}
-
-	// Gets all NFT items of user
-	url := fmt.Sprintf("%s/api/v2/%s/nft?chain=%s&format=decimal",
-		endpoint, userAddress, chainType)
-	response, _ := util.GetURL(url, headers)
-
-	res := new(types.MoralisNFTResult)
-
-	err := jsoni.Unmarshal(response, &res)
-	if err != nil {
-		return types.MoralisNFTResult{}, err
-	}
-
-	return *res, nil
-}
-
-func GetNFTTransfers(userAddress string, chainType MoralisChainType, apiKey string) (types.MoralisNFTTransferResult, error) {
-	var headers = map[string]string{
-		"accept":    "application/json",
-		"X-API-Key": apiKey,
-	}
-
-	// Get all NFT transfers of user
-	url := fmt.Sprintf("%s/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
-		endpoint, userAddress, chainType)
-	response, _ := util.GetURL(url, headers)
-
-	res := new(types.MoralisNFTTransferResult)
-
-	err := jsoni.Unmarshal(response, &res)
-	if err != nil {
-		return types.MoralisNFTTransferResult{}, err
-	}
-
-	return *res, nil
 }
