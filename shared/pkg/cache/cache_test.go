@@ -6,6 +6,7 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/net/context"
 )
 
 type Object struct {
@@ -16,6 +17,7 @@ type Object struct {
 var (
 	KeyTestGetSet = "TestGetSet"
 	KeyTestZAdd   = "TestZAdd"
+	ctx           = context.Background()
 )
 
 func TestGetSet(t *testing.T) {
@@ -26,11 +28,11 @@ func TestGetSet(t *testing.T) {
 
 	valueSet := &Object{Name: KeyTestGetSet}
 
-	err = cache.Set(KeyTestGetSet, valueSet, 0)
+	err = cache.Set(ctx, KeyTestGetSet, valueSet, 0)
 	assert.Nil(t, err)
 
 	valueGet := &Object{}
-	err = cache.Get(KeyTestGetSet, valueGet)
+	err = cache.Get(ctx, KeyTestGetSet, valueGet)
 	assert.Nil(t, err)
 	assert.Equal(t, valueSet.Name, valueGet.Name)
 }
@@ -41,11 +43,11 @@ func TestExists(t *testing.T) {
 	err := cache.Setup()
 	assert.Nil(t, err)
 
-	e, err := cache.Exists(KeyTestGetSet)
+	e, err := cache.Exists(ctx, KeyTestGetSet)
 	assert.Nil(t, err)
 	assert.True(t, e)
 
-	ne, err := cache.Exists("key_not_exist")
+	ne, err := cache.Exists(ctx, "key_not_exist")
 	assert.Nil(t, err)
 	assert.False(t, ne)
 }
@@ -58,7 +60,7 @@ func TestZAdd(t *testing.T) {
 
 	n := 0
 	for n < 3 {
-		err = cache.ZAdd(KeyTestZAdd, &Object{Name: KeyTestZAdd + strconv.Itoa(n), Score: int64(n)}, float64(n))
+		err = cache.ZAdd(ctx, KeyTestZAdd, &Object{Name: KeyTestZAdd + strconv.Itoa(n), Score: int64(n)}, float64(n))
 		assert.Nil(t, err)
 
 		n++
@@ -74,11 +76,11 @@ func TestZRevRange(t *testing.T) {
 	len1 := 1
 	len2 := 2
 
-	result, err := cache.ZRevRange(KeyTestZAdd, "0", "1", 0, int64(len1))
+	result, err := cache.ZRevRange(ctx, KeyTestZAdd, "0", "1", 0, int64(len1))
 	assert.Nil(t, err)
 	assert.True(t, len(result) == len1)
 
-	result, err = cache.ZRevRange(KeyTestZAdd, "0", "2", 0, int64(len2))
+	result, err = cache.ZRevRange(ctx, KeyTestZAdd, "0", "2", 0, int64(len2))
 	assert.Nil(t, err)
 	assert.True(t, len(result) == len2)
 
@@ -98,11 +100,11 @@ func TestZRevRangeWithScore(t *testing.T) {
 	len1 := 1
 	len2 := 2
 
-	result, err := cache.ZRevRangeWithScore(KeyTestZAdd, "0", "1", 0, int64(len1))
+	result, err := cache.ZRevRangeWithScore(ctx, KeyTestZAdd, "0", "1", 0, int64(len1))
 	assert.Nil(t, err)
 	assert.True(t, len(result) == len1)
 
-	result, err = cache.ZRevRangeWithScore(KeyTestZAdd, "1", "2", 0, int64(len2))
+	result, err = cache.ZRevRangeWithScore(ctx, KeyTestZAdd, "1", "2", 0, int64(len2))
 	assert.Nil(t, err)
 	assert.True(t, len(result) == len2)
 
