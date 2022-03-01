@@ -1,7 +1,6 @@
 package db
 
 import (
-	"log"
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/dblogger"
@@ -14,7 +13,7 @@ import (
 
 var DB *gorm.DB
 
-func init() {
+func Setup() error {
 	var err error
 
 	// Use custom logger
@@ -33,15 +32,13 @@ func init() {
 	})
 
 	if err != nil {
-		log.Fatalf("db.init err: %v", err)
-		panic(err)
+		return err
 	}
 
 	// Ping
 	sqlDB, err := DB.DB()
 	if err != nil {
-		log.Fatalf("db.init err: %v", err)
-		panic(err)
+		return err
 	}
 
 	// Set config
@@ -53,9 +50,10 @@ func init() {
 	// defer sqlDB.Close()
 
 	if err = sqlDB.Ping(); err != nil {
-		log.Fatalf("db.init err: %v", err)
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func AutoMigrate() error {

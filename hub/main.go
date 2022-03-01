@@ -26,6 +26,11 @@ func init() {
 		log.Fatalf("cache.Setup err: %v", err)
 	}
 
+	if err := db.Setup(); err != nil {
+		log.Fatalf("db.Setup err: %v", err)
+		panic(err)
+	}
+
 	if err := db.AutoMigrate(); err != nil {
 		log.Fatalf("db.AutoMigrate err: %v", err)
 		panic(err)
