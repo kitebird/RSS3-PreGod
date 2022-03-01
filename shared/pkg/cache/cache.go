@@ -13,7 +13,6 @@ import (
 var (
 	jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 	rdb   *redis.Client
-	ctx   = context.Background()
 )
 
 func Setup() error {
@@ -23,7 +22,7 @@ func Setup() error {
 		DB:       config.Config.Redis.DB,
 	})
 
-	if _, err := rdb.Ping(ctx).Result(); err != nil {
+	if _, err := rdb.Ping(context.Background()).Result(); err != nil {
 		return err
 	}
 
@@ -31,7 +30,7 @@ func Setup() error {
 }
 
 func Get(key string, data interface{}) error {
-	value, err := rdb.Get(ctx, key).Result()
+	value, err := rdb.Get(context.Background(), key).Result()
 	if err == redis.Nil || err != nil {
 		return err
 	}
@@ -45,11 +44,11 @@ func Set(key string, data interface{}, expire time.Duration) error {
 		return err
 	}
 
-	return rdb.Set(ctx, key, value, expire).Err()
+	return rdb.Set(context.Background(), key, value, expire).Err()
 }
 
 func Exists(key string) (bool, error) {
-	exist, err := rdb.Exists(ctx, key).Result()
+	exist, err := rdb.Exists(context.Background(), key).Result()
 
 	if err != nil {
 		return false, err
@@ -64,7 +63,7 @@ func ZAdd(key string, data interface{}, score float64) error {
 		return err
 	}
 
-	if err = rdb.ZAdd(ctx, key, &redis.Z{
+	if err = rdb.ZAdd(context.Background(), key, &redis.Z{
 		Score:  score,
 		Member: value,
 	}).Err(); err != nil {
@@ -76,7 +75,7 @@ func ZAdd(key string, data interface{}, score float64) error {
 
 // zrange in pre-node
 func ZRevRange(key string, min string, max string, offset int64, count int64) ([]interface{}, error) {
-	res := rdb.ZRevRangeByScore(ctx, key, &redis.ZRangeBy{
+	res := rdb.ZRevRangeByScore(context.Background(), key, &redis.ZRangeBy{
 		Min:    min,
 		Max:    max,
 		Offset: offset,
@@ -103,7 +102,7 @@ func ZRevRange(key string, min string, max string, offset int64, count int64) ([
 // zrangeWithScore in pre-node
 func ZRevRangeWithScore(key string, min string, max string, offset int64, count int64) ([]interface{}, error) {
 	// go-redis will check for Offset and Count
-	res := rdb.ZRevRangeByScoreWithScores(ctx, key, &redis.ZRangeBy{
+	res := rdb.ZRevRangeByScoreWithScores(context.Background(), key, &redis.ZRangeBy{
 		Min:    min,
 		Max:    max,
 		Offset: offset,
@@ -140,7 +139,7 @@ func ZRem(key string, data interface{}, score float64) error {
 		return err
 	}
 
-	if _, err := rdb.ZRem(ctx, key, value).Result(); err != nil {
+	if _, err := rdb.ZRem(context.Background(), key, value).Result(); err != nil {
 		return err
 	}
 
@@ -153,7 +152,7 @@ func SRem(key string, data interface{}) error {
 		return err
 	}
 
-	if _, err := rdb.SRem(ctx, key, value).Result(); err != nil {
+	if _, err := rdb.SRem(context.Background(), key, value).Result(); err != nil {
 		return err
 	}
 
@@ -166,7 +165,7 @@ func SAdd(key string, data interface{}) error {
 		return err
 	}
 
-	if _, err := rdb.SAdd(ctx, key, value).Result(); err != nil {
+	if _, err := rdb.SAdd(context.Background(), key, value).Result(); err != nil {
 		return err
 	}
 
@@ -174,7 +173,7 @@ func SAdd(key string, data interface{}) error {
 }
 
 func SGet(key string, data interface{}) ([]interface{}, error) {
-	res := rdb.SMembers(ctx, key)
+	res := rdb.SMembers(context.Background(), key)
 
 	if res == nil {
 		return nil, res.Err()
