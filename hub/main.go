@@ -19,24 +19,14 @@ import (
 )
 
 func init() {
-	if err := config.Setup(); err != nil {
-		log.Fatalf("config.Setup err: %v", err)
-	}
-
-	if err := logger.Setup(); err != nil {
-		log.Fatalf("config.Setup err: %v", err)
-	}
-
 	if err := cache.Setup(); err != nil {
-		logger.Fatalf("cache.Setup err: %v", err)
-	}
-
-	if err := db.Setup(); err != nil {
-		logger.Fatalf("db.Setup err: %v", err)
+		log.Fatalf("cache.Setup err: %v", err)
+		panic(err)
 	}
 
 	if err := db.AutoMigrate(); err != nil {
-		logger.Fatalf("db.AutoMigrate err: %v", err)
+		log.Fatalf("db.AutoMigrate err: %v", err)
+		panic(err)
 	}
 }
 

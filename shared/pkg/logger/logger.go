@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"log"
+
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger/engine"
 	"go.uber.org/zap"
@@ -11,7 +13,7 @@ var Logger *zap.SugaredLogger
 var ShortcutLogger *zap.SugaredLogger
 var DesugarredLogger *zap.Logger
 
-func Setup() error {
+func init() {
 	var err error
 	Logger, err = engine.InitZapLogger(config.Config.Logger)
 
@@ -19,10 +21,8 @@ func Setup() error {
 	DesugarredLogger = Logger.Desugar().WithOptions(zap.AddCallerSkip(1))
 
 	if err != nil {
-		return err
+		log.Fatalf("logger.init err: %v", err)
 	}
-
-	return nil
 }
 
 // Some shortcuts:

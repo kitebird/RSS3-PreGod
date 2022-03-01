@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"time"
 
 	"github.com/knadh/koanf"
@@ -92,14 +93,16 @@ var (
 	k = koanf.New(".")
 )
 
-func Setup() error {
+func init() {
 	// Read user config
 	if err := k.Load(file.Provider("config/config.dev.json"), json.Parser()); err != nil {
-		return err
+		log.Fatalf("config.init err: %v", err)
+		panic(err)
 	}
 
 	if err := k.Unmarshal("", Config); err != nil {
-		return err
+		log.Fatalf("config.init err: %v", err)
+		panic(err)
 	}
 
 	Config.HubServer.ReadTimeout = Config.HubServer.ReadTimeout * time.Second
@@ -107,6 +110,4 @@ func Setup() error {
 
 	Config.Postgres.ConnMaxIdleTime = Config.Postgres.ConnMaxIdleTime * time.Second
 	Config.Postgres.ConnMaxLifetime = Config.Postgres.ConnMaxLifetime * time.Second
-
-	return nil
 }
