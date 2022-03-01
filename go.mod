@@ -16,8 +16,8 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.7.9
-	go.mongodb.org/mongo-driver v1.7.0
 	github.com/valyala/fastjson v1.6.3
+	go.mongodb.org/mongo-driver v1.7.0
 	go.uber.org/zap v1.21.0
 	gorm.io/datatypes v1.0.5
 	gorm.io/driver/postgres v1.2.3
