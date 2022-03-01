@@ -20,6 +20,7 @@ type tokenMeta struct {
 }
 
 var token = map[string]tokenMeta{
+	"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee": {18, "ETH"},
 	"0x6b175474e89094c44da98b954eedeac495271d0f": {18, "DAI"},
 	"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {6, "USDC"},
 	"0xdac17f958d2ee523a2206206994597c13d831ec7": {6, "USDT"},
@@ -182,25 +183,11 @@ func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
 		tokenAddress := "0x" + item.Topic1[26:]
 		adminAddress := "0x" + item.Data[26:]
 		amount := item.Topic2
-
 		formatedAmount := big.NewInt(1)
 		formatedAmount.SetString(amount[2:], 16)
 
-		if err != nil {
-			return nil, err
-		}
-
-		var symbol string
-
-		var decimal int64
-
-		if tokenAddress == "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" {
-			symbol = "ETH"
-			decimal = 18
-		} else {
-			symbol = token[tokenAddress].symbol
-			decimal = token[tokenAddress].decimal
-		}
+		symbol := token[tokenAddress].symbol
+		decimal := token[tokenAddress].decimal
 
 		donation := DonationInfo{
 			Donor:          donor,
