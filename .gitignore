@@ -21,10 +21,13 @@ dist/
 .idea/
 
 # Dev Data
-*.env
+**/*.env
 
 # DB Data
 tmp_data/
 
 .vscode/
 
+docker/volume
+
+config/config.local.json

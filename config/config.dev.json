@@ -21,7 +21,7 @@
     "prefix_tag": "pregod",
     "engine": "zap",
     "level": "debug",
-    "encoding": "console",
+    "encoding": "json",
     "output": [
       {
         "type": "stdout"
@@ -34,7 +34,11 @@
     },
     "moralis": {
       "api_key": "+1"
-
+    "jike": {
+      "area_code": "+1",
+      "mobile_phone_number": "",
+      "password": "",
+      "app_version": "7.27.1"
     }
   }
 }
