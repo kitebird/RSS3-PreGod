@@ -138,7 +138,6 @@ func GetUserProfile(name string) (*types.UserProfileStruct, error) {
 	return profile, err
 }
 
-//nolint:funlen // function name is necessarily this loginWithPhoneAndPassword
 func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
 	refreshErr := RefreshJikeToken()
 
