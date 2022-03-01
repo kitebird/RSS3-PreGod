@@ -28,4 +28,7 @@ func init() {
 }
 
 func main() {
+	if err := config.Setup(); err != nil {
+		logger.Fatalf("config.Setup err: %v", err)
+	}
 }

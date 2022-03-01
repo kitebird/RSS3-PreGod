@@ -13,6 +13,7 @@ require (
 	github.com/kamva/mgm/v3 v3.4.1
 	github.com/knadh/koanf v1.4.0
 	github.com/lib/pq v1.10.4
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.7.9

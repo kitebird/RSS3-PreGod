@@ -73,10 +73,29 @@ type ConfigStruct struct {
 	Postgres  PostgresStruct  `koanf:"postgres"`
 	Mongo     MongoStruct     `koanf:"mongo"`
 	Logger    LoggerStruct    `koanf:"logger"`
+	Indexer   IndexerStruct   `koanf:"indexer"`
+}
+
+type MiscStruct struct {
+	UserAgent string `koanf:"user_agent"`
+}
+
+//nolint:tagliatelle // format is required by Jike API
+type JikeStruct struct {
+	AreaCode          string `koanf:"area_code" json:"areaCode"`
+	MobilePhoneNumber string `koanf:"mobile_phone_number" json:"mobilePhoneNumber"`
+	Password          string `koanf:"password" json:"password"`
+	AppVersion        string `koanf:"app_version" json:"appVersion"`
+}
+
+type IndexerStruct struct {
+	Misc MiscStruct `koanf:"misc"`
+	Jike JikeStruct `koanf:"jike"`
 }
 
 var (
-	Config = &ConfigStruct{}
+	Config  = &ConfigStruct{}
+	Indexer = &IndexerStruct{}
 
 	k = koanf.New(".")
 )
