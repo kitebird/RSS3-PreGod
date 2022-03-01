@@ -36,7 +36,7 @@ services:
 
     rocketmq.broker:
         # restart: always
-        image: registry.digitalocean.com/rss3/rocketmq:latest
+        image: rss3/rocketmq:latest
         container_name: mqbroker
         environment:
             - NAMESRV_ADDR=rocketmq.nameserver:9876
