@@ -31,7 +31,7 @@ func GetNFTs(userAddress string, chainType string, apiKey string) (types.Moralis
 	// Gets all NFT items of user
 	url := fmt.Sprintf("%s/api/v2/%s/nft?chain=%s&format=decimal",
 		endpoint, userAddress, chainType)
-	response, _ := util.GetURL(url, headers)
+	response, _ := util.Get(url, headers)
 
 	res := new(types.MoralisNFTResult)
 
@@ -52,7 +52,7 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (types
 	// Gets all NFT transfers of user
 	url := fmt.Sprintf("%s/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
 		endpoint, userAddress, chainType)
-	response, _ := util.GetURL(url, headers)
+	response, _ := util.Get(url, headers)
 
 	res := new(types.MoralisNFTTransferResult)
 

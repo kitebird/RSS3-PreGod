@@ -23,7 +23,7 @@ func Logger() gin.HandlerFunc {
 		switch {
 		case statusCode >= 400 && statusCode <= 499:
 			{
-				getLogger().Warn("[ACCESS]",
+				logger.DesugarWarn("[ACCESS]",
 					zap.Int("statusCode", statusCode),
 					zap.String("latency", latency.String()),
 					zap.String("clientIP", clientIP),
@@ -34,7 +34,7 @@ func Logger() gin.HandlerFunc {
 			}
 		case statusCode >= 500:
 			{
-				getLogger().Error("[ACCESS]",
+				logger.DesugarError("[ACCESS]",
 					zap.Int("statusCode", statusCode),
 					zap.String("latency", latency.String()),
 					zap.String("clientIP", clientIP),
@@ -44,7 +44,7 @@ func Logger() gin.HandlerFunc {
 				)
 			}
 		default:
-			getLogger().Info("[ACCESS]",
+			logger.DesugarInfo("[ACCESS]",
 				zap.Int("statusCode", statusCode),
 				zap.String("latency", latency.String()),
 				zap.String("clientIP", clientIP),
@@ -54,14 +54,4 @@ func Logger() gin.HandlerFunc {
 			)
 		}
 	}
-}
-
-var desugarredLogger *zap.Logger
-
-func getLogger() *zap.Logger {
-	if desugarredLogger == nil {
-		desugarredLogger = logger.Logger.Desugar()
-	}
-
-	return desugarredLogger
 }

@@ -33,6 +33,17 @@ type PostgresStruct struct {
 	ConnMaxLifetime time.Duration `koanf:"conn_max_lifetime"`
 }
 
+/*
+ * File module：You can simply make the log print to a file
+ * example:
+ * Type = "file"
+ * FilePath = "./log/app.log"
+ *
+ * Syslog module: You can make the log print to a syslog server
+ * * You need to download rsyslog.
+ * * you need to use syslog.sh under 'scripts' to generate the configuration file pregod_syslog.conf under /etc/rsyslog.d
+ * * The default configuration of facility is 0, which is related to the generated configuration file, see local*
+ */
 type LoggerOutputConfig struct {
 	Type     string `koanf:"type"`     // available values: `stdout`, `file`, `syslog`
 	Filepath string `koanf:"filepath"` // only for file
@@ -54,10 +65,29 @@ type ConfigStruct struct {
 	Redis     RedisStruct     `koanf:"redis"`
 	Postgres  PostgresStruct  `koanf:"postgres"`
 	Logger    LoggerStruct    `koanf:"logger"`
+	Indexer   IndexerStruct   `koanf:"indexer"`
+}
+
+type MiscStruct struct {
+	UserAgent string `koanf:"user_agent"`
+}
+
+//nolint:tagliatelle // format is required by Jike API
+type JikeStruct struct {
+	AreaCode          string `koanf:"area_code" json:"areaCode"`
+	MobilePhoneNumber string `koanf:"mobile_phone_number" json:"mobilePhoneNumber"`
+	Password          string `koanf:"password" json:"password"`
+	AppVersion        string `koanf:"app_version" json:"appVersion"`
+}
+
+type IndexerStruct struct {
+	Misc MiscStruct `koanf:"misc"`
+	Jike JikeStruct `koanf:"jike"`
 }
 
 var (
-	Config = &ConfigStruct{}
+	Config  = &ConfigStruct{}
+	Indexer = &IndexerStruct{}
 
 	k = koanf.New(".")
 )
