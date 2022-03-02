@@ -13,7 +13,7 @@ type Authority struct {
 	Platform constants.PlatformName `json:"platform"`
 }
 
-// Parses the uri and returns the authority struct.
+// ParseAuthority parses the uri and returns the authority struct.
 // Returns error if the uri is invalid.
 func ParseAuthority(uri string) (*Authority, error) {
 	s := strings.SplitN(uri, "@", 2)
@@ -45,4 +45,20 @@ func ParseAuthority(uri string) (*Authority, error) {
 		Identity: identity,
 		Platform: constants.PlatformName(platform),
 	}, nil
+}
+
+// AccountInstanceURI returns an account instance URI
+// example:
+// rss3://account:0xC8b960D09C0078c18Dcbe7eB9AB9d816BcCa8944@evm
+// rss3://account:DIYgod@twitter
+func AccountInstanceURI(identity, accountPlatform string) string {
+	return "rss3://" + "account" + ":" + identity + "@" + accountPlatform
+}
+
+// ItemInstanceURI returns an automatically generated Instance URI for Item.
+// example:
+// rss3://asset:ethereum-0xacbe98efe2d4d103e221e04c76d7c55db15c8e89-5@evm
+// rss3://note:5591079b-1f5b-4ae9-8209-51b18f0d3be0@twitte
+func ItemInstanceURI(itemType, uniqueId, itemPlatform string) string {
+	return "rss3://" + itemType + ":" + uniqueId + "@" + itemPlatform
 }
