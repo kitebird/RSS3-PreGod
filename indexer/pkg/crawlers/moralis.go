@@ -11,7 +11,7 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
-type moralisCralwer struct {
+type moralisCrawler struct {
 	rss3Items   []*model.Item
 	rss3Objects []*model.Object
 
@@ -19,7 +19,7 @@ type moralisCralwer struct {
 }
 
 func NewMoralisCrawler() Crawler {
-	return &moralisCralwer{
+	return &moralisCrawler{
 		rss3Items:   []*model.Item{},
 		rss3Objects: []*model.Object{},
 
@@ -28,10 +28,10 @@ func NewMoralisCrawler() Crawler {
 	}
 }
 
-func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkName) error {
+func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkName) error {
 	chainType := moralis.GetChainType(itemType)
 	if chainType == moralis.Unknown {
-		return fmt.Errorf("unsupporetd network: %s", itemType)
+		return fmt.Errorf("unsupported network: %s", itemType)
 	}
 
 	itemTypeID := chainType.GetNFTItemTypeID()
@@ -104,7 +104,7 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkNam
 	return nil
 }
 
-func (mc *moralisCralwer) GetResult() *CrawlerResult {
+func (mc *moralisCrawler) GetResult() *CrawlerResult {
 	return &CrawlerResult{
 		Assets:  mc.rss3Assets,
 		Notes:   mc.rss3Notes,
