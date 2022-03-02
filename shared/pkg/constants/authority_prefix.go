@@ -3,6 +3,7 @@ package constants
 type Prefix string
 
 const (
+	Prefix_RSS3     Prefix = "rss3://"
 	Prefix_Account  Prefix = "account"
 	Prefix_Instance Prefix = "instance"
 	Prefix_Note     Prefix = "note"

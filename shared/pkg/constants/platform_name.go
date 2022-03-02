@@ -20,7 +20,7 @@ const (
 	PlatformName_Unknown PlatformName = "unknown"
 
 	PlatformName_Rss3   PlatformName = "rss3"
-	PlatformName_Evm    PlatformName = "evm"
+	PlatformName_Evm    PlatformName = "ethereum"
 	PlatformName_Solana PlatformName = "solana"
 	PlatformName_Flow   PlatformName = "flow"
 
