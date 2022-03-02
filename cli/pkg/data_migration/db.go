@@ -1,10 +1,11 @@
 package data_migration
 
 import (
+	"log"
+
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
-	"log"
 )
 
 func prepareDB() error {

@@ -2,59 +2,83 @@ package data_migration
 
 import (
 	"errors"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/handler"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
+
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/handler"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/mongo"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-func migrate(fromDir string, delete bool) error {
+// what file:
+// 1. main index file
+// 2. link list (following)
+// 3. link backlist (following)
+// 4. auto asset list
+func migrate(mongouri string) error {
+	// set up mongodb
+	err := mongo.Setup(mongouri)
+	if err != nil {
+		return err
+	}
 
-	// what file:
-	// 1. main index file
-	// 2. link list (following)
-	// 3. link backlist (following)
-	// 4. auto asset list
+	var result []bson.D
+	if err = mongo.GetAllData(&result); err != nil {
+		return err
+	}
 
-	// for each filename, use specific handler
-	return filepath.Walk(fromDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			// skip
-			return nil
-		}
+	log.Println("got MongoDB data:", len(result))
+
+	var warnings []string
+
+	for i, item := range result {
+		row := item.Map()
+
 		// do something
-		filename := info.Name()
-		filebytes, err := os.ReadFile(path)
+		path, ok := row["path"].(string)
+		if !ok {
+			return errors.New("path is not string")
+		}
+
+		log.Println("item:", i, "path:", path)
+
+		content, ok := row["content"].(bson.D)
+		if !ok {
+			return errors.New("content is not bson.D")
+		}
+
 		if err != nil {
 			return err
 		}
-		var errInHandle error = nil
-		if !strings.Contains(filename, "-") {
+
+		var errInHandle error
+
+		if !strings.Contains(path, "-") {
 			// is main index
-			errInHandle = handler.MainIndex(filebytes)
-		} else if strings.Contains(filename, "-list-assets") {
-			errInHandle = handler.AssetListAuto(filebytes)
-		} else if strings.Contains(filename, "-list-links") {
-			errInHandle = handler.LinkList(filebytes)
-		} else if strings.Contains(filename, "-list-backlinks") {
-			errInHandle = handler.LinkBackList(filebytes)
+			errInHandle = handler.MainIndex(content)
+		} else if strings.Contains(path, "-list-assets") {
+			errInHandle = handler.AssetListAuto(content)
+		} else if strings.Contains(path, "-list-links") {
+			errInHandle = handler.LinkList(content)
+		} else if strings.Contains(path, "-list-backlinks") {
+			errInHandle = handler.LinkBackList(content)
 		} else {
-			errInHandle = errors.New("Unknown file: " + filename)
+			warnings = append(warnings, "unknown path: "+path)
+			// errInHandle = errors.New("Unknown file: " + path)
 		}
 
-		if errInHandle == nil && delete {
-			// delete
-			errInHandle = os.Remove(path)
+		if errInHandle != nil {
+			log.Println("Error: ", path)
+
+			return errInHandle
+		} else {
+			log.Println("Success: ", path)
 		}
+	}
 
-		log.Println("Success: ", filename)
+	if len(warnings) > 0 {
+		log.Println("Warnings: ", warnings)
+	}
 
-		return errInHandle
-
-	})
-
+	return nil
 }

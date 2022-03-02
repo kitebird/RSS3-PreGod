@@ -16,6 +16,7 @@ func init() {
 
 func main() {
 	flag.Parse()
+
 	if isDataMigrationCmd {
 		data_migration.Start()
 	} else {

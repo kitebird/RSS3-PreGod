@@ -1,6 +1,9 @@
 package handler
 
-func AssetListAuto(filebytes []byte) error {
+import "go.mongodb.org/mongo-driver/bson"
+
+//nolint:wsl // not implemented
+func AssetListAuto(content bson.D) error {
 	//// handle auto asset list
 	//var autoAssetList protocol.RSS3AutoAssets031
 	//// Unmarshal

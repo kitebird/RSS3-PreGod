@@ -6,25 +6,27 @@ import (
 )
 
 var (
-	fromDirectory string
-	deleteFile    bool
+	mongouri string
 )
 
 func init() {
-	flag.StringVar(&fromDirectory, "from", "", "Directory to read v0.3.1 files from")
-	flag.BoolVar(&deleteFile, "delete", false, "Delete files after migration")
+	flag.StringVar(&mongouri, "mongouri", "", "old mongouri for db migration")
 }
 
 func Start() {
 	flag.Parse()
-	if fromDirectory == "" {
+
+	if mongouri == "" {
 		flag.PrintDefaults()
+
 		return
 	}
+
 	if err := prepareDB(); err != nil {
 		log.Fatalln(err)
 	}
-	if err := migrate(fromDirectory, deleteFile); err != nil {
+
+	if err := migrate(mongouri); err != nil {
 		log.Fatalln(err)
 	}
 }

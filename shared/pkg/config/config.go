@@ -1,8 +1,11 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/util"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
@@ -33,17 +36,16 @@ type PostgresStruct struct {
 	ConnMaxLifetime time.Duration `koanf:"conn_max_lifetime"`
 }
 
-/*
- * File module：You can simply make the log print to a file
- * example:
- * Type = "file"
- * FilePath = "./log/app.log"
- *
- * Syslog module: You can make the log print to a syslog server
- * * You need to download rsyslog.
- * * you need to use syslog.sh under 'scripts' to generate the configuration file pregod_syslog.conf under /etc/rsyslog.d
- * * The default configuration of facility is 0, which is related to the generated configuration file, see local*
- */
+// File module：You can simply make the log print to a file
+//
+// Example:
+// - Type = "file"
+// - FilePath = "./log/app.log"
+//
+// Syslog module: You can make the log print to a syslog server
+// You need to download rsyslog.
+// you need to use syslog.sh under 'scripts' to generate the configuration file pregod_syslog.conf under /etc/rsyslog.d
+// The default configuration of facility is 0, which is related to the generated configuration file, see local*
 type LoggerOutputConfig struct {
 	Type     string `koanf:"type"`     // available values: `stdout`, `file`, `syslog`
 	Filepath string `koanf:"filepath"` // only for file
@@ -94,7 +96,12 @@ var (
 
 func Setup() error {
 	// Read user config
-	if err := k.Load(file.Provider("config/config.dev.json"), json.Parser()); err != nil {
+	fp, err := getConfigFilePath()
+	if err != nil {
+		return err
+	}
+
+	if err := k.Load(file.Provider(fp), json.Parser()); err != nil {
 		return err
 	}
 
@@ -109,4 +116,26 @@ func Setup() error {
 	Config.Postgres.ConnMaxLifetime = Config.Postgres.ConnMaxLifetime * time.Second
 
 	return nil
+}
+
+// Gets config file path.
+// Config files are located at `config/config.*.json`.
+// The wildcard part is specified with an env var `CONFIG_ENV`.
+// The default `CONFIG_ENV` is `dev`; that is, the default config file is `config/config.dev.json`.
+func getConfigFilePath() (string, error) {
+	ce := os.Getenv("CONFIG_ENV")
+	if ce == "" {
+		os.Setenv("CONFIG_ENV", "dev")
+
+		ce = "dev"
+	}
+
+	dirname, err := util.Dirname()
+	if err != nil {
+		return "", err
+	}
+
+	fp := filepath.Join(dirname, "..", "..", "..", "config", "config."+ce+".json")
+
+	return fp, nil
 }
