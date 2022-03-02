@@ -47,18 +47,40 @@ func ParseAuthority(uri string) (*Authority, error) {
 	}, nil
 }
 
-// AccountInstanceURI returns an account instance URI
-// example:
-// rss3://account:0xC8b960D09C0078c18Dcbe7eB9AB9d816BcCa8944@evm
-// rss3://account:DIYgod@twitter
-func AccountInstanceURI(identity, accountPlatform string) string {
-	return "rss3://" + "account" + ":" + identity + "@" + accountPlatform
+// URI returns an RSS3 URI for any identity
+func URI(identity string) string {
+	return "rss3://" + identity
 }
 
-// ItemInstanceURI returns an automatically generated Instance URI for Item.
+// AccountInstanceId returns an account instance id
 // example:
-// rss3://asset:ethereum-0xacbe98efe2d4d103e221e04c76d7c55db15c8e89-5@evm
-// rss3://note:5591079b-1f5b-4ae9-8209-51b18f0d3be0@twitte
-func ItemInstanceURI(itemType, uniqueId, itemPlatform string) string {
-	return "rss3://" + itemType + ":" + uniqueId + "@" + itemPlatform
+// account:0xC8b960D09C0078c18Dcbe7eB9AB9d816BcCa8944@evm
+// account:DIYgod@twitter
+func AccountInstanceId(identity, accountPlatform string) string {
+	return "account" + ":" + identity + "@" + accountPlatform
+}
+
+// ItemInstanceId returns an automatically generated Instance id for Item.
+// example:
+// asset:ethereum-0xacbe98efe2d4d103e221e04c76d7c55db15c8e89-5@evm
+func ItemInstanceId(itemType, uniqueId, itemPlatform string) string {
+	return itemType + ":" + uniqueId + "@" + itemPlatform
+}
+
+// AssetInstanceId returns an asset instance id
+// example:
+// asset:0xb9619cf4f875cdf0e3ce48b28a1c725bc4f6c0fb-1024@ethereum
+func AssetInstanceId(assetAddress, tokenId, assetPlatform string) string {
+	return "asset" + ":" + assetAddress + "-" + tokenId + "@" + assetPlatform
+}
+
+// NoteInstanceId returns an asset instance id
+// example:
+// note:5591079b-1f5b-4ae9-8209-51b18f0d3be0@twitter
+func NoteInstanceId(noteUUID, itemPlatform string) string {
+	return "note" + ":" + noteUUID + "@" + itemPlatform
+}
+
+func ItemId(instanceId, itemType, itemUUID string) string {
+	return instanceId + "/" + itemType + "/" + itemUUID
 }
