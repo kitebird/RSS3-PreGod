@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
@@ -75,7 +74,7 @@ func RefreshJikeToken() error {
 		return err
 	}
 
-	token := new(types.RefreshTokenStruct)
+	token := new(RefreshTokenStruct)
 
 	err = jsoni.Unmarshal(response, &token)
 
@@ -97,7 +96,7 @@ func RefreshJikeToken() error {
 	}
 }
 
-func GetUserProfile(name string) (*types.UserProfileStruct, error) {
+func GetUserProfile(name string) (*UserProfileStruct, error) {
 	refreshErr := RefreshJikeToken()
 
 	if refreshErr != nil {
@@ -128,7 +127,7 @@ func GetUserProfile(name string) (*types.UserProfileStruct, error) {
 		return nil, err
 	}
 
-	profile := new(types.UserProfileStruct)
+	profile := new(UserProfileStruct)
 
 	parsedObject := parsedJson.GetObject("user")
 
@@ -138,7 +137,7 @@ func GetUserProfile(name string) (*types.UserProfileStruct, error) {
 	return profile, err
 }
 
-func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
+func GetUserTimeline(name string) ([]TimelineStruct, error) {
 	refreshErr := RefreshJikeToken()
 
 	if refreshErr != nil {
@@ -152,7 +151,7 @@ func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
 		"cookie": "fetchRankedUpdate=" + strconv.FormatInt(time.Now().UnixNano(), 10) + "; x-jike-access-token=" + AccessToken + "; x-jike-refresh-token=" + RefreshToken,
 	}
 
-	data := new(types.TimelineRequestStruct)
+	data := new(TimelineRequestStruct)
 
 	data.OperationName = "UserFeeds"
 	data.Variables.Username = name
@@ -265,7 +264,7 @@ func GetUserTimeline(name string) ([]types.TimelineStruct, error) {
 
 	parsedObject := parsedJson.GetArray("data", "userProfile", "feeds", "nodes")
 
-	result := make([]types.TimelineStruct, len(parsedObject))
+	result := make([]TimelineStruct, len(parsedObject))
 
 	for i, node := range parsedObject {
 		t, timeErr := time.Parse(time.RFC3339, trimQuote(node.Get("createdAt").String()))

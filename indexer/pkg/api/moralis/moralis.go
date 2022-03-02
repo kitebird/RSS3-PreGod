@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/joho/godotenv"
 	jsoniter "github.com/json-iterator/go"
 )
@@ -22,7 +21,7 @@ func GetMoralisApiKey() string {
 	return os.Getenv("MoralisApiKey")
 }
 
-func GetNFTs(userAddress string, chainType MoralisChainType, apiKey string) (types.MoralisNFTResult, error) {
+func GetNFTs(userAddress string, chainType MoralisChainType, apiKey string) (MoralisNFTResult, error) {
 	var headers = map[string]string{
 		"accept":    "application/json",
 		"X-API-Key": apiKey,
@@ -33,17 +32,17 @@ func GetNFTs(userAddress string, chainType MoralisChainType, apiKey string) (typ
 		endpoint, userAddress, chainType)
 	response, _ := util.Get(url, headers)
 
-	res := new(types.MoralisNFTResult)
+	res := new(MoralisNFTResult)
 
 	err := jsoni.Unmarshal(response, &res)
 	if err != nil {
-		return types.MoralisNFTResult{}, err
+		return MoralisNFTResult{}, err
 	}
 
 	return *res, nil
 }
 
-func GetNFTTransfers(userAddress string, chainType MoralisChainType, apiKey string) (types.MoralisNFTTransferResult, error) {
+func GetNFTTransfers(userAddress string, chainType MoralisChainType, apiKey string) (MoralisNFTTransferResult, error) {
 	var headers = map[string]string{
 		"accept":    "application/json",
 		"X-API-Key": apiKey,
@@ -54,11 +53,11 @@ func GetNFTTransfers(userAddress string, chainType MoralisChainType, apiKey stri
 		endpoint, userAddress, chainType)
 	response, _ := util.Get(url, headers)
 
-	res := new(types.MoralisNFTTransferResult)
+	res := new(MoralisNFTTransferResult)
 
 	err := jsoni.Unmarshal(response, &res)
 	if err != nil {
-		return types.MoralisNFTTransferResult{}, err
+		return MoralisNFTTransferResult{}, err
 	}
 
 	return *res, nil
