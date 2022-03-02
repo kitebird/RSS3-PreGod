@@ -22,6 +22,7 @@ func GetActions(user string) ([]types.PoapResponse, error) {
 	url := fmt.Sprintf("%s/actions/scan/%s",
 		endpoint, user)
 	response, err := util.Get(url, nil)
+
 	if err != nil {
 		return []types.PoapResponse{}, err
 	}
