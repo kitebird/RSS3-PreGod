@@ -9,7 +9,7 @@ type Attachment struct {
 	Content    string   `json:"content" bson:"content"`
 	Address    []string `json:"address" bson:"address"`
 	MimeType   string   `json:"mime_type" bson:"mime_type"`
-	Name       string   `json:"name" bson:"name"`
+	Type       string   `json:"type" bson:"type"`
 	SizeInByte int      `json:"size_in_bytes" bson:"size_in_bytes"`
 }
 
@@ -26,12 +26,12 @@ type Object struct {
 	Attachments []Attachment `json:"attachments" bson:"attachments"`
 }
 
-func NewAttachment(content string, address []string, mimetype string, name string, size_in_bytes int) *Attachment {
+func NewAttachment(content string, address []string, mimetype string, t string, size_in_bytes int) *Attachment {
 	return &Attachment{
 		Content:    content,
 		Address:    address,
 		MimeType:   mimetype,
-		Name:       name,
+		Type:       t,
 		SizeInByte: size_in_bytes,
 	}
 }
