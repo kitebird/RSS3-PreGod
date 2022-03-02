@@ -1,4 +1,4 @@
-package crawlers
+package crawler
 
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"

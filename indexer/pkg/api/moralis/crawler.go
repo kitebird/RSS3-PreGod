@@ -1,11 +1,11 @@
-package crawlers
+package moralis
 
 import (
 	"fmt"
 	"log"
 	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
@@ -18,7 +18,7 @@ type moralisCrawler struct {
 	rss3Assets, rss3Notes []*model.ItemId
 }
 
-func NewMoralisCrawler() Crawler {
+func NewMoralisCrawler() crawler.Crawler {
 	return &moralisCrawler{
 		rss3Items:   []*model.Item{},
 		rss3Objects: []*model.Object{},
@@ -30,13 +30,13 @@ func NewMoralisCrawler() Crawler {
 
 //nolint:funlen // disable line length check
 func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkName) error {
-	chainType := moralis.GetChainType(itemType)
-	if chainType == moralis.Unknown {
+	chainType := GetChainType(itemType)
+	if chainType == Unknown {
 		return fmt.Errorf("unsupported network: %s", itemType)
 	}
 
 	itemTypeID := chainType.GetNFTItemTypeID()
-	nftTransfers, err := moralis.GetNFTTransfers(userAddress, chainType, moralis.GetMoralisApiKey())
+	nftTransfers, err := GetNFTTransfers(userAddress, chainType, GetMoralisApiKey())
 
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 	log.Println(nftTransfers.Total)
 	//TODO: tsp
 
-	assets, err := moralis.GetNFTs(userAddress, chainType, moralis.GetMoralisApiKey())
+	assets, err := GetNFTs(userAddress, chainType, GetMoralisApiKey())
 	if err != nil {
 		return err
 	}
@@ -114,8 +114,8 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 	return nil
 }
 
-func (mc *moralisCrawler) GetResult() *CrawlerResult {
-	return &CrawlerResult{
+func (mc *moralisCrawler) GetResult() *crawler.CrawlerResult {
+	return &crawler.CrawlerResult{
 		Assets:  mc.rss3Assets,
 		Notes:   mc.rss3Notes,
 		Items:   mc.rss3Items,
