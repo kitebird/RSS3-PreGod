@@ -11,17 +11,17 @@ func ProcessTask(t *Task) error {
 	if err != nil {
 		panic(err)
 	}
-	assets, notes, items, objects := mw.GetResult()
+	r := mw.GetResult()
 
-	for _, item := range items {
+	for _, item := range r.Items {
 		db.InsertItemDoc(item)
 	}
-	for _, object := range objects {
+	for _, object := range r.Objects {
 		db.InsertObjectDoc(object)
 	}
 	//TODO: save by account: <identity>@<platform>
-	db.SetAssets(t.Identity, assets)
-	db.AppendNotes(t.Identity, notes)
+	db.SetAssets(t.Identity, r.Assets)
+	db.AppendNotes(t.Identity, r.Notes)
 
 	return nil
 }

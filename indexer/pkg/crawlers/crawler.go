@@ -5,13 +5,15 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
+type CrawlerResult struct {
+	Assets  []*model.ItemId
+	Notes   []*model.ItemId
+	Items   []*model.Item
+	Objects []*model.Object
+}
+
 type Crawler interface {
 	Work(string, constants.NetworkName) error
-	// GetResult return assets, notes, items, objects
-	GetResult() ([]*model.ItemId, []*model.ItemId, []*model.Item, []*model.Object)
-
-	GetAssets() []*model.ItemId
-	GetNotes() []*model.ItemId
-	GetItems() []*model.Item
-	GetObjects() []*model.Object
+	// GetResult return &{Assets, Notes, Items, Objects}
+	GetResult() *CrawlerResult
 }

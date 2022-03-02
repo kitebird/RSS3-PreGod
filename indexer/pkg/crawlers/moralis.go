@@ -104,22 +104,11 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkNam
 	return nil
 }
 
-func (mc *moralisCralwer) GetResult() ([]*model.ItemId, []*model.ItemId, []*model.Item, []*model.Object) {
-	return mc.rss3Assets, mc.rss3Notes, mc.rss3Items, mc.rss3Objects
-}
-
-func (mc *moralisCralwer) GetAssets() []*model.ItemId {
-	return mc.rss3Assets
-}
-
-func (mc *moralisCralwer) GetNotes() []*model.ItemId {
-	return mc.rss3Notes
-}
-
-func (mc *moralisCralwer) GetItems() []*model.Item {
-	return mc.rss3Items
-}
-
-func (mc *moralisCralwer) GetObjects() []*model.Object {
-	return mc.rss3Objects
+func (mc *moralisCralwer) GetResult() *CrawlerResult {
+	return &CrawlerResult{
+		Assets:  mc.rss3Assets,
+		Notes:   mc.rss3Notes,
+		Items:   mc.rss3Items,
+		Objects: mc.rss3Objects,
+	}
 }
