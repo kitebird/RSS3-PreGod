@@ -17,33 +17,35 @@ const (
 )
 
 func GetChainType(network constants.NetworkName) MoralisChainType {
-	if network == constants.NetworkName_Ethereum {
+	switch network {
+	case constants.NetworkName_Ethereum:
 		return ETH
-	} else if network == constants.NetworkName_BNB {
+	case constants.NetworkName_BNB:
 		return BSC
-	} else if network == constants.NetworkName_Polygon {
+	case constants.NetworkName_Polygon:
 		return Polygon
-	} else if network == constants.NetworkName_Avalanche {
+	case constants.NetworkName_Avalanche:
 		return AVAX
-	} else if network == constants.NetworkName_Fantom {
+	case constants.NetworkName_Fantom:
 		return Fantom
-	} else {
+	default:
 		return Unknown
 	}
 }
 
 func (mt MoralisChainType) GetNFTItemTypeID() constants.ItemTypeID {
-	if mt == ETH {
+	switch mt {
+	case "ETH":
 		return constants.ItemType_Ethereum_Nft
-	} else if mt == BSC {
+	case "BSC":
 		return constants.ItemType_Bsc_Nft
-	} else if mt == Polygon {
+	case "Polygon":
 		return constants.ItemType_Polygon_Nft
-	} else if mt == AVAX {
+	case "AVAX":
 		return constants.ItemType_Avax_Nft
-	} else if mt == Fantom {
+	case "Fantom":
 		return constants.ItemType_Fantom_Nft
-	} else {
+	default:
 		return constants.ItemType_Unknown
 	}
 }
