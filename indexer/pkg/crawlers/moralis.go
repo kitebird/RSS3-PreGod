@@ -28,6 +28,7 @@ func NewMoralisCrawler() Crawler {
 	}
 }
 
+//nolint:funlen // disable line length check
 func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkName) error {
 	chainType := moralis.GetChainType(itemType)
 	if chainType == moralis.Unknown {
@@ -36,9 +37,11 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 
 	itemTypeID := chainType.GetNFTItemTypeID()
 	nftTransfers, err := moralis.GetNFTTransfers(userAddress, chainType, moralis.GetMoralisApiKey())
+
 	if err != nil {
 		return err
 	}
+
 	log.Println(nftTransfers.Total)
 	//TODO: tsp
 
@@ -54,6 +57,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 			logger.Error(tsp, err)
 			tsp = time.Now()
 		}
+
 		ni := model.NewItem(
 			nftTransfer.GetUid(),
 			itemTypeID,
@@ -68,20 +72,24 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 			Proof:      nftTransfer.TransactionHash,
 		})
 	}
+
 	for _, asset := range assets.Result {
 		// TODO: make attachments and authors
 		no := model.NewObject(nil, asset.GetUid(), itemTypeID, "", "", nil, nil)
 		mc.rss3Objects = append(mc.rss3Objects, no)
 		hasProof := false
+
 		for _, nftTransfer := range nftTransfers.Result {
 			if nftTransfer.EqualsToToken(asset) {
 				hasProof = true
+
 				mc.rss3Assets = append(mc.rss3Assets, &model.ItemId{
 					ItemTypeID: itemTypeID,
 					Proof:      nftTransfer.TransactionHash,
 				})
 			}
 		}
+
 		if !hasProof {
 			// TODO: error handle here
 			logger.Errorf("Asset doesn't has proof.")
@@ -90,11 +98,13 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 	// make the object list complete
 	for _, nftTransfer := range nftTransfers.Result {
 		hasObject := false
+
 		for _, asset := range assets.Result {
 			if nftTransfer.EqualsToToken(asset) && asset.MetaData != "" {
 				hasObject = true
 			}
 		}
+
 		if !hasObject {
 			// TODO: get object
 			logger.Errorf("Asset doesn't has the metadata.")
