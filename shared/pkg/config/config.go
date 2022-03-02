@@ -85,10 +85,9 @@ type JikeStruct struct {
 }
 
 type IndexerStruct struct {
-	Misc MiscStruct `koanf:"misc"`
-	Jike JikeStruct `koanf:"jike"`
-  Moralis MoralisStruct `koanf:"moralis"`
-
+	Misc    MiscStruct    `koanf:"misc"`
+	Jike    JikeStruct    `koanf:"jike"`
+	Moralis MoralisStruct `koanf:"moralis"`
 }
 
 var (

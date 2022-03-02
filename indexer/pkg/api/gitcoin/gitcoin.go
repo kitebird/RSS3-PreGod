@@ -98,8 +98,11 @@ func GetGrants() (content []byte, err error) {
 }
 
 func GetProject(adminAddress string) (content []byte, err error) {
+	headers := make(map[string]string)
+	util.SetCommonHeader(headers)
+
 	url := grantsApi + "?admin_address=" + adminAddress
-	content, err = util.Get(url, nil)
+	content, err = util.Get(url, headers)
 
 	return
 }

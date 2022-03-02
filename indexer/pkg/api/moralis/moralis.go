@@ -91,12 +91,15 @@ func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chain
 
 	url := fmt.Sprintf("%s/api/v2/%s/logs?chain=%s&from_block=%d&to_block=%d&topic0=%s",
 		endpoint, address, chainType, fromBlock, toBlock, topic)
-	response, _ := util.Get(url, headers)
+	response, err := util.Get(url, headers)
+	if err != nil {
+		return MoralisGetLogsResult{}, err
+	}
 	//fmt.Println(string(response))
 
 	res := new(MoralisGetLogsResult)
 
-	err := jsoni.Unmarshal(response, &res)
+	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
 		return MoralisGetLogsResult{}, err
 	}
