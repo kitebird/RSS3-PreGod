@@ -1,8 +1,11 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/util"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
@@ -66,6 +69,10 @@ type LoggerStruct struct {
 	Output []LoggerOutputConfig `koanf:"output"`
 }
 
+type MoralisStruct struct {
+	ApiKey string `koanf:"api_key"`
+}
+
 type ConfigStruct struct {
 	Protocol  ProtocolStruct  `koanf:"protocol"`
 	HubServer HubServerStruct `koanf:"hub_server"`
@@ -89,8 +96,9 @@ type JikeStruct struct {
 }
 
 type IndexerStruct struct {
-	Misc MiscStruct `koanf:"misc"`
-	Jike JikeStruct `koanf:"jike"`
+	Misc    MiscStruct    `koanf:"misc"`
+	Jike    JikeStruct    `koanf:"jike"`
+	Moralis MoralisStruct `koanf:"moralis"`
 }
 
 var (
@@ -102,7 +110,12 @@ var (
 
 func Setup() error {
 	// Read user config
-	if err := k.Load(file.Provider("config/config.dev.json"), json.Parser()); err != nil {
+	fp, err := getConfigFilePath()
+	if err != nil {
+		return err
+	}
+
+	if err := k.Load(file.Provider(fp), json.Parser()); err != nil {
 		return err
 	}
 
@@ -117,4 +130,26 @@ func Setup() error {
 	Config.Postgres.ConnMaxLifetime = Config.Postgres.ConnMaxLifetime * time.Second
 
 	return nil
+}
+
+// Gets config file path.
+// Config files are located at `config/config.*.json`.
+// The wildcard part is specified with an env var `CONFIG_ENV`.
+// The default `CONFIG_ENV` is `dev`; that is, the default config file is `config/config.dev.json`.
+func getConfigFilePath() (string, error) {
+	ce := os.Getenv("CONFIG_ENV")
+	if ce == "" {
+		os.Setenv("CONFIG_ENV", "dev")
+
+		ce = "dev"
+	}
+
+	dirname, err := util.Dirname()
+	if err != nil {
+		return "", err
+	}
+
+	fp := filepath.Join(dirname, "..", "..", "..", "config", "config."+ce+".json")
+
+	return fp, nil
 }
