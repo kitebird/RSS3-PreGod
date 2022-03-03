@@ -59,6 +59,10 @@ type LoggerStruct struct {
 	Output []LoggerOutputConfig `koanf:"output"`
 }
 
+type MoralisStruct struct {
+	ApiKey string `koanf:"api_key"`
+}
+
 type ConfigStruct struct {
 	Protocol  ProtocolStruct  `koanf:"protocol"`
 	HubServer HubServerStruct `koanf:"hub_server"`
@@ -81,8 +85,9 @@ type JikeStruct struct {
 }
 
 type IndexerStruct struct {
-	Misc MiscStruct `koanf:"misc"`
-	Jike JikeStruct `koanf:"jike"`
+	Misc    MiscStruct    `koanf:"misc"`
+	Jike    JikeStruct    `koanf:"jike"`
+	Moralis MoralisStruct `koanf:"moralis"`
 }
 
 var (

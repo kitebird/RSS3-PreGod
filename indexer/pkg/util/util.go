@@ -11,7 +11,7 @@ func Get(url string, headers map[string]string) ([]byte, error) {
 	client := resty.New()
 	client.SetTimeout(1 * time.Second * 10)
 
-	setCommonHeader(headers)
+	SetCommonHeader(headers)
 
 	request := client.R().EnableTrace().SetHeaders(headers)
 
@@ -26,7 +26,7 @@ func Post(url string, headers map[string]string, data string) ([]byte, error) {
 	client := resty.New()
 	client.SetTimeout(1 * time.Second * 10)
 
-	setCommonHeader(headers)
+	SetCommonHeader(headers)
 
 	request := client.R().EnableTrace().SetHeaders(headers).SetBody(data)
 
@@ -36,13 +36,13 @@ func Post(url string, headers map[string]string, data string) ([]byte, error) {
 	return resp.Body(), err
 }
 
-// returns raw *resty.Response for Jike
+// PostRaw returns raw *resty.Response for Jike
 func PostRaw(url string, headers map[string]string, data string) (*resty.Response, error) {
 	// Create a Resty Client
 	client := resty.New()
 	client.SetTimeout(1 * time.Second * 10)
 
-	setCommonHeader(headers)
+	SetCommonHeader(headers)
 
 	request := client.R().EnableTrace().SetHeaders(headers).SetBody(data)
 
@@ -52,6 +52,6 @@ func PostRaw(url string, headers map[string]string, data string) (*resty.Respons
 	return resp, err
 }
 
-func setCommonHeader(headers map[string]string) {
+func SetCommonHeader(headers map[string]string) {
 	headers["User-Agent"] = "RSS3-PreGod"
 }
