@@ -1,6 +1,16 @@
-package types
+package gitcoin
 
 import "math/big"
+
+type ChainType string
+
+const (
+	Unknown ChainType = "unknown"
+
+	ETH     ChainType = "eth"
+	Polygon ChainType = "polygon"
+	ZKSYNC  ChainType = "zksync"
+)
 
 type GrantInfo struct {
 	Title        string

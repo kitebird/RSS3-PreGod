@@ -11,7 +11,9 @@ func Get(url string, headers map[string]string) ([]byte, error) {
 	client := resty.New()
 	client.SetTimeout(1 * time.Second * 10)
 
-	SetCommonHeader(headers)
+	if headers != nil {
+		SetCommonHeader(headers)
+	}
 
 	request := client.R().EnableTrace().SetHeaders(headers)
 
@@ -26,7 +28,9 @@ func Post(url string, headers map[string]string, data string) ([]byte, error) {
 	client := resty.New()
 	client.SetTimeout(1 * time.Second * 10)
 
-	SetCommonHeader(headers)
+	if headers != nil {
+		SetCommonHeader(headers)
+	}
 
 	request := client.R().EnableTrace().SetHeaders(headers).SetBody(data)
 
@@ -42,7 +46,9 @@ func PostRaw(url string, headers map[string]string, data string) (*resty.Respons
 	client := resty.New()
 	client.SetTimeout(1 * time.Second * 10)
 
-	SetCommonHeader(headers)
+	if headers != nil {
+		SetCommonHeader(headers)
+	}
 
 	request := client.R().EnableTrace().SetHeaders(headers).SetBody(data)
 

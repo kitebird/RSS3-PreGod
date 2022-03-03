@@ -5,7 +5,6 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/valyala/fastjson"
 )
 
@@ -83,12 +82,6 @@ var token = map[string]tokenMeta{
 	"0x6810e776880c02933d47db1b9fc05908e5386b96": {18, "GNO"},
 	"0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2": {18, "MKR"},
 }
-
-type (
-	GrantInfo    = types.GrantInfo
-	ProjectInfo  = types.ProjectInfo
-	DonationInfo = types.DonationInfo
-)
 
 // GetGrants returns all grant projects.
 func GetGrants() (content []byte, err error) {
@@ -170,10 +163,21 @@ func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 	return project, nil
 }
 
-func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
-	chainType := "eth"
+func GetDonations(chainType ChainType) ([]DonationInfo, error) {
+	if chainType == ETH {
+		return nil, nil
+	} else if chainType == Polygon {
+		return nil, nil
+	} else if chainType == ZKSYNC {
+		return nil, nil
+	}
+
+	return nil, nil
+}
+
+func GetEthDonations(fromBlock int64, toBlock int64, chainType ChainType) ([]DonationInfo, error) {
 	apiKey := moralis.GetApiKey()
-	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, chainType, apiKey)
+	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, string(chainType), apiKey)
 
 	if err != nil {
 		return nil, err
