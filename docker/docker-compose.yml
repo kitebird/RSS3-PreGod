@@ -19,8 +19,6 @@ services:
         restart: always
         image: mongo:latest
         container_name: mongodb
-        environment:
-            - MONGO_INITDB_DATABASE=rss3-prod
         ports:
             - '27017:27017'
 

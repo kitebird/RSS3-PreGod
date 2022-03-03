@@ -130,7 +130,7 @@ func parseGraphqlNode(node string) (MirrorArticle, error) {
 	// title
 	article.Title = string(parsedJson.GetStringBytes("content", "title"))
 	// timestamp
-	article.TimeStamp = parsedJson.GetUint64("content", "timestamp")
+	article.TimeStamp = parsedJson.GetInt64("content", "timestamp")
 	// content
 	article.Content = string(parsedJson.GetStringBytes("content", "body")) // timestamp
 
