@@ -1,25 +1,25 @@
-package crawlers
+package moralis
 
 import (
 	"fmt"
 	"log"
 	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
-type moralisCralwer struct {
+type moralisCrawler struct {
 	rss3Items   []*model.Item
 	rss3Objects []*model.Object
 
 	rss3Assets, rss3Notes []*model.ItemId
 }
 
-func NewMoralisCrawler() Crawler {
-	return &moralisCralwer{
+func NewMoralisCrawler() crawler.Crawler {
+	return &moralisCrawler{
 		rss3Items:   []*model.Item{},
 		rss3Objects: []*model.Object{},
 
@@ -28,21 +28,24 @@ func NewMoralisCrawler() Crawler {
 	}
 }
 
-func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkName) error {
-	chainType := moralis.GetChainType(itemType)
-	if chainType == moralis.Unknown {
-		return fmt.Errorf("unsupporetd network: %s", itemType)
+//nolint:funlen // disable line length check
+func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkName) error {
+	chainType := GetChainType(itemType)
+	if chainType == Unknown {
+		return fmt.Errorf("unsupported network: %s", itemType)
 	}
 
 	itemTypeID := chainType.GetNFTItemTypeID()
-	nftTransfers, err := moralis.GetNFTTransfers(userAddress, chainType, moralis.GetMoralisApiKey())
+	nftTransfers, err := GetNFTTransfers(userAddress, chainType, GetMoralisApiKey())
+
 	if err != nil {
 		return err
 	}
+
 	log.Println(nftTransfers.Total)
 	//TODO: tsp
 
-	assets, err := moralis.GetNFTs(userAddress, chainType, moralis.GetMoralisApiKey())
+	assets, err := GetNFTs(userAddress, chainType, GetMoralisApiKey())
 	if err != nil {
 		return err
 	}
@@ -54,6 +57,7 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkNam
 			logger.Error(tsp, err)
 			tsp = time.Now()
 		}
+
 		ni := model.NewItem(
 			nftTransfer.GetUid(),
 			itemTypeID,
@@ -68,20 +72,24 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkNam
 			Proof:      nftTransfer.TransactionHash,
 		})
 	}
+
 	for _, asset := range assets.Result {
 		// TODO: make attachments and authors
 		no := model.NewObject(nil, asset.GetUid(), itemTypeID, "", "", nil, nil)
 		mc.rss3Objects = append(mc.rss3Objects, no)
 		hasProof := false
+
 		for _, nftTransfer := range nftTransfers.Result {
 			if nftTransfer.EqualsToToken(asset) {
 				hasProof = true
+
 				mc.rss3Assets = append(mc.rss3Assets, &model.ItemId{
 					ItemTypeID: itemTypeID,
 					Proof:      nftTransfer.TransactionHash,
 				})
 			}
 		}
+
 		if !hasProof {
 			// TODO: error handle here
 			logger.Errorf("Asset doesn't has proof.")
@@ -90,11 +98,13 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkNam
 	// make the object list complete
 	for _, nftTransfer := range nftTransfers.Result {
 		hasObject := false
+
 		for _, asset := range assets.Result {
 			if nftTransfer.EqualsToToken(asset) && asset.MetaData != "" {
 				hasObject = true
 			}
 		}
+
 		if !hasObject {
 			// TODO: get object
 			logger.Errorf("Asset doesn't has the metadata.")
@@ -104,8 +114,8 @@ func (mc *moralisCralwer) Work(userAddress string, itemType constants.NetworkNam
 	return nil
 }
 
-func (mc *moralisCralwer) GetResult() *CrawlerResult {
-	return &CrawlerResult{
+func (mc *moralisCrawler) GetResult() *crawler.CrawlerResult {
+	return &crawler.CrawlerResult{
 		Assets:  mc.rss3Assets,
 		Notes:   mc.rss3Notes,
 		Items:   mc.rss3Items,

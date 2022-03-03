@@ -26,8 +26,6 @@ dist/
 # DB Data
 tmp_data/
 
-.vscode/
-
 docker/volume
 
 config/config.local.json

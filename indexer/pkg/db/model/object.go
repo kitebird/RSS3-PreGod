@@ -5,11 +5,11 @@ import (
 	"github.com/kamva/mgm/v3"
 )
 
-type Attachement struct {
+type Attachment struct {
 	Content    string   `json:"content" bson:"content"`
 	Address    []string `json:"address" bson:"address"`
 	MimeType   string   `json:"mime_type" bson:"mime_type"`
-	Name       string   `json:"name" bson:"name"`
+	Type       string   `json:"type" bson:"type"`
 	SizeInByte int      `json:"size_in_bytes" bson:"size_in_bytes"`
 }
 
@@ -19,19 +19,19 @@ type Object struct {
 	Uid        string               `json:"uid" bson:"uid"` // Index: (Uid, ItemType)
 	ItemTypeID constants.ItemTypeID `json:"item_type_id" bson:"item_type_id"`
 
-	Authors      []string      `json:"authors" bson:"authors"`
-	Title        string        `json:"title" bson:"title"`
-	Summary      string        `json:"summary" bson:"summary"`
-	Tags         []string      `json:"tags" bson:"tags"`
-	Attachements []Attachement `json:"attachements" bson:"attachments"`
+	Authors     []string     `json:"authors" bson:"authors"`
+	Title       string       `json:"title" bson:"title"`
+	Summary     string       `json:"summary" bson:"summary"`
+	Tags        []string     `json:"tags" bson:"tags"`
+	Attachments []Attachment `json:"attachments" bson:"attachments"`
 }
 
-func NewAttachment(content string, address []string, mimetype string, name string, size_in_bytes int) *Attachement {
-	return &Attachement{
+func NewAttachment(content string, address []string, mimetype string, t string, size_in_bytes int) *Attachment {
+	return &Attachment{
 		Content:    content,
 		Address:    address,
 		MimeType:   mimetype,
-		Name:       name,
+		Type:       t,
 		SizeInByte: size_in_bytes,
 	}
 }
@@ -43,15 +43,15 @@ func NewObject(
 	title string,
 	summary string,
 	tags []string,
-	attachments []Attachement,
+	attachments []Attachment,
 ) *Object {
 	return &Object{
-		Authors:      authors,
-		Uid:          uid,
-		ItemTypeID:   itemTypeID,
-		Title:        title,
-		Summary:      summary,
-		Tags:         tags,
-		Attachements: attachments,
+		Authors:     authors,
+		Uid:         uid,
+		ItemTypeID:  itemTypeID,
+		Title:       title,
+		Summary:     summary,
+		Tags:        tags,
+		Attachments: attachments,
 	}
 }
