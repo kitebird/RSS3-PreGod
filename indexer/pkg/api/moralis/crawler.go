@@ -36,7 +36,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 	}
 
 	itemTypeID := chainType.GetNFTItemTypeID()
-	nftTransfers, err := GetNFTTransfers(userAddress, chainType, GetMoralisApiKey())
+	nftTransfers, err := GetNFTTransfers(userAddress, chainType, GetApiKey())
 
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 	log.Println(nftTransfers.Total)
 	//TODO: tsp
 
-	assets, err := GetNFTs(userAddress, chainType, GetMoralisApiKey())
+	assets, err := GetNFTs(userAddress, chainType, GetApiKey())
 	if err != nil {
 		return err
 	}
