@@ -8,6 +8,7 @@ services:
 
     postgres:
         environment:
+            - POSTGRES_DB=pregod
             - POSTGRES_USER=rss3
             - POSTGRES_PASSWORD=Pa33WoRD
         volumes:

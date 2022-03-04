@@ -67,3 +67,28 @@ func (i MoralisNFTTransferItem) String() string {
 	return fmt.Sprintf(`From: %s, To: %s, TokenAddress: %s, ContractType: %s, TokenId: %s`,
 		i.FromAddress, i.ToAddress, i.TokenAddress, i.ContractType, i.TokenId)
 }
+
+type MoralisGetLogsItem struct {
+	TransactionHash string `json:"transaction_hash"`
+	Address         string `json:"address"`
+	BlockTimestamp  string `json:"block_timestamp"`
+	BlockNumber     string `json:"block_number"`
+	BlockHash       string `json:"block_hash"`
+	Data            string `json:"data"`
+	Topic0          string `json:"topic0"`
+	Topic1          string `json:"topic1"`
+	Topic2          string `json:"topic2"`
+	Topic3          string `json:"topic3"`
+}
+
+func (i MoralisGetLogsItem) String() string {
+	return fmt.Sprintf(`TransactionHash: %s, Address: %s, Data: %s, Topic0: %s, Topic1: %s, Topic2:%s, Topic3: %s`,
+		i.TransactionHash, i.Address, i.Data, i.Topic0, i.Topic1, i.Topic2, i.Topic3)
+}
+
+type MoralisGetLogsResult struct {
+	Total    int64                `json:"total"`
+	Page     int64                `json:"page"`
+	PageSize int64                `json:"page_size"`
+	Result   []MoralisGetLogsItem `json:"result"`
+}

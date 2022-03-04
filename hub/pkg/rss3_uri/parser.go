@@ -8,7 +8,7 @@ import (
 )
 
 type Authority struct {
-	Prefix   constants.Prefix       `json:"prefix"`
+	Prefix   constants.PrefixName   `json:"prefix"`
 	Identity string                 `json:"identity"`
 	Platform constants.PlatformName `json:"platform"`
 }
@@ -41,7 +41,7 @@ func ParseAuthority(uri string) (*Authority, error) {
 	}
 
 	return &Authority{
-		Prefix:   constants.Prefix(prefix),
+		Prefix:   constants.PrefixName(prefix),
 		Identity: identity,
 		Platform: constants.PlatformName(platform),
 	}, nil
