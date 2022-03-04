@@ -36,7 +36,7 @@ func LinkList(content bson.D) error {
 	linkTypeId := constants.StringToLinkTypeID(listID)
 	pageNumberStr := splits[3]
 
-	instanceID := account + "@" + string(constants.PlatformName_Evm)
+	instanceID := account + "@" + string(constants.PlatformSymbolEthereum)
 	linkListID := instanceID + "/list/links/" + listID + "/" + pageNumberStr
 
 	pageNumber, err := strconv.Atoi(pageNumberStr)
@@ -56,18 +56,18 @@ func LinkList(content bson.D) error {
 	for i, target := range linkList.List {
 		uniqueName :=
 			fmt.Sprint(linkTypeId) +
-				"-" + account + "-" + fmt.Sprint(constants.PrefixID_Account) + "-" + fmt.Sprint(constants.PlatformNameID_Evm) +
-				"-" + target + "-" + fmt.Sprint(constants.PrefixID_Account) + "-" + fmt.Sprint(constants.PlatformNameID_Evm)
+				"-" + account + "-" + fmt.Sprint(constants.PrefixIDAccount) + "-" + fmt.Sprint(constants.PlatformIDEthereum) +
+				"-" + target + "-" + fmt.Sprint(constants.PrefixIDAccount) + "-" + fmt.Sprint(constants.PlatformIDEthereum)
 
 		linkID := uuid.NewV5(uuid.NamespaceOID, uniqueName).String()
 		links[i] = model.Link{
 			LinkID:               linkID,
 			RSS3ID:               account,
-			PrefixID:             constants.PrefixID_Account,
-			PlatformNameID:       constants.PlatformNameID_Evm,
+			PrefixID:             constants.PrefixIDAccount,
+			PlatformNameID:       constants.PlatformIDEthereum,
 			TargetRSS3ID:         target,
-			TargetPrefixID:       constants.PrefixID_Account,
-			TargetPlatformNameID: constants.PlatformNameID_Evm,
+			TargetPrefixID:       constants.PrefixIDAccount,
+			TargetPlatformNameID: constants.PlatformIDEthereum,
 			PageIndex:            pageNumber,
 		}
 	}
