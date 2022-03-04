@@ -4,11 +4,11 @@ type PrefixName string
 type PrefixID int32
 
 const (
-	Prefix_RSS3     Prefix = "rss3://"
-	Prefix_Account  Prefix = "account"
-	Prefix_Instance Prefix = "instance"
-	Prefix_Note     Prefix = "note"
-	Prefix_Asset    Prefix = "asset"
+	Prefix_RSS3     PrefixName = "rss3://"
+	Prefix_Account  PrefixName = "account"
+	Prefix_Instance PrefixName = "instance"
+	Prefix_Note     PrefixName = "note"
+	Prefix_Asset    PrefixName = "asset"
 )
 
 const (

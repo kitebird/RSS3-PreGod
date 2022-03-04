@@ -59,7 +59,7 @@ func AccountInstanceURI(identity string, accountPlatform constants.PlatformName)
 // ItemInstanceURI returns an automatically generated Instance URI for Item.
 // example:
 // rss3://asset:ethereum-0xacbe98efe2d4d103e221e04c76d7c55db15c8e89-5@evm
-func ItemInstanceURI(itemType constants.Prefix, uniqueId string, itemPlatform constants.PlatformName) string {
+func ItemInstanceURI(itemType constants.PrefixName, uniqueId string, itemPlatform constants.PlatformName) string {
 	return string(constants.Prefix_RSS3+itemType) + ":" + uniqueId + "@" + string(itemPlatform)
 }
 
