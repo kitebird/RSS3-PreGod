@@ -2,24 +2,27 @@ package constants
 
 type PlatformID int
 
-func (p *PlatformID) Symbol() PlatformSymbol {
-	if v, ok := platformSymbolMap[*p]; ok {
+func (p PlatformID) Symbol() PlatformSymbol {
+	if v, ok := platformSymbolMap[p]; ok {
 		return v
 	}
+
 	return PlatformSymbolUnknown
 }
 
-func (p *PlatformID) IsSignable() bool {
-	_, ok := signablePlatformSymbolMap[*p]
+func (p PlatformID) IsSignable() bool {
+	_, ok := signablePlatformSymbolMap[p]
+
 	return ok
 }
 
 type PlatformSymbol string
 
-func (p *PlatformSymbol) ID() PlatformID {
-	if v, ok := platformIDMap[*p]; ok {
+func (p PlatformSymbol) ID() PlatformID {
+	if v, ok := platformIDMap[p]; ok {
 		return v
 	}
+
 	return PlatformIDUnknown
 }
 
@@ -67,6 +70,8 @@ var (
 
 	signablePlatformSymbolMap = map[PlatformID]PlatformSymbol{
 		PlatformIDEthereum: PlatformSymbolEthereum,
+		PlatformIDSolana:   PlatformSymbolSolana,
+		PlatformIDFlow:     PlatformSymbolFlow,
 	}
 )
 
@@ -75,6 +80,7 @@ func IsValidPlatformSymbol(value string) bool {
 	if has && id != PlatformIDUnknown {
 		return true
 	}
+
 	return false
 }
 
