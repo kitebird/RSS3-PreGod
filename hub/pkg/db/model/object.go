@@ -19,6 +19,6 @@ type Object struct {
 	Tags        pq.StringArray `gorm:"type:text[]"`
 	Attachments datatypes.JSON `gorm:"type:jsonb"`
 
-	PlatformNameID   constants.PlatformNameID `gorm:"type:int;column:platform_name_id"`
-	PlatformObjectID string                   `gorm:"type:text;column:platform_object_id"` // object ID on the platform
+	PlatformNameID   constants.PlatformID `gorm:"type:int;column:platform_name_id"`
+	PlatformObjectID string               `gorm:"type:text;column:platform_object_id"` // object ID on the platform
 }

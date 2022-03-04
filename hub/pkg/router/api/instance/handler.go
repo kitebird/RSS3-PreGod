@@ -3,7 +3,7 @@ package instance
 import (
 	"net/http"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/rss3_uri"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/rss3uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ type RequestUri struct {
 }
 
 type ResponseData struct {
-	Authority rss3_uri.Authority `json:"authority"`
+	Authority rss3uri.Instance `json:"authority"`
 }
 
 // GetInstance returns the instance information for the given authority.
@@ -39,7 +39,7 @@ func GetInstance(c *gin.Context) {
 	}
 
 	// parse uri
-	authority, err := rss3_uri.ParseAuthority(uri.Authority)
+	authority, err := rss3uri.ParseInstance(uri.Authority)
 	if err != nil {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid uri: "+err.Error())
 
