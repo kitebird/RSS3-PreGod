@@ -12,6 +12,13 @@ const (
 	ZKSYNC  ChainType = "zksync"
 )
 
+type DonationApproach string
+
+const (
+	DonationApproachStandard = "Standard"
+	DonationApproachZksync   = "zkSync"
+)
+
 type GrantInfo struct {
 	Title        string
 	AdminAddress string
@@ -42,5 +49,5 @@ type DonationInfo struct {
 	Decimals       int64
 	Timestamp      string
 	TxHash         string
-	Approach       string
+	Approach       DonationApproach
 }

@@ -7,15 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetProject(t *testing.T) {
-	t.Parallel()
-
-	adminAddress := "0xf634ec94939efd57cb888fa8451c1e0d0f973c23"
-	res, err := gitcoin.GetProject(adminAddress)
-	assert.Nil(t, err)
-	assert.NotEmpty(t, res)
-}
-
 func TestGetGrantsInfo(t *testing.T) {
 	t.Parallel()
 
@@ -45,6 +36,14 @@ func TestGetEthDonations(t *testing.T) {
 	t.Parallel()
 
 	res, err := gitcoin.GetEthDonations(12605342, 12605343, gitcoin.ETH)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, res)
+}
+
+func TestGetZkSyncDonations(t *testing.T) {
+	t.Parallel()
+
+	res, err := gitcoin.GetZkSyncDonations(1000, 1001)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, res)
 }

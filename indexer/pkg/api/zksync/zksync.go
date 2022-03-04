@@ -30,7 +30,7 @@ func GetLatestBlockHeight() (int64, error) {
 }
 
 func GetTokens() ([]Token, error) {
-	url := endpoint + "/api/v0.1/" + "tokens"
+	url := endpoint + "/api/v0.1/tokens"
 	response, err := util.Get(url, nil)
 
 	if err != nil {
@@ -55,7 +55,26 @@ func GetTokens() ([]Token, error) {
 	return tokens, nil
 }
 
-func GetTxsByBlock(blockHeight int64) ([]Transaction, error) {
+// GetZksToken returns Token by tokenId
+func GetZksToken(id int64) Token {
+	// TODO: get Token from db
+	token := Token{Id: 0,
+		Address:  "0x0000000000000000000000000000000000000000",
+		Symbol:   "ETH",
+		Decimals: 18,
+		Kind:     "ERC20",
+		IsNFT:    false,
+	}
+	return token
+}
+
+// InactiveAdminAddress checks an admin address is active or not
+func InactiveAdminAddress(adminAddress string) bool {
+	// TODO: check from db
+	return false
+}
+
+func GetTxsByBlock(blockHeight int64) ([]ZKTransaction, error) {
 	url := fmt.Sprintf("%s/api/v0.1/blocks/%d/transactions", endpoint, blockHeight)
 	response, err := util.Get(url, nil)
 
@@ -67,7 +86,7 @@ func GetTxsByBlock(blockHeight int64) ([]Transaction, error) {
 	parsedJson, _ := parser.Parse(string(response))
 
 	arrs := parsedJson.GetArray()
-	trxs := make([]Transaction, len(arrs))
+	trxs := make([]ZKTransaction, len(arrs))
 
 	for i, arr := range arrs {
 		trxs[i].TxHash = string(arr.GetStringBytes("tx_hash"))
@@ -76,7 +95,7 @@ func GetTxsByBlock(blockHeight int64) ([]Transaction, error) {
 		trxs[i].Op.To = string(arr.GetStringBytes("op", "to"))
 		trxs[i].Op.Type = string(arr.GetStringBytes("op", "type"))
 		trxs[i].Op.Nonce = arr.GetInt64("op", "nonce")
-		trxs[i].Op.Token = arr.GetInt64("op", "token")
+		trxs[i].Op.TokenId = arr.GetInt64("op", "token")
 		trxs[i].Op.Amount = string(arr.GetStringBytes("op", "amount"))
 		trxs[i].Op.AccountId = arr.GetInt64("op", "accountId")
 		trxs[i].Success = arr.GetBool("success")

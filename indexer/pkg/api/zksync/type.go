@@ -3,12 +3,12 @@ package zksync
 import "fmt"
 
 type Token struct {
-	Id       int64  `json:"id"`
-	Address  string `json:"address"`
-	Symbol   string `json:"symbol"`
-	Decimals int64  `json:"decimals"`
-	Kind     string `json:"kind"`
-	IsNFT    bool   `json:"is_nft"`
+	Id       int64
+	Address  string
+	Symbol   string
+	Decimals int64
+	Kind     string
+	IsNFT    bool
 }
 
 func (t Token) String() string {
@@ -17,27 +17,27 @@ func (t Token) String() string {
 }
 
 type Op struct {
-	To        string `json:"to"`
-	Fee       string `json:"fee"`
-	From      string `json:"from"`
-	Type      string `json:"type"`
-	Nonce     int64  `json:"nonce"`
-	Token     int64  `json:"token"`
-	Amount    string `json:"amount"`
-	AccountId int64  `json:"accountId"` // nolint:tagliatelle // accountId is returned by zksync api
+	To        string
+	Fee       string
+	From      string
+	Type      string
+	Nonce     int64
+	TokenId   int64
+	Amount    string
+	AccountId int64
 }
 
 func (o Op) String() string {
-	return fmt.Sprintf(`From: %s, To: %s, Type: %s, Token: %d, Amount: %s`,
-		o.From, o.To, o.Type, o.Token, o.Amount)
+	return fmt.Sprintf(`From: %s, To: %s, Type: %s, TokenId: %d, Amount: %s`,
+		o.From, o.To, o.Type, o.TokenId, o.Amount)
 }
 
-type Transaction struct {
-	TxHash      string `json:"tx_hash"`
-	BlockNumber int64  `json:"block_number"`
-	Op          Op     `json:"op"`
-	Success     bool   `json:"success"`
-	FailReason  string `json:"fail_reason"`
-	CreatedAt   string `json:"created_at"`
-	BatchId     string `json:"batch_id"`
+type ZKTransaction struct {
+	TxHash      string
+	BlockNumber int64
+	Op          Op
+	Success     bool
+	FailReason  string
+	CreatedAt   string
+	BatchId     string
 }
