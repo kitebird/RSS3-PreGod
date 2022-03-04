@@ -5,33 +5,7 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/gitcoin"
 	"github.com/stretchr/testify/assert"
-	"github.com/valyala/fastjson"
 )
-
-func TestGetGrants(t *testing.T) {
-	t.Parallel()
-
-	res, err := gitcoin.GetGrants()
-	assert.Nil(t, err)
-	assert.NotEmpty(t, res)
-
-	var parser fastjson.Parser
-	parsedJson, parseErr := parser.Parse(string(res))
-	assert.Nil(t, parseErr)
-
-	arr := parsedJson.GetArray()
-	for _, v := range arr {
-		item := v.GetArray()
-		if len(item) == 2 && item[1].String() != "\"0x0\"" {
-			// check title
-			title := item[0].String()
-			assert.NotEmpty(t, title)
-			// check address
-			adminAddress := item[1].String()
-			assert.NotEmpty(t, adminAddress)
-		}
-	}
-}
 
 func TestGetProject(t *testing.T) {
 	t.Parallel()
@@ -45,9 +19,18 @@ func TestGetProject(t *testing.T) {
 func TestGetGrantsInfo(t *testing.T) {
 	t.Parallel()
 
-	res, err := gitcoin.GetGrantsInfo()
+	grants, err := gitcoin.GetGrantsInfo()
 	assert.Nil(t, err)
-	assert.NotEmpty(t, res)
+	assert.NotEmpty(t, grants)
+
+	for _, item := range grants {
+		if item.AdminAddress != "\"0x0\"" {
+			// check title
+			assert.NotEmpty(t, item.Title)
+			// check address
+			assert.NotEmpty(t, item.AdminAddress)
+		}
+	}
 }
 
 func TestGetProjectsInfo(t *testing.T) {

@@ -83,13 +83,7 @@ var token = map[string]tokenMeta{
 	"0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2": {18, "MKR"},
 }
 
-// GetGrants returns all grant projects.
-func GetGrants() (content []byte, err error) {
-	content, err = util.Get(grantUrl, nil)
-
-	return
-}
-
+// GetProject returns project info from gitcoin
 func GetProject(adminAddress string) (content []byte, err error) {
 	headers := make(map[string]string)
 	util.SetCommonHeader(headers)
@@ -100,8 +94,9 @@ func GetProject(adminAddress string) (content []byte, err error) {
 	return
 }
 
+// GetGrantsInfo returns grant info from gitcoin
 func GetGrantsInfo() ([]GrantInfo, error) {
-	content, err := GetGrants()
+	content, err := util.Get(grantUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +109,7 @@ func GetGrantsInfo() ([]GrantInfo, error) {
 	}
 
 	grantArrs := parsedJson.GetArray()
-	grants := make([]GrantInfo, len(grantArrs))
+	grants := make([]GrantInfo, 0)
 
 	for _, grant := range grantArrs {
 		projects := grant.GetArray()
@@ -126,6 +121,7 @@ func GetGrantsInfo() ([]GrantInfo, error) {
 	return grants, nil
 }
 
+// GetProjectsInfo returns project infos from gitcoin
 func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 	var project ProjectInfo
 
@@ -163,18 +159,7 @@ func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 	return project, nil
 }
 
-func GetDonations(chainType ChainType) ([]DonationInfo, error) {
-	if chainType == ETH {
-		return nil, nil
-	} else if chainType == Polygon {
-		return nil, nil
-	} else if chainType == ZKSYNC {
-		return nil, nil
-	}
-
-	return nil, nil
-}
-
+// GetEthDonations returns donations from ethereum and polygon
 func GetEthDonations(fromBlock int64, toBlock int64, chainType ChainType) ([]DonationInfo, error) {
 	apiKey := moralis.GetApiKey()
 	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, string(chainType), apiKey)
