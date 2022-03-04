@@ -22,20 +22,20 @@ var (
 )
 
 type URI struct {
-	Instance *Instance `json:"instance"`
+	Instance Instance `json:"instance"`
 }
 
 func (u *URI) String() string {
 	value := url.URL{
 		Scheme: Scheme,
-		User:   url.UserPassword(string(u.Instance.Prefix), u.Instance.Identity),
-		Path:   string(u.Instance.Platform),
+		User:   url.UserPassword(u.Instance.GetPrefix(), u.Instance.GetIdentity()),
+		Path:   u.Instance.GetSuffix(),
 	}
 
 	return value.String()
 }
 
-func New(instance *Instance) *URI {
+func New(instance Instance) *URI {
 	return &URI{
 		Instance: instance,
 	}
