@@ -10,7 +10,7 @@ import (
 func TestGetNFT(t *testing.T) {
 	t.Parallel()
 
-	apiKey := moralis.GetMoralisApiKey()
+	apiKey := moralis.GetApiKey()
 	result, err := moralis.GetNFTs("0x3b6d02a24df681ffdf621d35d70aba7adaac07c1", "eth", apiKey)
 	// assert for nil
 	assert.Nil(t, err)
@@ -21,7 +21,7 @@ func TestGetNFT(t *testing.T) {
 func TestGetNFTTransfers(t *testing.T) {
 	t.Parallel()
 
-	apiKey := moralis.GetMoralisApiKey()
+	apiKey := moralis.GetApiKey()
 	result, err := moralis.GetNFTTransfers("0x3b6d02a24df681ffdf621d35d70aba7adaac07c1", "eth", apiKey)
 	// assert for nil
 	assert.Nil(t, err)
@@ -32,7 +32,7 @@ func TestGetNFTTransfers(t *testing.T) {
 func TestGetLogs(t *testing.T) {
 	t.Parallel()
 
-	apiKey := moralis.GetMoralisApiKey()
+	apiKey := moralis.GetApiKey()
 
 	result, err := moralis.GetLogs(
 		12605342,

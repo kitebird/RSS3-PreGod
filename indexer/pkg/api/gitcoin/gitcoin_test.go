@@ -5,49 +5,23 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/gitcoin"
 	"github.com/stretchr/testify/assert"
-	"github.com/valyala/fastjson"
 )
-
-func TestGetGrants(t *testing.T) {
-	t.Parallel()
-
-	res, err := gitcoin.GetGrants()
-	assert.Nil(t, err)
-	assert.NotEmpty(t, res)
-
-	var parser fastjson.Parser
-	parsedJson, parseErr := parser.Parse(string(res))
-	assert.Nil(t, parseErr)
-
-	arr := parsedJson.GetArray()
-	for _, v := range arr {
-		item := v.GetArray()
-		if len(item) == 2 && item[1].String() != "\"0x0\"" {
-			// check title
-			title := item[0].String()
-			assert.NotEmpty(t, title)
-			// check address
-			adminAddress := item[1].String()
-			assert.NotEmpty(t, adminAddress)
-		}
-	}
-}
-
-func TestGetProject(t *testing.T) {
-	t.Parallel()
-
-	adminAddress := "0xf634ec94939efd57cb888fa8451c1e0d0f973c23"
-	res, err := gitcoin.GetProject(adminAddress)
-	assert.Nil(t, err)
-	assert.NotEmpty(t, res)
-}
 
 func TestGetGrantsInfo(t *testing.T) {
 	t.Parallel()
 
-	res, err := gitcoin.GetGrantsInfo()
+	grants, err := gitcoin.GetGrantsInfo()
 	assert.Nil(t, err)
-	assert.NotEmpty(t, res)
+	assert.NotEmpty(t, grants)
+
+	for _, item := range grants {
+		if item.AdminAddress != "\"0x0\"" {
+			// check title
+			assert.NotEmpty(t, item.Title)
+			// check address
+			assert.NotEmpty(t, item.AdminAddress)
+		}
+	}
 }
 
 func TestGetProjectsInfo(t *testing.T) {
@@ -58,10 +32,18 @@ func TestGetProjectsInfo(t *testing.T) {
 	assert.NotEmpty(t, res)
 }
 
-func TestGetDonations(t *testing.T) {
+func TestGetEthDonations(t *testing.T) {
 	t.Parallel()
 
-	res, err := gitcoin.GetDonations(12605342, 12605343)
+	res, err := gitcoin.GetEthDonations(12605342, 12605343, gitcoin.ETH)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, res)
+}
+
+func TestGetZkSyncDonations(t *testing.T) {
+	t.Parallel()
+
+	res, err := gitcoin.GetZkSyncDonations(1000, 1001)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, res)
 }

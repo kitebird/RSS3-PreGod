@@ -137,6 +137,7 @@ func GetUserProfile(name string) (*UserProfileStruct, error) {
 	return profile, err
 }
 
+// nolint:funlen // format is required by Jike API
 func GetUserTimeline(name string) ([]TimelineStruct, error) {
 	refreshErr := RefreshJikeToken()
 
@@ -156,7 +157,6 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 	data.OperationName = "UserFeeds"
 	data.Variables.Username = name
 
-	// nolint:lll // format is required by Jike API
 	data.Query = `query UserFeeds($username: String!) {
 					userProfile(username: $username) {
 						screenName

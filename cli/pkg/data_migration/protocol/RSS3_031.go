@@ -40,7 +40,7 @@ type RSS3Index031 struct {
 			Class string `bson:"class"`
 			Order int    `bson:"order"`
 		} `bson:"assets"`
-	} `bson:"_pass"` // nolint:tagliatelle // cause the bson field just named "_pass"
+	} `bson:"_pass"`
 }
 
 type RSS3AutoAssets031 struct {

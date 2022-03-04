@@ -4,8 +4,8 @@ import (
 	"math/big"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/zksync"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/valyala/fastjson"
 )
 
@@ -84,31 +84,9 @@ var token = map[string]tokenMeta{
 	"0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2": {18, "MKR"},
 }
 
-type (
-	GrantInfo    = types.GrantInfo
-	ProjectInfo  = types.ProjectInfo
-	DonationInfo = types.DonationInfo
-)
-
-// GetGrants returns all grant projects.
-func GetGrants() (content []byte, err error) {
-	content, err = util.Get(grantUrl, nil)
-
-	return
-}
-
-func GetProject(adminAddress string) (content []byte, err error) {
-	headers := make(map[string]string)
-	util.SetCommonHeader(headers)
-
-	url := grantsApi + "?admin_address=" + adminAddress
-	content, err = util.Get(url, headers)
-
-	return
-}
-
+// GetGrantsInfo returns grant info from gitcoin
 func GetGrantsInfo() ([]GrantInfo, error) {
-	content, err := GetGrants()
+	content, err := util.Get(grantUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +99,7 @@ func GetGrantsInfo() ([]GrantInfo, error) {
 	}
 
 	grantArrs := parsedJson.GetArray()
-	grants := make([]GrantInfo, len(grantArrs))
+	grants := make([]GrantInfo, 0)
 
 	for _, grant := range grantArrs {
 		projects := grant.GetArray()
@@ -133,12 +111,18 @@ func GetGrantsInfo() ([]GrantInfo, error) {
 	return grants, nil
 }
 
+// GetProjectsInfo returns project infos from gitcoin
 func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 	var project ProjectInfo
 
-	content, err := GetProject(adminAddress)
+	headers := make(map[string]string)
+	util.SetCommonHeader(headers)
+
+	url := grantsApi + "?admin_address=" + adminAddress
+	content, err := util.Get(url, headers)
+
 	if err != nil {
-		return project, err
+		return project, nil
 	}
 
 	var parser fastjson.Parser
@@ -154,6 +138,7 @@ func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 		project.AdminAddress = adminAddress
 		project.Title = title
 	} else {
+		// project is active
 		project.Active = true
 		project.AdminAddress = adminAddress
 		project.Title = title
@@ -170,10 +155,53 @@ func GetProjectsInfo(adminAddress string, title string) (ProjectInfo, error) {
 	return project, nil
 }
 
-func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
-	chainType := "eth"
-	apiKey := moralis.GetMoralisApiKey()
-	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, chainType, apiKey)
+// GetZkSyncDonations returns donations from zksync
+func GetZkSyncDonations(fromBlock, toBlock int64) ([]DonationInfo, error) {
+	donations := make([]DonationInfo, 0)
+
+	for i := fromBlock; i <= toBlock; i++ {
+		trxs, err := zksync.GetTxsByBlock(i)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, tx := range trxs {
+			if tx.Op.Type != "Transfer" ||
+				!tx.Success ||
+				tx.Op.To == "" ||
+				zksync.InactiveAdminAddress(tx.Op.To) {
+				continue
+			}
+
+			tokenId := tx.Op.TokenId
+			token := zksync.GetZksToken(tokenId)
+
+			formatedAmount := big.NewInt(1)
+			formatedAmount.SetString(tx.Op.Amount, 10)
+
+			d := DonationInfo{
+				Donor:          tx.Op.From,
+				AdminAddress:   tx.Op.To,
+				TokenAddress:   token.Address,
+				Amount:         tx.Op.Amount,
+				Symbol:         token.Symbol,
+				FormatedAmount: formatedAmount,
+				Decimals:       token.Decimals,
+				Timestamp:      tx.CreatedAt,
+				TxHash:         tx.TxHash,
+				Approach:       DonationApproachZksync,
+			}
+			donations = append(donations, d)
+		}
+	}
+
+	return donations, nil
+}
+
+// GetEthDonations returns donations from ethereum and polygon
+func GetEthDonations(fromBlock int64, toBlock int64, chainType ChainType) ([]DonationInfo, error) {
+	apiKey := moralis.GetApiKey()
+	logs, err := moralis.GetLogs(fromBlock, toBlock, bulkCheckoutAddress, donationSentTopic, string(chainType), apiKey)
 
 	if err != nil {
 		return nil, err
@@ -202,7 +230,7 @@ func GetDonations(fromBlock int64, toBlock int64) ([]DonationInfo, error) {
 			Decimals:       decimal,
 			Timestamp:      item.BlockTimestamp,
 			TxHash:         item.TransactionHash,
-			Approach:       "Standard",
+			Approach:       DonationApproachStandard,
 		}
 
 		donations = append(donations, donation)

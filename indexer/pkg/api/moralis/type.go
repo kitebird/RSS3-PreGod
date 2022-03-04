@@ -7,19 +7,19 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
-type MoralisChainType string
+type ChainType string
 
 const (
-	Unknown MoralisChainType = "unknown"
+	Unknown ChainType = "unknown"
 
-	ETH     MoralisChainType = "eth"
-	BSC     MoralisChainType = "bsc"
-	Polygon MoralisChainType = "polygon"
-	AVAX    MoralisChainType = "avalanche"
-	Fantom  MoralisChainType = "fantom"
+	ETH     ChainType = "eth"
+	BSC     ChainType = "bsc"
+	Polygon ChainType = "polygon"
+	AVAX    ChainType = "avalanche"
+	Fantom  ChainType = "fantom"
 )
 
-func GetChainType(network constants.NetworkName) MoralisChainType {
+func GetChainType(network constants.NetworkName) ChainType {
 	switch network {
 	case constants.NetworkName_Ethereum:
 		return ETH
@@ -36,7 +36,7 @@ func GetChainType(network constants.NetworkName) MoralisChainType {
 	}
 }
 
-func (mt MoralisChainType) GetNFTItemTypeID() constants.ItemTypeID {
+func (mt ChainType) GetNFTItemTypeID() constants.ItemTypeID {
 	switch mt {
 	case "ETH":
 		return constants.ItemType_Ethereum_Nft
@@ -53,8 +53,8 @@ func (mt MoralisChainType) GetNFTItemTypeID() constants.ItemTypeID {
 	}
 }
 
-// MoralisNFTItem store all indexed NFTs from moralis api.
-type MoralisNFTItem struct {
+// NFTItem store all indexed NFTs from moralis api.
+type NFTItem struct {
 	TokenAddress      string `json:"token_address"`
 	TokenId           string `json:"token_id"`
 	BlockNumberMinted string `json:"block_number_minted"`
@@ -72,21 +72,21 @@ type MoralisNFTItem struct {
 	Frozen            int64  `json:"frozen"`
 }
 
-type MoralisNFTResult struct {
-	Total    int64            `json:"total"`
-	Page     int64            `json:"page"`
-	PageSize int64            `json:"page_size"`
-	Result   []MoralisNFTItem `json:"result"`
-	Status   string           `json:"status"`
+type NFTResult struct {
+	Total    int64     `json:"total"`
+	Page     int64     `json:"page"`
+	PageSize int64     `json:"page_size"`
+	Result   []NFTItem `json:"result"`
+	Status   string    `json:"status"`
 }
 
-func (i MoralisNFTItem) String() string {
+func (i NFTItem) String() string {
 	return fmt.Sprintf(`TokenAddress: %s, TokenId: %s, OwnerOf: %s, TokenURI: %s`,
 		i.TokenAddress, i.TokenId, i.OwnerOf, i.TokenURI)
 }
 
-// MoralisNFTTransferItem store the transfers of NFTS.
-type MoralisNFTTransferItem struct {
+// NFTTransferItem store the transfers of NFTS.
+type NFTTransferItem struct {
 	BlockNumber      string `json:"block_number"`
 	BlockTimestamp   string `json:"block_timestamp"`
 	BlockHash        string `json:"block_hash"`
@@ -105,37 +105,37 @@ type MoralisNFTTransferItem struct {
 	Operator         string `json:"operator"`
 }
 
-type MoralisNFTTransferResult struct {
-	Total       int64                    `json:"total"`
-	Page        int64                    `json:"page"`
-	PageSize    int64                    `json:"page_size"`
-	Result      []MoralisNFTTransferItem `json:"result"`
-	Cursor      string                   `json:"cursor"`
-	BlockExists bool                     `json:"block_exists"`
+type NFTTransferResult struct {
+	Total       int64             `json:"total"`
+	Page        int64             `json:"page"`
+	PageSize    int64             `json:"page_size"`
+	Result      []NFTTransferItem `json:"result"`
+	Cursor      string            `json:"cursor"`
+	BlockExists bool              `json:"block_exists"`
 }
 
-func (i MoralisNFTTransferItem) String() string {
+func (i NFTTransferItem) String() string {
 	return fmt.Sprintf(`From: %s, To: %s, TokenAddress: %s, ContractType: %s, TokenId: %s`,
 		i.FromAddress, i.ToAddress, i.TokenAddress, i.ContractType, i.TokenId)
 }
 
-func (i MoralisNFTTransferItem) EqualsToToken(nft MoralisNFTItem) bool {
+func (i NFTTransferItem) EqualsToToken(nft NFTItem) bool {
 	return i.TokenAddress == nft.TokenAddress && i.TokenId == nft.TokenId
 }
 
-func (i MoralisNFTItem) GetUid() string {
+func (i NFTItem) GetUid() string {
 	return fmt.Sprintf("%s.%s", i.TokenAddress, i.TokenId)
 }
 
-func (i MoralisNFTTransferItem) GetUid() string {
+func (i NFTTransferItem) GetUid() string {
 	return fmt.Sprintf("%s.%s", i.TokenAddress, i.TokenId)
 }
 
-func (i MoralisNFTTransferItem) GetTsp() (time.Time, error) {
+func (i NFTTransferItem) GetTsp() (time.Time, error) {
 	return time.Parse(time.RFC3339, i.BlockTimestamp)
 }
 
-type MoralisGetLogsItem struct {
+type GetLogsItem struct {
 	TransactionHash string `json:"transaction_hash"`
 	Address         string `json:"address"`
 	BlockTimestamp  string `json:"block_timestamp"`
@@ -148,14 +148,14 @@ type MoralisGetLogsItem struct {
 	Topic3          string `json:"topic3"`
 }
 
-func (i MoralisGetLogsItem) String() string {
+func (i GetLogsItem) String() string {
 	return fmt.Sprintf(`TransactionHash: %s, Address: %s, Data: %s, Topic0: %s, Topic1: %s, Topic2:%s, Topic3: %s`,
 		i.TransactionHash, i.Address, i.Data, i.Topic0, i.Topic1, i.Topic2, i.Topic3)
 }
 
-type MoralisGetLogsResult struct {
-	Total    int64                `json:"total"`
-	Page     int64                `json:"page"`
-	PageSize int64                `json:"page_size"`
-	Result   []MoralisGetLogsItem `json:"result"`
+type GetLogsResult struct {
+	Total    int64         `json:"total"`
+	Page     int64         `json:"page"`
+	PageSize int64         `json:"page_size"`
+	Result   []GetLogsItem `json:"result"`
 }
