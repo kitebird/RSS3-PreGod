@@ -24,6 +24,7 @@ const (
 	NetworkIDPlayStation     NetworkID = 15
 	NetworkIDGitHub          NetworkID = 16
 
+	NetworkSymbolUnknown                       = "unknown"
 	NetworkSymbolEthereumMainnet NetworkSymbol = "ethereum_mainnet"
 	NetworkSymbolPolygon         NetworkSymbol = "polygon"
 	NetworkSymbolBNBChain        NetworkSymbol = "bnb"
@@ -43,7 +44,25 @@ const (
 )
 
 var (
-	networkIDMap = map[NetworkSymbol]NetworkID{}
+	networkIDMap = map[NetworkSymbol]NetworkID{
+		NetworkSymbolUnknown:         NetworkIDUnknown,
+		NetworkSymbolEthereumMainnet: NetworkIDEthereumMainnet,
+		NetworkSymbolPolygon:         NetworkIDPolygon,
+		NetworkSymbolBNBChain:        NetworkIDBNBChain,
+		NetworkSymbolArbitrum:        NetworkIDArbitrum,
+		NetworkSymbolAvalanche:       NetworkIDAvalanche,
+		NetworkSymbolFantom:          NetworkIDFantom,
+		NetworkSymbolGnosisMainnet:   NetworkIDGnosisMainnet,
+		NetworkSymbolSolanaMainet:    NetworkIDSolanaMainet,
+		NetworkSymbolFlowMainnet:     NetworkIDFlowMainnet,
+		NetworkSymbolArweaveMainnet:  NetworkIDArweaveMainnet,
+		NetworkSymbolRSS:             NetworkIDRSS,
+		NetworkSymbolTwitter:         NetworkIDTwitter,
+		NetworkSymbolMisskey:         NetworkIDMisskey,
+		NetworkSymbolJike:            NetworkIDJike,
+		NetworkSymbolPlayStation:     NetworkIDPlayStation,
+		NetworkSymbolGitHub:          NetworkIDGitHub,
+	}
 )
 
 func IsValidNetworkName(value string) bool {

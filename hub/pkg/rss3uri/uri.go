@@ -15,6 +15,7 @@ var (
 	ErrInvalidPrefix   = errors.New("invalid prefix")
 	ErrInvalidIdentity = errors.New("invalid identity")
 	ErrInvalidPlatform = errors.New("invalid platform")
+	ErrInvalidNetwork  = errors.New("invalid network")
 )
 
 var (

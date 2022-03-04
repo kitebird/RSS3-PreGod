@@ -2,7 +2,6 @@ package rss3uri
 
 import (
 	"fmt"
-
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
@@ -85,7 +84,7 @@ func NewInstance(prefix, identity, platform string) (Instance, error) {
 		}, nil
 	default:
 		if !constants.IsValidNetworkName(platform) {
-			return nil, ErrInvalidPlatform
+			return nil, ErrInvalidNetwork
 		}
 
 		return &NetworkInstance{
