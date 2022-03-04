@@ -31,6 +31,7 @@ func (u *URI) String() string {
 		User:   url.UserPassword(string(u.Instance.Prefix), u.Instance.Identity),
 		Path:   string(u.Instance.Platform),
 	}
+
 	return value.String()
 }
 

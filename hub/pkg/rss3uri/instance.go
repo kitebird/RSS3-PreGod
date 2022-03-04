@@ -2,6 +2,7 @@ package rss3uri
 
 import (
 	"fmt"
+
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
@@ -23,12 +24,15 @@ func NewInstance(prefix, identity, platform string) (*Instance, error) {
 	if !constants.IsValidPrefix(prefix) {
 		return nil, ErrInvalidPrefix
 	}
+
 	if identity == "" {
 		return nil, ErrInvalidIdentity
 	}
+
 	if !constants.IsValidPlatformName(platform) {
 		return nil, ErrInvalidPlatform
 	}
+
 	return &Instance{
 		Prefix:   constants.PrefixName(prefix),
 		Identity: identity,
@@ -41,5 +45,6 @@ func ParseInstance(rawInstance string) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return uri.Instance, nil
 }
