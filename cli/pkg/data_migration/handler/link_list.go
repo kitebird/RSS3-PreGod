@@ -61,14 +61,14 @@ func LinkList(content bson.D) error {
 
 		linkID := uuid.NewV5(uuid.NamespaceOID, uniqueName).String()
 		links[i] = model.Link{
-			LinkID:               linkID,
-			RSS3ID:               account,
-			PrefixID:             constants.PrefixIDAccount,
-			PlatformNameID:       constants.PlatformIDEthereum,
-			TargetRSS3ID:         target,
-			TargetPrefixID:       constants.PrefixIDAccount,
-			TargetPlatformNameID: constants.PlatformIDEthereum,
-			PageIndex:            pageNumber,
+			LinkID:           linkID,
+			RSS3ID:           account,
+			PrefixID:         constants.PrefixIDAccount,
+			PlatformID:       constants.PlatformIDEthereum,
+			TargetRSS3ID:     target,
+			TargetPrefixID:   constants.PrefixIDAccount,
+			TargetPlatformID: constants.PlatformIDEthereum,
+			PageIndex:        pageNumber,
 		}
 	}
 

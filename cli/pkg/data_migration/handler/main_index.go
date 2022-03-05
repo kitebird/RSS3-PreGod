@@ -81,7 +81,7 @@ func MainIndex(content bson.D) error {
 	accounts := []model.AccountPlatform{
 		{
 			AccountID:         newID,
-			PlatformNameID:    constants.PlatformIDEthereum,
+			PlatformID:        constants.PlatformIDEthereum,
 			PlatformAccountID: mainIndex.ID,
 			Base: model.BaseModel{
 				CreatedAt: CreatedAt,
@@ -95,7 +95,7 @@ func MainIndex(content bson.D) error {
 
 		accounts = append(accounts, model.AccountPlatform{
 			AccountID:         splits[0] + "@" + splits[1],
-			PlatformNameID:    getAccountPlatform(splits[0]),
+			PlatformID:        getAccountPlatform(splits[0]),
 			PlatformAccountID: splits[1],
 			Base: model.BaseModel{
 				CreatedAt: CreatedAt,
