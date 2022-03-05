@@ -162,6 +162,7 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 
 	data.Query = `query UserFeeds($username: String!) {
 					userProfile(username: $username) {
+						username
 						screenName
 						briefIntro
 						feeds {
@@ -280,6 +281,7 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 			return nil, timeErr
 		}
 
+		result[i].Author = trimQuote(parsedJson.Get("username").String())
 		result[i].Timestamp = t
 		result[i].Summary = trimQuote(node.Get("content").String())
 		result[i].Link = fmt.Sprintf("https://web.okjike.com/originalPost/%s", id)
