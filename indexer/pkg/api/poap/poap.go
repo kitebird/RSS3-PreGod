@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	jsoniter "github.com/json-iterator/go"
 )
 

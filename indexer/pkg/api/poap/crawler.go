@@ -71,7 +71,6 @@ func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkName) 
 			ItemTypeID: constants.ItemType_Xdai_Poap,
 			Proof:      "Here is the proof",
 		})
-
 	}
 
 	return nil
