@@ -19,6 +19,6 @@ type Object struct {
 	Tags        pq.StringArray `gorm:"type:text[]"`
 	Attachments datatypes.JSON `gorm:"type:jsonb"`
 
-	PlatformNameID   constants.PlatformID `gorm:"type:int;column:platform_name_id"`
-	PlatformObjectID string               `gorm:"type:text;column:platform_object_id"` // object ID on the platform
+	NetworkID       constants.NetworkID `gorm:"type:int;column:network_id"`
+	NetworkObjectID string              `gorm:"type:text;column:network_object_id"` // object ID on the network
 }

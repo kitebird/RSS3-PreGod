@@ -9,11 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type RequestUri struct {
+type GetInstanceRequestUri struct {
 	Authority string `uri:"authority" binding:"required"`
 }
 
-type ResponseData struct {
+type GetInstanceResponseData struct {
 	Authority rss3uri.Instance `json:"authority"`
 }
 
@@ -25,13 +25,13 @@ type ResponseData struct {
 // @Accept       json
 // @Produce      json
 // @Param        authority  path      string  true  "Authority"
-// @Success      200        {object}  web.Response{data=ResponseData}
+// @Success      200        {object}  web.Response{data=GetInstanceResponseData}
 // @Router       /{authority} [get]
 func GetInstance(c *gin.Context) {
 	w := web.Gin{C: c}
 
 	// validate uri
-	var uri RequestUri
+	var uri GetInstanceRequestUri
 	if err := c.ShouldBindUri(&uri); err != nil {
 		w.JSONResponse(http.StatusBadRequest, status.INVALID_PARAMS, "invalid uri")
 
