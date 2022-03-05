@@ -1,4 +1,8 @@
-package types
+package poap
+
+import (
+	"time"
+)
 
 type PoapEventInfo struct {
 	Id          int    `json:"id"`
@@ -36,4 +40,8 @@ type PoapSupply struct {
 type TokenResponse struct {
 	PoapEventInfo PoapEventInfo `json:"event"`
 	PoapSupply    PoapSupply    `json:"supply"`
+}
+
+func (i PoapResponse) GetTsp() (time.Time, error) {
+	return time.Parse("2006-01-02 15:04:05", i.Created)
 }

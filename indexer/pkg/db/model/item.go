@@ -23,7 +23,13 @@ type Item struct {
 	PlatformCreatedAt time.Time `json:"date_created" bson:"date_created"`
 }
 
-func NewItem(objectUid string, objectTypeId constants.ItemTypeID, from string, to string, proof string, platformCreatedAt time.Time) *Item {
+func NewItem(
+	objectUid string,
+	objectTypeId constants.ItemTypeID,
+	from string,
+	to string,
+	proof string,
+	platformCreatedAt time.Time) *Item {
 	return &Item{
 		ItemId: ItemId{
 			ItemTypeID: objectTypeId,
