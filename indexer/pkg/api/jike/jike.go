@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
@@ -20,9 +21,11 @@ var (
 	parser       fastjson.Parser
 )
 
-func init() {
-	c := cron.New()
+func New() {
+	Login()
+
 	// everyday at 00:00, refresh Jike tokens
+	c := cron.New()
 	c.AddFunc("0 0 * * *", func() { Login() })
 	c.Start()
 }
@@ -267,6 +270,9 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 	result := make([]TimelineStruct, len(parsedObject))
 
 	for i, node := range parsedObject {
+		id := trimQuote(node.Get("id").String())
+		result[i].Id = id
+
 		t, timeErr := time.Parse(time.RFC3339, trimQuote(node.Get("createdAt").String()))
 		if err != nil {
 			logger.Fatalf("Jike GetUserTimeline timestamp parsing err: %v", timeErr)
@@ -274,11 +280,10 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 			return nil, timeErr
 		}
 
-		id := trimQuote(node.Get("id").String())
-		result[i].Hash = id
-		result[i].Timestamp = fmt.Sprintf("0x%x", t.Unix())
-		result[i].PreContent = formatFeed(node)
+		result[i].Timestamp = t
+		result[i].Summary = trimQuote(node.Get("content").String())
 		result[i].Link = fmt.Sprintf("https://web.okjike.com/originalPost/%s", id)
+		result[i].Attachments = *getAttachment(node)
 	}
 
 	if err != nil {
@@ -290,6 +295,7 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 	return result, err
 }
 
+//nolint:unused // might need it in the future
 func formatFeed(node *fastjson.Value) string {
 	text := trimQuote(node.Get("content").String())
 
@@ -309,7 +315,7 @@ func formatFeed(node *fastjson.Value) string {
 		}
 	}
 
-	if node.Exists("target") {
+	if node.Exists("target") && node.Get("type").String() == "REPOST" {
 		target := node.Get("target")
 		// a status key means the feed is unavailable, e.g, DELETED
 		if !target.Exists("status") {
@@ -323,6 +329,81 @@ func formatFeed(node *fastjson.Value) string {
 	}
 
 	return text
+}
+
+// TODO: handle video attachments
+func getAttachment(node *fastjson.Value) *[]model.Attachment {
+	var content string
+
+	attachments := make([]model.Attachment, 0)
+
+	// process the original post attachments
+	attachments = append(attachments, *getPicture(node.Get("pictures"))...)
+
+	// a 'status' field often means the report target is unavailable, e.g, DELETED
+	if !node.Exists("target", "status") {
+		if node.Exists("target") {
+			node = node.Get("target")
+			// store quote_address
+
+			content = "https://web.okjike.com/originalPost/" + trimQuote(node.Get("id").String())
+
+			qAddress := *model.NewAttachment(content, nil, "text/uri-list", "quote_address", 0)
+
+			// store quote_text
+
+			content = trimQuote(node.Get("content").String())
+			qText := *model.NewAttachment(content, nil, "text/plain", "quote_text", 0)
+
+			attachments = append(attachments, qAddress, qText)
+
+			// store quote_media
+
+			if node.Exists("pictures") {
+				attachments = append(attachments, *getPicture(node)...)
+			}
+		}
+	}
+
+	return &attachments
+}
+
+func getPicture(node *fastjson.Value) *[]model.Attachment {
+	address := make([]string, 1)
+
+	var mime, content string
+
+	var sizeInBytes = 0
+
+	pictues := node.GetArray("pictures")
+
+	result := make([]model.Attachment, len(pictues))
+
+	for i, picture := range pictues {
+		var url string
+
+		if picture.Exists("thumbnailUrl") {
+			url = trimQuote(picture.Get("thumbnailUrl").String())
+		}
+
+		if picture.Exists("picUrl") {
+			url = trimQuote(picture.Get("picUrl").String())
+		}
+
+		header, err := util.Head(url)
+
+		if err == nil {
+			sizeInBytes, _ = strconv.Atoi(header.Get("Content-Length"))
+			mime = header.Get("Content-Type")
+		}
+
+		address = append(address, url)
+
+		qMedia := *model.NewAttachment(content, address, mime, "quote_media", sizeInBytes)
+		result[i] = qMedia
+	}
+
+	return &result
 }
 
 func trimQuote(s string) string {
