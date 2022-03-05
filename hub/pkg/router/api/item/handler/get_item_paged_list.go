@@ -13,7 +13,7 @@ import (
 type GetItemPagedListRequestUri struct {
 	Authority string             `uri:"authority" binding:"required"`
 	ItemType  constants.ItemType `uri:"item_type" binding:"required"`
-	ItemUUID  string             `uri:"item_uuid" binding:"required"`
+	PageIndex int                `uri:"page_index" binding:"required"`
 }
 
 type GetItemPagedListResponseData struct {
