@@ -3,10 +3,10 @@ package item
 import (
 	"net/http"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/rss3uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +17,7 @@ type GetItemPagedListRequestUri struct {
 }
 
 type GetItemPagedListResponseData struct {
-	Authority rss3uri.Instance `json:"authority"`
+	Authority util.Instance `json:"authority"`
 }
 
 func GetItemPagedList(c *gin.Context) {

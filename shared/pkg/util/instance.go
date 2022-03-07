@@ -1,4 +1,4 @@
-package rss3uri
+package util
 
 import (
 	"fmt"
