@@ -23,21 +23,24 @@ fmt:
 lint:
 	golangci-lint run ./...
 
+pre_commit:
+	pre-commit run --all-files
+
 get:
 	@echo "  >  \033[32mDownloading & Installing all the modules...\033[0m "
 	go mod tidy && go mod download
 
 dev_docker:
 	@echo "  >  \033[32mStarting docker environment... \033[0m "
-	docker-compose -f docker-compose.dev.yml up
+	docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up
 
-dev_go_hub:
-	@echo "  >  \033[32mHappy coding! 😄😄😄 \033[0m "
+dev_hub:
+	@echo "  >  \033[32mHappy coding hub! 😄😄😄 \033[0m "
 	go run hub/main.go
 
-dev_go_indexer:
-	@echo "  >  \033[32mHappy coding! 😄😄😄 \033[0m "
-	go run indexer/main.go
+dev_indexer:
+	@echo "  >  \033[32mHappy coding indexer! 😄😄😄 \033[0m "
+	go run hub/indexer.go
 
 build:
 	make build_go
