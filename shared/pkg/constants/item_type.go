@@ -1,6 +1,7 @@
 package constants
 
 type ItemTypeID int32
+type ItemType string
 
 const (
 	ItemType_Unknown ItemTypeID = 0
