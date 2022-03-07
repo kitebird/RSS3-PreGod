@@ -71,7 +71,7 @@ func MainIndex(content bson.D) error {
 		RSS3ID:         newID,
 		PrefixID:       constants.PrefixIDAccount,
 		InstanceTypeID: constants.InstanceTypeAccount,
-		Base: model.BaseModel{
+		BaseModel: model.BaseModel{
 			CreatedAt: CreatedAt,
 			UpdatedAt: UpdatedAt,
 		},
@@ -83,7 +83,7 @@ func MainIndex(content bson.D) error {
 			AccountID:         newID,
 			PlatformID:        constants.PlatformIDEthereum,
 			PlatformAccountID: mainIndex.ID,
-			Base: model.BaseModel{
+			BaseModel: model.BaseModel{
 				CreatedAt: CreatedAt,
 				UpdatedAt: UpdatedAt,
 			},
@@ -97,7 +97,7 @@ func MainIndex(content bson.D) error {
 			AccountID:         splits[0] + "@" + splits[1],
 			PlatformID:        getAccountPlatform(splits[0]),
 			PlatformAccountID: splits[1],
-			Base: model.BaseModel{
+			BaseModel: model.BaseModel{
 				CreatedAt: CreatedAt,
 				UpdatedAt: UpdatedAt,
 			},
@@ -114,7 +114,7 @@ func MainIndex(content bson.D) error {
 		InstanceBase:    instanceBase,
 		AccountPlatform: accounts,
 
-		Base: model.BaseModel{
+		BaseModel: model.BaseModel{
 			CreatedAt: CreatedAt,
 			UpdatedAt: UpdatedAt,
 		},
