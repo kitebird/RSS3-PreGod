@@ -36,20 +36,20 @@ func GetChainType(network constants.NetworkName) ChainType {
 	}
 }
 
-func (mt ChainType) GetNFTItemTypeID() constants.ItemTypeID {
+func (mt ChainType) GetNetworkSymbol() constants.NetworkSymbol {
 	switch mt {
 	case "ETH":
-		return constants.ItemType_Ethereum_Nft
+		return constants.NetworkSymbolEthereumMainnet
 	case "BSC":
-		return constants.ItemType_Bsc_Nft
+		return constants.NetworkSymbolBNBChain
 	case "Polygon":
-		return constants.ItemType_Polygon_Nft
+		return constants.NetworkSymbolPolygon
 	case "AVAX":
-		return constants.ItemType_Avax_Nft
+		return constants.NetworkSymbolAvalanche
 	case "Fantom":
-		return constants.ItemType_Fantom_Nft
+		return constants.NetworkSymbolFantom
 	default:
-		return constants.ItemType_Unknown
+		return constants.NetworkSymbolUnknown
 	}
 }
 

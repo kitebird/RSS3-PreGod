@@ -43,21 +43,10 @@ func AppendNotes(instance string, notes []*model.ItemId) {
 
 // TODO: getter
 
-func InsertObjectDoc(object *model.Object) *mongo.SingleResult {
-	return mgm.Coll(&model.Object{}).FindOneAndReplace(
-		mgm.Ctx(),
-		bson.M{"uid": object.Uid, "tags": object.Tags},
-		object,
-		options.FindOneAndReplace().SetUpsert(true),
-	)
-}
-
-// TODO: getter
-
 func InsertItemDoc(item *model.Item) *mongo.SingleResult {
 	return mgm.Coll(&model.Item{}).FindOneAndReplace(
 		mgm.Ctx(),
-		bson.M{"item_id.tags": item.ItemId.Tags, "item_id.proof": item.ItemId.Proof},
+		bson.M{"item_id.network_id": item.ItemId.NetworkId, "item_id.proof": item.ItemId.Proof},
 		item,
 		options.FindOneAndReplace().SetUpsert(true),
 	)
