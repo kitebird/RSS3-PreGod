@@ -9,7 +9,7 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/util"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
 type moralisCrawler struct {
@@ -85,7 +85,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 			tsp = time.Now()
 		}
 
-		author, err := util.NewInstance("account", nftTransfer.FromAddress, string(networkSymbol))
+		author, err := rss3uri.NewInstance("account", nftTransfer.FromAddress, string(networkSymbol))
 		if err != nil {
 			// TODO
 			logger.Error(tsp, err)
