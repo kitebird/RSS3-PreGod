@@ -1,8 +1,8 @@
 package model
 
 import (
-	datatype "github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/model/datatype"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
+	"gorm.io/datatypes"
 )
 
 // `link_list` model.
@@ -15,5 +15,5 @@ type LinkList struct {
 
 	LinkType constants.LinkTypeID `gorm:"type:int"`
 
-	Metadata datatype.Attachments `gorm:"type:jsonb"`
+	Metadata datatypes.JSONMap `gorm:"type:jsonb"`
 }
