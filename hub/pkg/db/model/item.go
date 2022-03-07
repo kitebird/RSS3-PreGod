@@ -12,11 +12,9 @@ type Item struct {
 
 	ObjectID string `gorm:"type:text;column:object_id"`
 
-	Proof     string `gorm:"type:text"`
-	From      string `gorm:"type:text"`
-	To        string `gorm:"type:text"`
-	Auto      bool   `gorm:"type:bool"`
-	PageIndex int    `gorm:"type:int"`
+	Auto      bool `gorm:"type:bool"`
+	PageIndex int  `gorm:"type:int"`
 
-	PlatformCreatedAt time.Time `gorm:"index"` // create time on the platform
+	OriginalCreatedAt time.Time `gorm:"index"` // create time on the platform
+	OriginalUpdatedAt time.Time `gorm:"index"` // update time on the platform
 }

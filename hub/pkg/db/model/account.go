@@ -1,8 +1,8 @@
 package model
 
 import (
+	datatype "github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/model/datatype"
 	"github.com/lib/pq"
-	"gorm.io/datatypes"
 )
 
 // `account` model.
@@ -14,7 +14,7 @@ type Account struct {
 	Bio       string         `gorm:"type:text"`
 	Avatars   pq.StringArray `gorm:"type:text[]"`
 
-	Attachments datatypes.JSON `gorm:"type:jsonb"`
+	Attachments datatype.Attachments `gorm:"type:jsonb"`
 	// The following fields are stored in `attachments` field above:
 	// Banners   pq.StringArray `gorm:"type:text[]"`
 	// Websites  pq.StringArray `gorm:"type:text[]"`
