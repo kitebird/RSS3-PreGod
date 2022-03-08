@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util/httpx"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	jsoniter "github.com/json-iterator/go"
 )
@@ -36,7 +36,7 @@ func GetNFTs(userAddress string, chainType ChainType, apiKey string) (NFTResult,
 	url := fmt.Sprintf("%s/api/v2/%s/nft?chain=%s&format=decimal",
 		endpoint, userAddress, chainType)
 
-	response, err := util.Get(url, headers)
+	response, err := httpx.Get(url, headers)
 	if err != nil {
 		return NFTResult{}, err
 	}
@@ -61,7 +61,7 @@ func GetNFTTransfers(userAddress string, chainType ChainType, apiKey string) (NF
 	url := fmt.Sprintf("%s/api/v2/%s/nft/transfers?chain=%s&format=decimal&direction=both",
 		endpoint, userAddress, chainType)
 
-	response, err := util.Get(url, headers)
+	response, err := httpx.Get(url, headers)
 	if err != nil {
 		return NFTTransferResult{}, err
 	}
@@ -85,7 +85,7 @@ func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chain
 	url := fmt.Sprintf("%s/api/v2/%s/logs?chain=%s&from_block=%d&to_block=%d&topic0=%s",
 		endpoint, address, chainType, fromBlock, toBlock, topic)
 
-	response, err := util.Get(url, headers)
+	response, err := httpx.Get(url, headers)
 	if err != nil {
 		return nil, err
 	}
