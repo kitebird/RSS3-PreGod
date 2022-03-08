@@ -19,17 +19,17 @@ const (
 	Fantom  ChainType = "fantom"
 )
 
-func GetChainType(network constants.NetworkName) ChainType {
+func GetChainType(network constants.NetworkID) ChainType {
 	switch network {
-	case constants.NetworkName_Ethereum:
+	case constants.NetworkIDEthereumMainnet:
 		return ETH
-	case constants.NetworkName_BNB:
+	case constants.NetworkIDBNBChain:
 		return BSC
-	case constants.NetworkName_Polygon:
+	case constants.NetworkIDPolygon:
 		return Polygon
-	case constants.NetworkName_Avalanche:
+	case constants.NetworkIDAvalanche:
 		return AVAX
-	case constants.NetworkName_Fantom:
+	case constants.NetworkIDFantom:
 		return Fantom
 	default:
 		return Unknown
@@ -149,7 +149,7 @@ type GetLogsItem struct {
 }
 
 func (i GetLogsItem) String() string {
-	return fmt.Sprintf(`TransactionHash: %s, Address: %s, Data: %s, Topic0: %s, Topic1: %s, Topic2:%s, Topic3: %s`,
+	return fmt.Sprintf(`TransactionHash: %s, TokenAddress: %s, Data: %s, Topic0: %s, Topic1: %s, Topic2:%s, Topic3: %s`,
 		i.TransactionHash, i.Address, i.Data, i.Topic0, i.Topic1, i.Topic2, i.Topic3)
 }
 

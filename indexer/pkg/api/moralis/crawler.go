@@ -13,25 +13,24 @@ import (
 )
 
 type moralisCrawler struct {
-	rss3Items []*model.Item
-
-	rss3Assets, rss3Notes []*model.ItemId
+	crawler.CrawlerResult
 }
 
 func NewMoralisCrawler() crawler.Crawler {
 	return &moralisCrawler{
-		rss3Items: []*model.Item{},
-
-		rss3Assets: []*model.ItemId{},
-		rss3Notes:  []*model.ItemId{},
+		crawler.CrawlerResult{
+			Items:  []*model.Item{},
+			Assets: []*model.ItemId{},
+			Notes:  []*model.ItemId{},
+		},
 	}
 }
 
 //nolint:funlen // disable line length check
-func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkName) error {
-	chainType := GetChainType(itemType)
+func (mc *moralisCrawler) Work(userAddress string, network constants.NetworkID) error {
+	chainType := GetChainType(network)
 	if chainType == Unknown {
-		return fmt.Errorf("unsupported network: %s", itemType)
+		return fmt.Errorf("unsupported network: %s", chainType)
 	}
 
 	networkSymbol := chainType.GetNetworkSymbol()
@@ -50,7 +49,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 	}
 	//parser
 	for _, nftTransfer := range nftTransfers.Result {
-		mc.rss3Notes = append(mc.rss3Notes, &model.ItemId{
+		mc.Notes = append(mc.Notes, &model.ItemId{
 			NetworkId: networkId,
 			Proof:     nftTransfer.TransactionHash,
 		})
@@ -63,7 +62,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 			if nftTransfer.EqualsToToken(asset) {
 				hasProof = true
 
-				mc.rss3Assets = append(mc.rss3Assets, &model.ItemId{
+				mc.Assets = append(mc.Assets, &model.ItemId{
 					NetworkId: networkId,
 					Proof:     nftTransfer.TransactionHash,
 				})
@@ -119,7 +118,7 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 			attachments,
 			tsp,
 		)
-		mc.rss3Items = append(mc.rss3Items, ni)
+		mc.Items = append(mc.Items, ni)
 	}
 
 	return nil
@@ -127,8 +126,8 @@ func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkNam
 
 func (mc *moralisCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Assets: mc.rss3Assets,
-		Notes:  mc.rss3Notes,
-		Items:  mc.rss3Items,
+		Assets: mc.Assets,
+		Notes:  mc.Notes,
+		Items:  mc.Items,
 	}
 }
