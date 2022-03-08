@@ -76,7 +76,7 @@ func GetNFTTransfers(userAddress string, chainType ChainType, apiKey string) (NF
 	return *res, nil
 }
 
-func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chainType string, apiKey string) (GetLogsResult, error) {
+func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chainType string, apiKey string) (*GetLogsResult, error) {
 	var headers = map[string]string{
 		"accept":    "application/json",
 		"X-API-Key": apiKey,
@@ -87,7 +87,7 @@ func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chain
 
 	response, err := util.Get(url, headers)
 	if err != nil {
-		return GetLogsResult{}, err
+		return nil, err
 	}
 	//fmt.Println(string(response))
 
@@ -95,8 +95,8 @@ func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chain
 
 	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
-		return GetLogsResult{}, err
+		return nil, err
 	}
 
-	return *res, nil
+	return res, nil
 }
