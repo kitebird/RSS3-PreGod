@@ -7,21 +7,19 @@ import (
 )
 
 type jikeCrawler struct {
-	rss3Items   []*model.Item
-	rss3Objects []*model.Object
+	rss3Items []*model.Item
 
 	rss3Assets, rss3Notes []*model.ItemId
 }
 
 func NewJikeCrawler() crawler.Crawler {
 	return &jikeCrawler{
-		rss3Items:   []*model.Item{},
-		rss3Objects: []*model.Object{},
-		rss3Notes:   []*model.ItemId{},
+		rss3Items: []*model.Item{},
+		rss3Notes: []*model.ItemId{},
 	}
 }
 
-func (mc *jikeCrawler) Work(userAddress string, itemType constants.NetworkName) error {
+func (mc *jikeCrawler) Work(userAddress string, networkId constants.NetworkID) error {
 	timeline, err := GetUserTimeline(userAddress)
 
 	if err != nil {
@@ -30,30 +28,25 @@ func (mc *jikeCrawler) Work(userAddress string, itemType constants.NetworkName) 
 
 	for _, item := range timeline {
 		ni := model.NewItem(
-			item.Link, // object uid for jike
-			constants.ItemType_Jike_Node,
-			item.Author,
-			"",
+			networkId,
 			item.Link,
+			model.Metadata{
+				"network": constants.NetworkSymbolJike,
+				"from":    item.Author,
+			},
+			constants.ItemTagsJikePost,
+			[]string{item.Author},
+			"",
+			item.Summary,
+			item.Attachments,
 			item.Timestamp,
 		)
 		mc.rss3Items = append(mc.rss3Items, ni)
 
 		mc.rss3Notes = append(mc.rss3Notes, &model.ItemId{
-			ItemTypeID: constants.ItemType_Jike_Node,
-			Proof:      item.Link,
+			NetworkId: networkId,
+			Proof:     item.Link,
 		})
-
-		no := model.NewObject(
-			[]string{item.Author},
-			item.Link, // object uid for jike
-			constants.ItemType_Jike_Node,
-			item.Summary, // use title as summary
-			item.Summary,
-			[]string{"Jike Post"},
-			item.Attachments,
-		)
-		mc.rss3Objects = append(mc.rss3Objects, no)
 	}
 
 	return nil
@@ -61,9 +54,8 @@ func (mc *jikeCrawler) Work(userAddress string, itemType constants.NetworkName) 
 
 func (mc *jikeCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Assets:  mc.rss3Assets,
-		Notes:   mc.rss3Notes,
-		Items:   mc.rss3Items,
-		Objects: mc.rss3Objects,
+		Assets: mc.rss3Assets,
+		Notes:  mc.rss3Notes,
+		Items:  mc.rss3Items,
 	}
 }

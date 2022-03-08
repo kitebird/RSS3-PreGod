@@ -7,12 +7,12 @@ import (
 )
 
 //nolint:tagliatelle // format is required by Jike API
-type UserProfileStruct struct {
+type UserProfile struct {
 	ScreenName string `json:"screenName"`
 	Bio        string `json:"bio"`
 }
 
-type TimelineStruct struct {
+type Timeline struct {
 	Id          string
 	Timestamp   time.Time
 	Summary     string
@@ -29,7 +29,7 @@ type RefreshTokenStruct struct {
 }
 
 //nolint:tagliatelle // format is required by Jike API
-type TimelineRequestStruct struct {
+type TimelineRequest struct {
 	OperationName string `json:"operationName"`
 	Variables     struct {
 		Username string `json:"username"`

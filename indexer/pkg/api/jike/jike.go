@@ -7,6 +7,7 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util/httpx"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
@@ -34,7 +35,7 @@ func Login() error {
 	json, err := jsoni.MarshalToString(config.Config.Indexer.Jike)
 
 	if err != nil {
-		logger.Fatalf("Jike Config read err: %v", err)
+		logger.Errorf("Jike Config read err: %v", err)
 
 		return err
 	}
@@ -46,10 +47,10 @@ func Login() error {
 
 	url := "https://api.ruguoapp.com/1.0/users/loginWithPhoneAndPassword"
 
-	response, err := util.PostRaw(url, headers, json)
+	response, err := httpx.PostRaw(url, headers, json)
 
 	if err != nil {
-		logger.Fatalf("Jike Login err: %v", err)
+		logger.Errorf("Jike Login err: %v", err)
 
 		return err
 	}
@@ -69,10 +70,10 @@ func RefreshJikeToken() error {
 
 	url := "https://api.ruguoapp.com/app_auth_tokens.refresh"
 
-	response, err := util.Get(url, headers)
+	response, err := httpx.Get(url, headers)
 
 	if err != nil {
-		logger.Fatalf("Jike RefreshToken err: %v", err)
+		logger.Errorf("Jike RefreshToken err: %v", err)
 
 		return err
 	}
@@ -88,18 +89,18 @@ func RefreshJikeToken() error {
 
 			return nil
 		} else {
-			logger.Fatalf("Jike RefreshToken err: %v", "Jike refresh token endpoint returned a failed response")
+			logger.Errorf("Jike RefreshToken err: %v", "Jike refresh token endpoint returned a failed response")
 
 			return err
 		}
 	} else {
-		logger.Fatalf("Jike RefreshToken err: %v", err)
+		logger.Errorf("Jike RefreshToken err: %v", err)
 
 		return err
 	}
 }
 
-func GetUserProfile(name string) (*UserProfileStruct, error) {
+func GetUserProfile(name string) (*UserProfile, error) {
 	refreshErr := RefreshJikeToken()
 
 	if refreshErr != nil {
@@ -114,10 +115,10 @@ func GetUserProfile(name string) (*UserProfileStruct, error) {
 
 	url := "https://api.ruguoapp.com/1.0/users/profile?username=" + name
 
-	response, err := util.Get(url, headers)
+	response, err := httpx.Get(url, headers)
 
 	if err != nil {
-		logger.Fatalf("Jike GetUserProfile err: %v", err)
+		logger.Errorf("Jike GetUserProfile err: %v", err)
 
 		return nil, err
 	}
@@ -125,12 +126,12 @@ func GetUserProfile(name string) (*UserProfileStruct, error) {
 	parsedJson, err := parser.Parse(string(response))
 
 	if err != nil {
-		logger.Fatalf("Jike GetUserProfile err: %v", "error parsing response")
+		logger.Errorf("Jike GetUserProfile err: %v", "error parsing response")
 
 		return nil, err
 	}
 
-	profile := new(UserProfileStruct)
+	profile := new(UserProfile)
 
 	parsedObject := parsedJson.GetObject("user")
 
@@ -141,7 +142,7 @@ func GetUserProfile(name string) (*UserProfileStruct, error) {
 }
 
 // nolint:funlen // format is required by Jike API
-func GetUserTimeline(name string) ([]TimelineStruct, error) {
+func GetUserTimeline(name string) ([]Timeline, error) {
 	refreshErr := RefreshJikeToken()
 
 	if refreshErr != nil {
@@ -155,7 +156,7 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 		"cookie": "fetchRankedUpdate=" + strconv.FormatInt(time.Now().UnixNano(), 10) + "; x-jike-access-token=" + AccessToken + "; x-jike-refresh-token=" + RefreshToken,
 	}
 
-	data := new(TimelineRequestStruct)
+	data := new(TimelineRequest)
 
 	data.OperationName = "UserFeeds"
 	data.Variables.Username = name
@@ -256,10 +257,10 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 
 	json, _ := jsoni.MarshalToString(data)
 
-	response, err := util.PostRaw(url, headers, json)
+	response, err := httpx.PostRaw(url, headers, json)
 
 	if err != nil {
-		logger.Fatalf("Jike GetUserTimeline err: %v", err)
+		logger.Errorf("Jike GetUserTimeline err: %v", err)
 
 		return nil, err
 	}
@@ -268,28 +269,28 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 
 	parsedObject := parsedJson.GetArray("data", "userProfile", "feeds", "nodes")
 
-	result := make([]TimelineStruct, len(parsedObject))
+	result := make([]Timeline, len(parsedObject))
 
 	for i, node := range parsedObject {
-		id := trimQuote(node.Get("id").String())
+		id := util.TrimQuote(node.Get("id").String())
 		result[i].Id = id
 
-		t, timeErr := time.Parse(time.RFC3339, trimQuote(node.Get("createdAt").String()))
+		t, timeErr := time.Parse(time.RFC3339, util.TrimQuote(node.Get("createdAt").String()))
 		if err != nil {
-			logger.Fatalf("Jike GetUserTimeline timestamp parsing err: %v", timeErr)
+			logger.Errorf("Jike GetUserTimeline timestamp parsing err: %v", timeErr)
 
 			return nil, timeErr
 		}
 
-		result[i].Author = trimQuote(parsedJson.Get("username").String())
+		result[i].Author = util.TrimQuote(parsedJson.Get("username").String())
 		result[i].Timestamp = t
-		result[i].Summary = trimQuote(node.Get("content").String())
+		result[i].Summary = util.TrimQuote(node.Get("content").String())
 		result[i].Link = fmt.Sprintf("https://web.okjike.com/originalPost/%s", id)
 		result[i].Attachments = *getAttachment(node)
 	}
 
 	if err != nil {
-		logger.Fatalf("Jike GetUserTimeline err: %v", "error parsing response")
+		logger.Errorf("Jike GetUserTimeline err: %v", "error parsing response")
 
 		return nil, err
 	}
@@ -299,7 +300,7 @@ func GetUserTimeline(name string) ([]TimelineStruct, error) {
 
 //nolint:unused // might need it in the future
 func formatFeed(node *fastjson.Value) string {
-	text := trimQuote(node.Get("content").String())
+	text := util.TrimQuote(node.Get("content").String())
 
 	if node.Exists("pictures") {
 		for _, picture := range node.GetArray("pictures") {
@@ -313,7 +314,7 @@ func formatFeed(node *fastjson.Value) string {
 				url = picture.Get("thumbnailUrl").String()
 			}
 
-			text += fmt.Sprintf("<img class=\"media\" src=\"%s\">", trimQuote(url))
+			text += fmt.Sprintf("<img class=\"media\" src=\"%s\">", util.TrimQuote(url))
 		}
 	}
 
@@ -323,7 +324,7 @@ func formatFeed(node *fastjson.Value) string {
 		if !target.Exists("status") {
 			var user string
 			if target.Exists("user", "screenName") {
-				user = trimQuote(target.Get("user", "screenName").String())
+				user = util.TrimQuote(target.Get("user", "screenName").String())
 			}
 
 			text += fmt.Sprintf("\nRT %s: %s", user, formatFeed(target))
@@ -348,14 +349,16 @@ func getAttachment(node *fastjson.Value) *[]model.Attachment {
 			node = node.Get("target")
 			// store quote_address
 
-			content = "https://web.okjike.com/originalPost/" + trimQuote(node.Get("id").String())
+			content = "https://web.okjike.com/originalPost/" + util.TrimQuote(node.Get("id").String())
 
-			qAddress := *model.NewAttachment(content, nil, "text/uri-list", "quote_address", 0)
+			syncAt := time.Now()
+
+			qAddress := *model.NewAttachment(content, nil, "text/uri-list", "quote_address", 0, syncAt)
 
 			// store quote_text
 
-			content = trimQuote(node.Get("content").String())
-			qText := *model.NewAttachment(content, nil, "text/plain", "quote_text", 0)
+			content = util.TrimQuote(node.Get("content").String())
+			qText := *model.NewAttachment(content, nil, "text/plain", "quote_text", 0, syncAt)
 
 			attachments = append(attachments, qAddress, qText)
 
@@ -385,14 +388,14 @@ func getPicture(node *fastjson.Value) *[]model.Attachment {
 		var url string
 
 		if picture.Exists("thumbnailUrl") {
-			url = trimQuote(picture.Get("thumbnailUrl").String())
+			url = util.TrimQuote(picture.Get("thumbnailUrl").String())
 		}
 
 		if picture.Exists("picUrl") {
-			url = trimQuote(picture.Get("picUrl").String())
+			url = util.TrimQuote(picture.Get("picUrl").String())
 		}
 
-		header, err := util.Head(url)
+		header, err := httpx.Head(url)
 
 		if err == nil {
 			sizeInBytes, _ = strconv.Atoi(header.Get("Content-Length"))
@@ -401,13 +404,9 @@ func getPicture(node *fastjson.Value) *[]model.Attachment {
 
 		address = append(address, url)
 
-		qMedia := *model.NewAttachment(content, address, mime, "quote_media", sizeInBytes)
+		qMedia := *model.NewAttachment(content, address, mime, "quote_media", sizeInBytes, time.Now())
 		result[i] = qMedia
 	}
 
 	return &result
-}
-
-func trimQuote(s string) string {
-	return s[1 : len(s)-1]
 }
