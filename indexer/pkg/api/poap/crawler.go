@@ -11,16 +11,15 @@ import (
 )
 
 type poapCralwer struct {
-	rss3Items   []*model.Item
-	rss3Objects []*model.Object
+	rss3Items []*model.Item
 
-	rss3Assets, rss3Notes []*model.ItemId
+	rss3Assets []*model.ItemId
+	rss3Notes  []*model.ItemId
 }
 
 func NewPoapCralwer() crawler.Crawler {
 	return &poapCralwer{
-		rss3Items:   []*model.Item{},
-		rss3Objects: []*model.Object{},
+		rss3Items: []*model.Item{},
 
 		rss3Assets: []*model.ItemId{},
 		rss3Notes:  []*model.ItemId{},
