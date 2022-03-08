@@ -28,17 +28,18 @@ func InitRouter() *gin.Engine {
 	apis := r.Group(API_PATH)
 	apis.Use(middleware.Logger())
 	{
+		// Instance
 		apis.GET("/:authority", api.GetInstance)
+
+		// items
+		r.GET("/:authority/:item_type/:item_uuid", api.GetItem)
+		r.GET("/:authority/list/:item_type/:page_index", api.GetItemPagedList)
+		// r.GET("/:authority/list/:item_type", api.GetItemList)
+
+		// // links
+		// r.GET("/:authority/list/links/:link_type/:page_index", api.GetLinkList)
+		// r.GET("/:authority/list/backlinks/:link_type", api.GetBacklinkList)
 	}
-
-	// // items
-	// r.GET("/:authority/:item_type/:item_uuid", api.GetItem)
-	// r.GET("/:authority/list/:item_type/:page_index", api.GetItemPagedList)
-	// r.GET("/:authority/list/:item_type", api.GetItemList)
-
-	// // links
-	// r.GET("/:authority/list/links/:link_type/:page_index", api.GetLinkList)
-	// r.GET("/:authority/list/backlinks/:link_type", api.GetBacklinkList)
 
 	// === Monitor ===
 	r.GET("/ping", ping.Ping)
