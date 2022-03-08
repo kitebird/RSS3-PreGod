@@ -3,6 +3,7 @@ package arbitrum
 import (
 	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/rss3uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
@@ -16,14 +17,15 @@ type abCrawler struct {
 func NewArbitrumCrawler() crawler.Crawler {
 	return &abCrawler{
 		crawler.CrawlerResult{
-			Assets:  []*model.ItemId{},
-			Notes:   []*model.ItemId{},
-			Items:   []*model.Item{},
-			Objects: []*model.Object{},
+			Assets: []*model.ItemId{},
+			Notes:  []*model.ItemId{},
+			Items:  []*model.Item{},
 		},
 	}
 }
-func (ac *abCrawler) Work(userAddress string, itemType constants.NetworkName) error {
+
+//nolint:funlen // disable line length check
+func (ac *abCrawler) Work(userAddress string, network constants.NetworkID) error {
 	nftTransfers, err := GetNFTTransfers(userAddress)
 	if err != nil {
 		return err
@@ -34,33 +36,18 @@ func (ac *abCrawler) Work(userAddress string, itemType constants.NetworkName) er
 		return err
 	}
 
-	// parse nft transfers
-	for _, v := range nftTransfers {
-		tsp, err := time.Parse(time.RFC3339, v.TimeStamp)
-		if err != nil {
-			tsp = time.Now()
-		}
+	networkId := constants.NetworkSymbolArbitrum.GetID()
 
-		ni := model.NewItem(
-			v.GetUid(),
-			constants.ItemType_Arbitrum_Nft,
-			v.From,
-			v.To,
-			v.Hash,
-			tsp,
-		)
-		ac.Items = append(ac.Items, ni)
+	// parse notes
+	for _, v := range nftTransfers {
 		ac.Notes = append(ac.Notes, &model.ItemId{
-			ItemTypeID: constants.ItemType_Arbitrum_Nft,
-			Proof:      v.Hash,
+			NetworkId: networkId,
+			Proof:     v.Hash,
 		})
 	}
 
-	// parse nfts
+	// parse assets
 	for _, v := range assets {
-		obj := model.NewObject(nil, v.GetUid(), constants.ItemType_Arbitrum_Nft, "", "", nil, nil)
-		ac.Objects = append(ac.Objects, obj)
-
 		hasProof := false
 
 		for _, nftTransfer := range nftTransfers {
@@ -68,8 +55,8 @@ func (ac *abCrawler) Work(userAddress string, itemType constants.NetworkName) er
 				hasProof = true
 
 				ac.Assets = append(ac.Assets, &model.ItemId{
-					ItemTypeID: constants.ItemType_Arbitrum_Nft,
-					Proof:      nftTransfer.Hash,
+					NetworkId: networkId,
+					Proof:     nftTransfer.Hash,
 				})
 			}
 		}
@@ -79,14 +66,56 @@ func (ac *abCrawler) Work(userAddress string, itemType constants.NetworkName) er
 		}
 	}
 
+	for _, v := range nftTransfers {
+		tsp, err := time.Parse(time.RFC3339, v.TimeStamp)
+		if err != nil {
+			tsp = time.Now()
+		}
+
+		author, err := rss3uri.NewInstance("account", v.From, string(constants.NetworkSymbolArbitrum))
+		if err != nil {
+			// TODO
+			logger.Error(err)
+		}
+
+		hasObject := false
+		attachments := make([]model.Attachment, 0)
+
+		for _, asset := range assets {
+			if v.EqualsToToken(asset) && asset.MetaData != "" {
+				hasObject = true
+			}
+		}
+
+		if !hasObject {
+			// TODO: get object
+			logger.Errorf("Asset doesn't has the metadata.")
+		}
+
+		item := model.NewItem(
+			networkId,
+			v.Hash,
+			model.Metadata{
+				"from": v.From,
+				"to":   v.To,
+			},
+			constants.ItemTagsNFT,
+			[]string{author.String()},
+			"",
+			"",
+			attachments,
+			tsp,
+		)
+		ac.Items = append(ac.Items, item)
+	}
+
 	return nil
 }
 
 func (ac *abCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Assets:  ac.Assets,
-		Notes:   ac.Notes,
-		Items:   ac.Items,
-		Objects: ac.Objects,
+		Assets: ac.Assets,
+		Notes:  ac.Notes,
+		Items:  ac.Items,
 	}
 }
