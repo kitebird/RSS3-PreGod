@@ -14,3 +14,12 @@ func TestGetNFTTransfers(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEqual(t, 0, res)
 }
+
+func TestGetNFTs(t *testing.T) {
+	t.Parallel()
+
+	res, err := arbitrum.GetNFTs("0xc661572db4d55e5cd96c9813f19f92f694f79814")
+	assert.Nil(t, err)
+	assert.NotEqual(t, 0, res)
+	assert.True(t, len(res) > 0)
+}
