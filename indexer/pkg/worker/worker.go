@@ -20,9 +20,6 @@ func ProcessTask(t *Task) error {
 		db.InsertItemDoc(item)
 	}
 
-	for _, object := range r.Objects {
-		db.InsertObjectDoc(object)
-	}
 	//TODO: save by account: <identity>@<platform>
 	db.SetAssets(t.Identity, r.Assets)
 	db.AppendNotes(t.Identity, r.Notes)
