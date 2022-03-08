@@ -91,10 +91,10 @@ type (
 )
 
 // GetGrants returns all grant projects.
-func GetGrants() (content []byte, err error) {
-	content, err = util.Get(grantUrl, nil)
+func GetGrants() ([]byte, error) {
+	content, err := util.Get(grantUrl, nil)
 
-	return
+	return content, err
 }
 
 func GetProject(adminAddress string) (content []byte, err error) {
@@ -117,7 +117,7 @@ func GetGrantsInfo() ([]GrantInfo, error) {
 	parsedJson, parseErr := parser.Parse(string(content))
 
 	if parseErr != nil {
-		return nil, nil
+		return nil, parseErr
 	}
 
 	grantArrs := parsedJson.GetArray()
