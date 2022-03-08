@@ -33,7 +33,7 @@ func GetNFTTxs(owner string) ([]byte, error) {
 
 	response, err := util.Get(url, nil)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return response, nil
@@ -42,14 +42,14 @@ func GetNFTTxs(owner string) ([]byte, error) {
 func GetNFTTransfers(owner string) ([]NFTTransferItem, error) {
 	response, err := GetNFTTxs(owner)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	var parser fastjson.Parser
 
 	parsedJson, parseErr := parser.Parse(string(response))
 	if parseErr != nil {
-		return nil, nil
+		return nil, parseErr
 	}
 
 	result := make([]NFTTransferItem, 0)
@@ -75,14 +75,14 @@ func GetNFTTransfers(owner string) ([]NFTTransferItem, error) {
 func GetNFTs(owner string) ([]NFTItem, error) {
 	response, err := GetNFTTxs(owner)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	var parser fastjson.Parser
 
 	parsedJson, parseErr := parser.Parse(string(response))
 	if parseErr != nil {
-		return nil, nil
+		return nil, parseErr
 	}
 
 	nfts := make(map[string]NFTItem)
