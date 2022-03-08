@@ -57,7 +57,7 @@ func GetNFTTransfers(owner string) ([]NFTTransferItem, error) {
 	arrys := parsedJson.GetArray("result")
 	for _, v := range arrys {
 		var item NFTTransferItem
-		item.Address = string(v.GetStringBytes("contractAddress"))
+		item.TokenAddress = string(v.GetStringBytes("contractAddress"))
 		item.TokenId = string(v.GetStringBytes("tokenID"))
 		item.Name = string(v.GetStringBytes("tokenName"))
 		item.Symbol = string(v.GetStringBytes("tokenSymbol"))
@@ -99,7 +99,7 @@ func GetNFTs(owner string) ([]NFTItem, error) {
 		to := string(v.GetStringBytes("to"))
 
 		if to == owner {
-			nft.Valid = false
+			nft.Valid = true
 		} else if from == owner {
 			nft.Valid = false
 		}
@@ -108,9 +108,16 @@ func GetNFTs(owner string) ([]NFTItem, error) {
 	}
 
 	result := make([]NFTItem, 0)
+
 	for _, v := range nfts {
+		v.TokenURI = GetTokenURI(v.TokenAddress)
 		result = append(result, v)
 	}
 
 	return result, nil
+}
+
+func GetTokenURI(contractAddress string) string {
+	// TODO: get tokenURI
+	return ""
 }

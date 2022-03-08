@@ -16,6 +16,7 @@ const (
 	ItemType_Polygon_Nft  ItemTypeID = 6
 	ItemType_Avax_Nft     ItemTypeID = 7
 	ItemType_Fantom_Nft   ItemTypeID = 8
+	ItemType_Arbitrum_Nft ItemTypeID = 9
 
 	// AutoNoteType
 	// 'evm_mirror_entry' | 'twitter_tweet' | 'misskey_note' | 'jike_node'.

@@ -149,7 +149,7 @@ type GetLogsItem struct {
 }
 
 func (i GetLogsItem) String() string {
-	return fmt.Sprintf(`TransactionHash: %s, Address: %s, Data: %s, Topic0: %s, Topic1: %s, Topic2:%s, Topic3: %s`,
+	return fmt.Sprintf(`TransactionHash: %s, TokenAddress: %s, Data: %s, Topic0: %s, Topic1: %s, Topic2:%s, Topic3: %s`,
 		i.TransactionHash, i.Address, i.Data, i.Topic0, i.Topic1, i.Topic2, i.Topic3)
 }
 
