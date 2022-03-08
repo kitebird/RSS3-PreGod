@@ -19,17 +19,17 @@ const (
 	Fantom  ChainType = "fantom"
 )
 
-func GetChainType(network constants.NetworkName) ChainType {
+func GetChainType(network constants.NetworkID) ChainType {
 	switch network {
-	case constants.NetworkName_Ethereum:
+	case constants.NetworkIDEthereumMainnet:
 		return ETH
-	case constants.NetworkName_BNB:
+	case constants.NetworkIDBNBChain:
 		return BSC
-	case constants.NetworkName_Polygon:
+	case constants.NetworkIDPolygon:
 		return Polygon
-	case constants.NetworkName_Avalanche:
+	case constants.NetworkIDAvalanche:
 		return AVAX
-	case constants.NetworkName_Fantom:
+	case constants.NetworkIDFantom:
 		return Fantom
 	default:
 		return Unknown
