@@ -19,7 +19,7 @@ type GetIndexRequest struct {
 	Instance string `uri:"instance" binding:"required"`
 }
 
-//nolint:funlen
+//nolint:funlen // SQL logic will be wrapped up later
 func GetIndexHandlerFunc(c *gin.Context) {
 	request := GetIndexRequest{}
 	if err := c.ShouldBindUri(&request); err != nil {
@@ -60,7 +60,6 @@ func GetIndexHandlerFunc(c *gin.Context) {
 		// TODO Account not found
 		//if errors.Is(err, gorm.ErrRecordNotFound) {
 		//}
-
 		w := web.Gin{C: c}
 		w.JSONResponse(http.StatusInternalServerError, status.ERROR, nil)
 

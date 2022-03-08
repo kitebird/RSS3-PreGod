@@ -7,8 +7,8 @@ import (
 )
 
 type GetNoteListRequest struct {
-	Instance string `uri:"instance" binding:"required"`
-	NoteID   string `uri:"note_id" binding:"required"`
+	Instance  string `uri:"instance" binding:"required"`
+	PageIndex string `uri:"page_index" binding:"required"`
 }
 
 func GetNoteListRequestHandlerFunc(c *gin.Context) {

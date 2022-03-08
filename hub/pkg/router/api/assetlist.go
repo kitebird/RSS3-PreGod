@@ -7,8 +7,8 @@ import (
 )
 
 type GetAssetListRequest struct {
-	Instance       string `uri:"instance" binding:"required"`
-	AssetPageIndex string `uri:"asset_page_index" binding:"required"`
+	Instance  string `uri:"instance" binding:"required"`
+	PageIndex string `uri:"page_index" binding:"required"`
 }
 
 func GetAssetListRequestHandlerFunc(c *gin.Context) {

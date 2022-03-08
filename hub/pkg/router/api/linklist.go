@@ -2,6 +2,8 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/protocol"
@@ -9,13 +11,12 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type GetLinkListRequest struct {
-	Instance      string `uri:"instance" binding:"required"`
-	LinkType      string `uri:"link_type" binding:"required"`
-	LinkPageIndex int    `uri:"link_page_index" binding:"required"`
+	Instance  string `uri:"instance" binding:"required"`
+	LinkType  string `uri:"link_type" binding:"required"`
+	PageIndex int    `uri:"page_index" binding:"required"`
 }
 
 func GetLinkListHandlerFunc(c *gin.Context) {
@@ -42,7 +43,7 @@ func GetLinkListHandlerFunc(c *gin.Context) {
 			Base: protocol.Base{
 				Version: protocol.Version,
 				// TODO Refine rss3uri package
-				Identifier: fmt.Sprintf("%s/list/link/following/%d", rss3uri.New(instance).String(), request.LinkPageIndex),
+				Identifier: fmt.Sprintf("%s/list/link/following/%d", rss3uri.New(instance).String(), request.PageIndex),
 				// TODO IdentifierNext
 				// TODO No test data available
 				// DateCreated: "",
@@ -56,7 +57,7 @@ func GetLinkListHandlerFunc(c *gin.Context) {
 	if err := db.DB.Where(
 		"rss3_id = ? and page_index = ?",
 		fmt.Sprintf("%s@%s", instance.GetIdentity(), instance.GetSuffix()),
-		request.LinkPageIndex,
+		request.PageIndex,
 	).Find(&links).Error; err != nil {
 		w := web.Gin{C: c}
 		w.JSONResponse(http.StatusInternalServerError, status.ERROR, nil)

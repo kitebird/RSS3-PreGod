@@ -45,15 +45,15 @@ func InitRouter() *gin.Engine {
 
 		// Link List File
 		// rss3://account:0xC8b960D09C0078c18Dcbe7eB9AB9d816BcCa8944@ethereum/list/link/following/1
-		apiRouter.GET("/:instance/list/link/:link_type/:link_page_index", api.GetLinkListHandlerFunc)
+		apiRouter.GET("/:instance/list/link/:link_type/:page_index", api.GetLinkListHandlerFunc)
 
 		// Asset List File
 		// rss3://account:0xC8b960D09C0078c18Dcbe7eB9AB9d816BcCa8944@ethereum/list/asset/0
-		apiRouter.GET("/:instance/list/asset/:asset_id", api.GetAssetListRequestHandlerFunc)
+		apiRouter.GET("/:instance/list/asset/:page_index", api.GetAssetListRequestHandlerFunc)
 
 		// Note List File
 		// rss3://account:0xC8b960D09C0078c18Dcbe7eB9AB9d816BcCa8944@ethereum/list/note/0
-		apiRouter.GET("/:instance/list/note/:note_id", api.GetNoteListRequestHandlerFunc)
+		apiRouter.GET("/:instance/list/note/:page_index", api.GetNoteListRequestHandlerFunc)
 	}
 
 	// === Monitor ===
