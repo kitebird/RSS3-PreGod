@@ -12,7 +12,7 @@ type CrawlerResult struct {
 }
 
 type Crawler interface {
-	Work(string, constants.NetworkName) error
+	Work(string, constants.NetworkID) error
 	// GetResult return &{Assets, Notes, Items}
 	GetResult() *CrawlerResult
 }

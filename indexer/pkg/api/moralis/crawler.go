@@ -28,10 +28,10 @@ func NewMoralisCrawler() crawler.Crawler {
 }
 
 //nolint:funlen // disable line length check
-func (mc *moralisCrawler) Work(userAddress string, itemType constants.NetworkName) error {
-	chainType := GetChainType(itemType)
+func (mc *moralisCrawler) Work(userAddress string, network constants.NetworkID) error {
+	chainType := GetChainType(network)
 	if chainType == Unknown {
-		return fmt.Errorf("unsupported network: %s", itemType)
+		return fmt.Errorf("unsupported network: %s", chainType)
 	}
 
 	networkSymbol := chainType.GetNetworkSymbol()
