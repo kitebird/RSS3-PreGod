@@ -1,7 +1,7 @@
 package protocol
 
 const (
-	Version = "v4.0.0"
+	Version = "v0.4.0"
 )
 
 type Base struct {
