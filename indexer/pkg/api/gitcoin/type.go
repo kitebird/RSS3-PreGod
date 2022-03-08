@@ -1,6 +1,23 @@
-package types
+package gitcoin
 
 import "math/big"
+
+type ChainType string
+
+const (
+	Unknown ChainType = "unknown"
+
+	ETH     ChainType = "eth"
+	Polygon ChainType = "polygon"
+	ZKSYNC  ChainType = "zksync"
+)
+
+type DonationApproach string
+
+const (
+	DonationApproachStandard = "Standard"
+	DonationApproachZksync   = "zkSync"
+)
 
 type GrantInfo struct {
 	Title        string
@@ -32,5 +49,5 @@ type DonationInfo struct {
 	Decimals       int64
 	Timestamp      string
 	TxHash         string
-	Approach       string
+	Approach       DonationApproach
 }

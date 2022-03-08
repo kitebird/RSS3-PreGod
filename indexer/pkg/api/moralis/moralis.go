@@ -5,22 +5,15 @@ import (
 	"strings"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/types"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	jsoniter "github.com/json-iterator/go"
-)
-
-type (
-	MoralisNFTResult         = types.MoralisNFTResult
-	MoralisNFTTransferResult = types.MoralisNFTTransferResult
-	MoralisGetLogsResult     = types.MoralisGetLogsResult
 )
 
 const endpoint = "https://deep-index.moralis.io"
 
 var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 
-func GetMoralisApiKey() string {
+func GetApiKey() string {
 	if err := config.Setup(); err != nil {
 		return ""
 	}
@@ -33,7 +26,7 @@ func GetMoralisApiKey() string {
 	return strings.Trim(apiKey, "\"")
 }
 
-func GetNFTs(userAddress string, chainType string, apiKey string) (MoralisNFTResult, error) {
+func GetNFTs(userAddress string, chainType ChainType, apiKey string) (NFTResult, error) {
 	var headers = map[string]string{
 		"accept":    "application/json",
 		"X-API-Key": apiKey,
@@ -45,20 +38,20 @@ func GetNFTs(userAddress string, chainType string, apiKey string) (MoralisNFTRes
 
 	response, err := util.Get(url, headers)
 	if err != nil {
-		return MoralisNFTResult{}, err
+		return NFTResult{}, err
 	}
 
-	res := new(MoralisNFTResult)
+	res := new(NFTResult)
 
 	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
-		return MoralisNFTResult{}, err
+		return NFTResult{}, err
 	}
 
 	return *res, nil
 }
 
-func GetNFTTransfers(userAddress string, chainType string, apiKey string) (MoralisNFTTransferResult, error) {
+func GetNFTTransfers(userAddress string, chainType ChainType, apiKey string) (NFTTransferResult, error) {
 	var headers = map[string]string{
 		"accept":    "application/json",
 		"X-API-Key": apiKey,
@@ -70,20 +63,20 @@ func GetNFTTransfers(userAddress string, chainType string, apiKey string) (Moral
 
 	response, err := util.Get(url, headers)
 	if err != nil {
-		return MoralisNFTTransferResult{}, err
+		return NFTTransferResult{}, err
 	}
 
-	res := new(MoralisNFTTransferResult)
+	res := new(NFTTransferResult)
 
 	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
-		return MoralisNFTTransferResult{}, err
+		return NFTTransferResult{}, err
 	}
 
 	return *res, nil
 }
 
-func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chainType string, apiKey string) (MoralisGetLogsResult, error) {
+func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chainType string, apiKey string) (GetLogsResult, error) {
 	var headers = map[string]string{
 		"accept":    "application/json",
 		"X-API-Key": apiKey,
@@ -94,15 +87,15 @@ func GetLogs(fromBlock int64, toBlock int64, address string, topic string, chain
 
 	response, err := util.Get(url, headers)
 	if err != nil {
-		return MoralisGetLogsResult{}, err
+		return GetLogsResult{}, err
 	}
 	//fmt.Println(string(response))
 
-	res := new(MoralisGetLogsResult)
+	res := new(GetLogsResult)
 
 	err = jsoni.Unmarshal(response, &res)
 	if err != nil {
-		return MoralisGetLogsResult{}, err
+		return GetLogsResult{}, err
 	}
 
 	return *res, nil
