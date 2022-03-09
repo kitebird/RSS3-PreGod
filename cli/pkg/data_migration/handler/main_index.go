@@ -120,7 +120,16 @@ func MainIndex(content bson.D) error {
 		},
 	}
 
-	// todo: migrate application data (signature, account tags, custom fields, etc)
+	signature := &model.Signature{
+		FileURI:   "rss3://account:" + newID,
+		Signature: mainIndex.Signature,
+		BaseModel: model.BaseModel{
+			CreatedAt: CreatedAt,
+			UpdatedAt: UpdatedAt,
+		},
+	}
+
+	// todo: migrate application data (account tags, custom fields, etc)
 
 	// Save
 	return db.DB.Transaction(func(tx *gorm.DB) error {
@@ -131,6 +140,9 @@ func MainIndex(content bson.D) error {
 			return err
 		}
 		if err := tx.Create(&account).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&signature).Error; err != nil {
 			return err
 		}
 

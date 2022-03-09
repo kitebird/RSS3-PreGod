@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/cli/pkg/data_migration/protocol"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/db"
@@ -14,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//nolint:funlen // no need to split
+//nolint:funlen,gocognit // no need to split
 func LinkList(content bson.D) error {
 	// handle link list
 	var linkList protocol.RSS3Links031
@@ -27,6 +28,17 @@ func LinkList(content bson.D) error {
 	if err = bson.Unmarshal(doc, &linkList); err != nil {
 		return err
 	}
+
+	CreatedAt, err := time.Parse("2006-01-02T15:04:05.000Z", linkList.DateCreated)
+	if err != nil {
+		return err
+	}
+
+	UpdatedAt, err := time.Parse("2006-01-02T15:04:05.000Z", linkList.DateUpdated)
+	if err != nil {
+		return err
+	}
+
 	// Split & save into db
 
 	splits := strings.Split(linkList.ID, "-") // {account} - list - links.{id} - {pageNumber}
@@ -48,6 +60,10 @@ func LinkList(content bson.D) error {
 		LinkListID: linkListID,
 		RSS3ID:     instanceID,
 		LinkType:   linkTypeId,
+		BaseModel: model.BaseModel{
+			CreatedAt: CreatedAt,
+			UpdatedAt: UpdatedAt,
+		},
 	}
 
 	// Generate link list
@@ -69,6 +85,10 @@ func LinkList(content bson.D) error {
 			TargetPrefixID:   constants.PrefixIDAccount,
 			TargetPlatformID: constants.PlatformIDEthereum,
 			PageIndex:        pageNumber,
+			BaseModel: model.BaseModel{
+				CreatedAt: CreatedAt,
+				UpdatedAt: UpdatedAt,
+			},
 		}
 	}
 
@@ -91,6 +111,15 @@ func LinkList(content bson.D) error {
 		}
 	}
 
+	signature := &model.Signature{
+		FileURI:   fmt.Sprintf("rss3://account:%s@%s/list/link/following/0", account, fmt.Sprint(constants.PlatformIDEthereum)),
+		Signature: linkList.Signature,
+		BaseModel: model.BaseModel{
+			CreatedAt: CreatedAt,
+			UpdatedAt: UpdatedAt,
+		},
+	}
+
 	return db.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&linkListModel).Error; err != nil {
 			return err
@@ -109,6 +138,10 @@ func LinkList(content bson.D) error {
 					return err
 				}
 			}
+		}
+
+		if err := tx.Create(&signature).Error; err != nil {
+			return err
 		}
 
 		return nil
