@@ -8,6 +8,8 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
 type worker struct {
@@ -40,27 +42,52 @@ func makeCrawlers(network constants.NetworkID) crawler.Crawler {
 }
 
 func (w *worker) processTask(t *Task) error {
-	c := makeCrawlers(t.Network)
+	var err error
+
+	var c crawler.Crawler
+
+	var r *crawler.CrawlerResult
+
+	instance := rss3uri.NewAccountInstance(t.Identity, t.PlatformID.Symbol()).String()
+
+	c = makeCrawlers(t.Network)
 	if c == nil {
-		return fmt.Errorf("unsupported network: %d", t.Network)
+		err = fmt.Errorf("unsupported network id: %d", t.Network)
+
+		goto RETURN
 	}
 
-	err := c.Work(t.Identity, t.Network)
+	err = c.Work(t.Identity, t.Network)
 
 	if err != nil {
-		panic(err)
+		err = fmt.Errorf("crawler fails while working: %s", err)
+
+		goto RETURN
 	}
 
-	r := c.GetResult()
-
-	for _, item := range r.Items {
-		db.InsertItemDoc(item)
+	r = c.GetResult()
+	if r.Items != nil {
+		for _, item := range r.Items {
+			db.InsertItemDoc(item)
+		}
 	}
-	//TODO: save by account: <identity>@<platform>
-	db.SetAssets(t.Identity, r.Assets)
-	db.AppendNotes(t.Identity, r.Notes)
 
-	return nil
+	if r.Assets != nil {
+		db.SetAssets(instance, r.Assets, t.Network)
+	}
+
+	if r.Notes != nil {
+		db.AppendNotes(instance, r.Notes)
+	}
+
+RETURN:
+	if err != nil {
+		logger.Error(err)
+
+		return err
+	} else {
+		return nil
+	}
 }
 
 func (w *worker) ListenAndServe() {

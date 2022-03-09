@@ -84,11 +84,7 @@ func (mc *moralisCrawler) Work(userAddress string, network constants.NetworkID) 
 			tsp = time.Now()
 		}
 
-		author, err := rss3uri.NewInstance("account", nftTransfer.FromAddress, string(networkSymbol))
-		if err != nil {
-			// TODO
-			logger.Error(tsp, err)
-		}
+		author := rss3uri.NewAccountInstance(userAddress, constants.PlatformSymbolEthereum)
 
 		hasObject := false
 		attachments := []model.Attachment{}

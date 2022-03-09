@@ -3,6 +3,7 @@ package db
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,11 +18,14 @@ func Setup() error {
 }
 
 // SetAssets refresh users' all assets by network
-func SetAssets(instance string, assets []*model.ItemId) {
-	//TODO: refresh by network
+func SetAssets(instance string, assets []*model.ItemId, refreshBy constants.NetworkID) {
 	mgm.Coll(&model.AccountItemList{}).FindOneAndUpdate(
 		mgm.Ctx(), bson.M{"account_instance": instance},
-		bson.M{"$set": bson.M{"assets": assets}},
+		bson.M{"$pull": bson.M{"assets.network_id": refreshBy}},
+	)
+	mgm.Coll(&model.AccountItemList{}).FindOneAndUpdate(
+		mgm.Ctx(), bson.M{"account_instance": instance},
+		bson.M{"$addToSet": bson.M{"assets": bson.M{"$each": assets}}},
 		options.FindOneAndUpdate().SetUpsert(true),
 	)
 }
