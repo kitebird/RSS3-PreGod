@@ -43,6 +43,10 @@ type MongoStruct struct {
 	MinPoolSize int    `koanf:"min_pool_size"`
 }
 
+type MQStruct struct {
+	NsAddr string `koanf:"ns_addr"`
+}
+
 /*
  * File module：You can simply make the log print to a file
  * example:
@@ -83,6 +87,7 @@ type ConfigStruct struct {
 	Redis     RedisStruct     `koanf:"redis"`
 	Postgres  PostgresStruct  `koanf:"postgres"`
 	Mongo     MongoStruct     `koanf:"mongo"`
+	MQ        MQStruct        `koanf:"mq"`
 	Logger    LoggerStruct    `koanf:"logger"`
 	Indexer   IndexerStruct   `koanf:"indexer"`
 }

@@ -34,6 +34,9 @@
       }
     ]
   },
+  "mq": {
+    "ns_addr": "localhost:9876"
+  },
   "indexer": {
     "misc": {
       "user_agent": "RSS3-PreGod"
