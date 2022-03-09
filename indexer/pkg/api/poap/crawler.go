@@ -8,21 +8,20 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
 type poapCralwer struct {
-	rss3Items []*model.Item
-
-	rss3Assets []*model.ItemId
-	rss3Notes  []*model.ItemId
+	crawler.CrawlerResult
 }
 
 func NewPoapCralwer() crawler.Crawler {
 	return &poapCralwer{
-		rss3Items: []*model.Item{},
-
-		rss3Assets: []*model.ItemId{},
-		rss3Notes:  []*model.ItemId{},
+		crawler.CrawlerResult{
+			Items:  []*model.Item{},
+			Assets: []*model.ItemId{},
+			Notes:  []*model.ItemId{},
+		},
 	}
 }
 
@@ -32,13 +31,26 @@ const (
 	Gnosis ChainType = "Gnosis"
 )
 
-func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkName) error {
-	if itemType != constants.NetworkName_Gnosis {
+func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkID) error {
+	if itemType != constants.NetworkIDGnosisMainnet {
 		return fmt.Errorf("network is not gnosis")
 	}
 
+	networkSymbol := constants.NetworkSymbolGnosisMainnet
+
+	networkId := networkSymbol.GetID()
+
 	poapResps, err := GetActions(userAddress)
 	if err != nil {
+		logger.Error(err)
+
+		return err
+	}
+
+	author, err := rss3uri.NewInstance("account", userAddress, string(constants.PlatformSymbolEthereum))
+	if err != nil {
+		logger.Error(err)
+
 		return err
 	}
 
@@ -53,23 +65,21 @@ func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkName) 
 		}
 
 		ni := model.NewItem(
-			poapResp.TokenId,
-			constants.ItemType_Xdai_Poap,
-			"0x0", // temp
-			poapResp.Owner,
-			"0x0",
+			networkId,
+			"",
+			model.Metadata{
+				"from": "0x0",
+				"to":   poapResp.Owner,
+			},
+			constants.ItemTagsNFTPOAP,
+			[]string{author.String()},
+			"",
+			"",
+			[]model.Attachment{},
 			tsp,
 		)
-		pc.rss3Items = append(pc.rss3Items, ni)
-		pc.rss3Notes = append(pc.rss3Notes, &model.ItemId{
-			ItemTypeID: constants.ItemType_Xdai_Poap,
-			Proof:      "Here is the proof",
-		})
 
-		pc.rss3Assets = append(pc.rss3Notes, &model.ItemId{
-			ItemTypeID: constants.ItemType_Xdai_Poap,
-			Proof:      "Here is the proof",
-		})
+		pc.Items = append(pc.Items, ni)
 	}
 
 	return nil
@@ -77,9 +87,8 @@ func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkName) 
 
 func (pc *poapCralwer) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Assets:  pc.rss3Assets,
-		Notes:   pc.rss3Notes,
-		Items:   pc.rss3Items,
-		Objects: pc.rss3Objects,
+		Assets: pc.Assets,
+		Notes:  pc.Notes,
+		Items:  pc.Items,
 	}
 }

@@ -3,7 +3,7 @@ package poap
 import (
 	"fmt"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util/httpx"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -20,7 +20,7 @@ func GetActions(user string) ([]PoapResponse, error) {
 
 	url := fmt.Sprintf("%s/actions/scan/%s",
 		endpoint, user)
-	response, err := util.Get(url, nil)
+	response, err := httpx.Get(url, nil)
 
 	if err != nil {
 		return []PoapResponse{}, err
