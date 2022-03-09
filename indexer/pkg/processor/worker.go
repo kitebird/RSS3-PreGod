@@ -15,6 +15,8 @@ type worker struct {
 }
 
 type Worker interface {
+	processTask(t *Task) error
+
 	ListenAndServe()
 }
 
@@ -37,7 +39,7 @@ func makeCrawlers(network constants.NetworkID) crawler.Crawler {
 	}
 }
 
-func ProcessTask(t *Task) error {
+func (w *worker) processTask(t *Task) error {
 	c := makeCrawlers(t.Network)
 	if c == nil {
 		return fmt.Errorf("unsupported network: %d", t.Network)
@@ -64,13 +66,13 @@ func ProcessTask(t *Task) error {
 func (w *worker) ListenAndServe() {
 	select {
 	case t := <-w.highQ:
-		ProcessTask(t)
+		w.processTask(t)
 	default:
 		select {
 		case t := <-w.highQ:
-			ProcessTask(t)
+			w.processTask(t)
 		case t := <-w.lowQ:
-			ProcessTask(t)
+			w.processTask(t)
 		}
 	}
 }
