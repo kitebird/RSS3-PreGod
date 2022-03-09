@@ -11,12 +11,12 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
-type poapCralwer struct {
+type poapCrawler struct {
 	crawler.CrawlerResult
 }
 
-func NewPoapCralwer() crawler.Crawler {
-	return &poapCralwer{
+func NewPoapCrawler() crawler.Crawler {
+	return &poapCrawler{
 		crawler.CrawlerResult{
 			Items:  []*model.Item{},
 			Assets: []*model.ItemId{},
@@ -31,7 +31,7 @@ const (
 	Gnosis ChainType = "Gnosis"
 )
 
-func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkID) error {
+func (pc *poapCrawler) Work(userAddress string, itemType constants.NetworkID) error {
 	if itemType != constants.NetworkIDGnosisMainnet {
 		return fmt.Errorf("network is not gnosis")
 	}
@@ -85,7 +85,7 @@ func (pc *poapCralwer) Work(userAddress string, itemType constants.NetworkID) er
 	return nil
 }
 
-func (pc *poapCralwer) GetResult() *crawler.CrawlerResult {
+func (pc *poapCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
 		Assets: pc.Assets,
 		Notes:  pc.Notes,
