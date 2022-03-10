@@ -38,6 +38,12 @@
     "ns_addr": "localhost:9876"
   },
   "indexer": {
+    "server": {
+      "run_mode": "debug",
+      "http_port": 8081,
+      "read_timeout": 60,
+      "write_timeout": 60
+    },
     "misc": {
       "user_agent": "RSS3-PreGod"
     },

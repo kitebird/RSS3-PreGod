@@ -34,13 +34,15 @@ func init() {
 }
 
 func main() {
-	addr := web.Setup(&web.Config{
+	srv := &web.Server{
 		RunMode:      config.Config.HubServer.RunMode,
 		HttpPort:     config.Config.HubServer.HttpPort,
 		ReadTimeout:  config.Config.HubServer.ReadTimeout,
 		WriteTimeout: config.Config.HubServer.WriteTimeout,
 		Handler:      router.InitRouter(),
-	})
+	}
+
+	addr := srv.Start()
 
 	logger.Infof("Start http server listening on http://%s", addr)
 	defer logger.Logger.Sync()

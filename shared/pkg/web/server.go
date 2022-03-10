@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Config struct {
+type Server struct {
 	RunMode      string
 	HttpPort     int
 	ReadTimeout  time.Duration
@@ -24,16 +24,16 @@ type Config struct {
 
 // Setup starts the web server.
 // Returns the address of the server.
-func Setup(cfg *Config) string {
-	gin.SetMode(cfg.RunMode)
+func (s *Server) Start() string {
+	gin.SetMode(s.RunMode)
 
-	addr := net.JoinHostPort("localhost", strconv.Itoa(cfg.HttpPort))
+	addr := net.JoinHostPort("localhost", strconv.Itoa(s.HttpPort))
 
 	server := &http.Server{
 		Addr:           addr,
-		Handler:        cfg.Handler,
-		ReadTimeout:    cfg.ReadTimeout,
-		WriteTimeout:   cfg.WriteTimeout,
+		Handler:        s.Handler,
+		ReadTimeout:    s.ReadTimeout,
+		WriteTimeout:   s.WriteTimeout,
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 
