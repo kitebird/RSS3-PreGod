@@ -6,12 +6,14 @@ const (
 	PrefixIDInstance PrefixID = 2
 	PrefixIDNote     PrefixID = 3
 	PrefixIDAsset    PrefixID = 4
+	PrefixIDLink     PrefixID = 5
 
 	PrefixNameUnknown  PrefixName = "unknown"
 	PrefixNameAccount  PrefixName = "account"
 	PrefixNameInstance PrefixName = "instance"
 	PrefixNameNote     PrefixName = "note"
 	PrefixNameAsset    PrefixName = "asset"
+	PrefixNameLink     PrefixName = "link"
 )
 
 var (
@@ -22,6 +24,7 @@ var (
 		PrefixNameInstance: PrefixIDInstance,
 		PrefixNameNote:     PrefixIDNote,
 		PrefixNameAsset:    PrefixIDAsset,
+		PrefixNameLink:     PrefixIDLink,
 	}
 )
 
