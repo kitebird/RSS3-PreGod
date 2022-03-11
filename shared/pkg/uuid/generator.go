@@ -10,6 +10,7 @@ import (
 
 var NAMESPACE = uuid.Must(uuid.Parse("6ba7b815-9dad-11d1-80b4-00c04fd430c8"))
 
+// Generates a UUID for a given account.
 func NewAccountUUID(
 	identity string,
 	platformID constants.PlatformID,
@@ -27,6 +28,7 @@ func NewAccountUUID(
 	return uuid
 }
 
+// Generates a UUID for a given note.
 func NewNoteUUID(
 	ownerIdentity string,
 	ownerPlatformID constants.PlatformID,
@@ -45,6 +47,7 @@ func NewNoteUUID(
 	return uuid
 }
 
+// Generates a UUID for a given asset.
 func NewAssetUUID(
 	ownerIdentity string,
 	ownerPlatformID constants.PlatformID,
@@ -63,24 +66,25 @@ func NewAssetUUID(
 	return uuid
 }
 
+// Generates a UUID for a given link.
 func NewLinkUUID(
 	linkTypeID constants.LinkTypeID,
-	subjectIdentity string,
 	subjectPrefixID constants.PrefixID,
+	subjectIdentity string,
 	subjectSuffixID string, // TODO: define type for suffixID
-	objectIdentity string,
 	objectPrefixID constants.PrefixID,
+	objectIdentity string,
 	objectSuffixID string,
 ) uuid.UUID {
 	var buf bytes.Buffer
 
 	buf.WriteString(strconv.Itoa(int(constants.PrefixIDLink)))
 	buf.WriteString(strconv.Itoa(int(linkTypeID)))
-	buf.WriteString(subjectIdentity)
 	buf.WriteString(strconv.Itoa(int(subjectPrefixID)))
+	buf.WriteString(subjectIdentity)
 	buf.WriteString(subjectSuffixID)
-	buf.WriteString(objectIdentity)
 	buf.WriteString(strconv.Itoa(int(objectPrefixID)))
+	buf.WriteString(objectIdentity)
 	buf.WriteString(objectSuffixID)
 
 	uuid := genUUID(buf.Bytes())
@@ -88,6 +92,7 @@ func NewLinkUUID(
 	return uuid
 }
 
+// Generates a UUID in v5, with the RSS3-Network namespace.
 func genUUID(bytes []byte) uuid.UUID {
 	uuid := uuid.NewSHA1(NAMESPACE, bytes)
 
