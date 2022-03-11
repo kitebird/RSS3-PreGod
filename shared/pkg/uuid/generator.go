@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var space = uuid.NameSpaceOID
+var NAMESPACE = uuid.Must(uuid.Parse("6ba7b815-9dad-11d1-80b4-00c04fd430c8"))
 
 func NewAccountUUID(
 	identity string,
@@ -22,7 +22,7 @@ func NewAccountUUID(
 	buf.WriteString(strconv.Itoa(int(platformID)))
 	buf.WriteString(createdAt)
 
-	uuid := uuid.NewSHA1(space, buf.Bytes())
+	uuid := genUUID(buf.Bytes())
 
 	return uuid
 }
@@ -40,7 +40,7 @@ func NewNoteUUID(
 	buf.WriteString(strconv.Itoa(int(noteNetworkID)))
 	buf.WriteString(createdAt)
 
-	uuid := uuid.NewSHA1(space, buf.Bytes())
+	uuid := genUUID(buf.Bytes())
 
 	return uuid
 }
@@ -58,7 +58,7 @@ func NewAssetUUID(
 	buf.WriteString(strconv.Itoa(int(assetNetworkID)))
 	buf.WriteString(createdAt)
 
-	uuid := uuid.NewSHA1(space, buf.Bytes())
+	uuid := genUUID(buf.Bytes())
 
 	return uuid
 }
@@ -82,7 +82,7 @@ func NewLinkUUID(
 }
 
 func genUUID(bytes []byte) uuid.UUID {
-	uuid := uuid.NewSHA1(space, bytes)
+	uuid := uuid.NewSHA1(NAMESPACE, bytes)
 
 	return uuid
 }
