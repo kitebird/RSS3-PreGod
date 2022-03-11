@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/router/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,6 +25,9 @@ func InitRouter() *gin.Engine {
 			"message": "method not allowed",
 		})
 	})
+
+	r.GET("/item", api.GetItemHandlerFunc)
+	r.GET("/bio", api.GetBioHandlerFunc)
 
 	return r
 }
