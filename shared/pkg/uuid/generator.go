@@ -64,17 +64,24 @@ func NewAssetUUID(
 }
 
 func NewLinkUUID(
-	ownerIdentity string,
-	ownerPlatformID constants.PlatformID,
-	linkNetworkID constants.NetworkID,
-	createdAt string, // timestamp in milliseconds
+	linkTypeID constants.LinkTypeID,
+	subjectIdentity string,
+	subjectPrefixID constants.PrefixID,
+	subjectSuffixID string, // TODO: define type for suffixID
+	objectIdentity string,
+	objectPrefixID constants.PrefixID,
+	objectSuffixID string,
 ) uuid.UUID {
 	var buf bytes.Buffer
 
 	buf.WriteString(strconv.Itoa(int(constants.PrefixIDLink)))
-	buf.WriteString(ownerIdentity)
-	buf.WriteString(strconv.Itoa(int(linkNetworkID)))
-	buf.WriteString(createdAt)
+	buf.WriteString(strconv.Itoa(int(linkTypeID)))
+	buf.WriteString(subjectIdentity)
+	buf.WriteString(strconv.Itoa(int(subjectPrefixID)))
+	buf.WriteString(subjectSuffixID)
+	buf.WriteString(objectIdentity)
+	buf.WriteString(strconv.Itoa(int(objectPrefixID)))
+	buf.WriteString(objectSuffixID)
 
 	uuid := genUUID(buf.Bytes())
 

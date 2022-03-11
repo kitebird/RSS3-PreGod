@@ -13,7 +13,7 @@ const (
 	PrefixNameInstance PrefixName = "instance"
 	PrefixNameNote     PrefixName = "note"
 	PrefixNameAsset    PrefixName = "asset"
-	PrefixNameLink     PrefixName = "link"
+	PrefixNameLink     PrefixName = "link" // only used to generate uuid
 )
 
 var (
