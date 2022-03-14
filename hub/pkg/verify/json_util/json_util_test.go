@@ -32,7 +32,7 @@ func TestSortJsonByKeys(t *testing.T) {
 		{
 			name: "nested",
 			json: `{"d":{"c":1,"a":2},"b":3}`,
-			want: `{"b":3,"d":{"c":2,"a":1}}`,
+			want: `{"b":3,"d":{"a":2,"c":1}}`,
 		},
 	}
 
