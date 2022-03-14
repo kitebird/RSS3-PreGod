@@ -131,18 +131,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      - name: test aws cli
-        run: aws --version
       - name: Replace image field
         uses: mikefarah/yq@master
         with:
           cmd: yq -i '.spec.template.spec.containers[0].image = "${{ steps.meta.outputs.tags }}"' ./deploy/dev/deploy.yaml
-      - name: Apply YAMLs
-        uses: steebchen/kubectl@v2.0.0
-        with:
-          config: ${{ secrets.KUBE_CONFIG_DEV }}
-          version: v1.21.0
-          command: apply -f deploy/dev
+      - run: aws eks update-kubeconfig --region us-west-2 --name development
+      - run: kubectl apply -f deploy/dev
 
   deploy-prod:
     if: startsWith(github.ref, 'refs/tags/v')
