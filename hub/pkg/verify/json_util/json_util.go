@@ -54,7 +54,7 @@ func removeSignProperties(i interface{}) {
 		}
 	case []interface{}:
 		for _, v := range v {
-			removeSignProperties(&v)
+			removeSignProperties(v)
 		}
 	}
 }
