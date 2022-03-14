@@ -6,10 +6,12 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/router"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/web"
 )
 
 func init() {
@@ -58,4 +60,17 @@ func main() {
 	// TODO: listen tasks from mq
 	// TODO: gracefully exit
 	go pollTasks(lowQ)
+
+	srv := &web.Server{
+		RunMode:      config.Config.Indexer.Server.RunMode,
+		HttpPort:     config.Config.Indexer.Server.HttpPort,
+		ReadTimeout:  config.Config.Indexer.Server.ReadTimeout,
+		WriteTimeout: config.Config.Indexer.Server.WriteTimeout,
+		Handler:      router.InitRouter(),
+	}
+
+	addr := srv.Start()
+
+	logger.Infof("Start http server listening on http://%s", addr)
+	defer logger.Logger.Sync()
 }

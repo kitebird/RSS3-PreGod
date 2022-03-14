@@ -3,7 +3,7 @@ package poap
 import (
 	"fmt"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util/httpx"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/httpx"
 	jsoniter "github.com/json-iterator/go"
 )
 
