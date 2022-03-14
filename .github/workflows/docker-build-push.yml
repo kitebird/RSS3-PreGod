@@ -19,15 +19,11 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
-      -
-        name: Docker meta
+      - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
         with:
-          # list of Docker images to use as base name for tags
-          images: |
-            rss3/pregod-hub
-          # generate Docker tags based on the following events/attributes
+          images: rss3/pregod-hub
           tags: |
             type=ref,event=tag
             type=ref,event=branch
@@ -125,6 +121,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: rss3/pregod-hub
+          tags: |
+            type=ref,event=tag
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -145,6 +152,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: rss3/pregod-hub
+          tags: |
+            type=ref,event=tag
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -154,10 +172,6 @@ jobs:
       - name: Replace image field
         uses: mikefarah/yq@master
         with:
-          cmd: yq -i '.spec.template.spec.containers[0].image = "${{ steps.meta.outputs.tags }}"' ./deploy/dev/deploy.yaml
-      - name: Apply YAMLs
-        uses: steebchen/kubectl@v2.0.0
-        with:
-          config: ${{ secrets.KUBE_CONFIG_PROD }}
-          version: v1.21.0
-          command: apply -f deploy/prod
+          cmd: yq -i '.spec.template.spec.containers[0].image = "${{ steps.meta.outputs.tags }}"' ./deploy/prod/deploy.yaml
+      - run: aws eks update-kubeconfig --region us-west-2 --name production
+      - run: kubectl apply -f deploy/prod
