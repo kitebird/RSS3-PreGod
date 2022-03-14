@@ -23,6 +23,9 @@
     "max_pool_size": 200,
     "min_pool_size": 50
   },
+  "network": {
+    "proxy": "http://localhost:7890"
+  },
   "logger": {
     "prefix_tag": "pregod",
     "engine": "zap",
@@ -55,6 +58,11 @@
       "mobile_phone_number": "",
       "password": "",
       "app_version": "7.27.1"
+    },
+    "twitter": {
+      "break_down_tokens":[
+        "xxx"
+      ]
     }
   }
 }

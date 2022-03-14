@@ -11,6 +11,8 @@ import (
 	"github.com/knadh/koanf/providers/file"
 )
 
+// Golbal Config
+
 type ProtocolStruct struct {
 	Version string `koanf:"version"`
 }
@@ -69,22 +71,18 @@ type LoggerStruct struct {
 	Output []LoggerOutputConfig `koanf:"output"`
 }
 
+type NetWorkStruct struct {
+	Proxy string `koanf:"proxy"`
+}
+
+// Indexer Struct Config
+
 type MoralisStruct struct {
 	ApiKey string `koanf:"api_key"`
 }
 
 type ArbitrumStruct struct {
 	ApiKey string `koanf:"arbiscan_key"`
-}
-
-type ConfigStruct struct {
-	Protocol  ProtocolStruct  `koanf:"protocol"`
-	HubServer HubServerStruct `koanf:"hub_server"`
-	Redis     RedisStruct     `koanf:"redis"`
-	Postgres  PostgresStruct  `koanf:"postgres"`
-	Mongo     MongoStruct     `koanf:"mongo"`
-	Logger    LoggerStruct    `koanf:"logger"`
-	Indexer   IndexerStruct   `koanf:"indexer"`
 }
 
 type MiscStruct struct {
@@ -98,7 +96,9 @@ type JikeStruct struct {
 	Password          string `koanf:"password" json:"password"`
 	AppVersion        string `koanf:"app_version" json:"appVersion"`
 }
-
+type TwitterStruct struct {
+	Tokens []string `koanf:"break_down_tokens"`
+}
 type IndexerServerStruct struct {
 	RunMode      string        `koanf:"run_mode"`
 	HttpPort     int           `koanf:"http_port"`
@@ -112,7 +112,19 @@ type IndexerStruct struct {
 	Misc     MiscStruct     `koanf:"misc"`
 	Jike     JikeStruct     `koanf:"jike"`
 	Moralis  MoralisStruct  `koanf:"moralis"`
+	Twitter  TwitterStruct  `koanf:"twitter"`
 	Aribtrum ArbitrumStruct `koanf:"arbitrum"`
+}
+
+type ConfigStruct struct {
+	Protocol  ProtocolStruct  `koanf:"protocol"`
+	HubServer HubServerStruct `koanf:"hub_server"`
+	Redis     RedisStruct     `koanf:"redis"`
+	Postgres  PostgresStruct  `koanf:"postgres"`
+	Mongo     MongoStruct     `koanf:"mongo"`
+	Logger    LoggerStruct    `koanf:"logger"`
+	Network   NetWorkStruct   `koanf:"network"`
+	Indexer   IndexerStruct   `koanf:"indexer"`
 }
 
 var (
