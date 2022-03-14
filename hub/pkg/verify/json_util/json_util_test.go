@@ -41,7 +41,7 @@ func TestSortJsonByKeys(t *testing.T) {
 		},
 		{
 			name: "json_with_sig_field",
-			json: `{"signature":"abc","d":{"c":1,"a":2,"agent":"abc"},"b":3}`,
+			json: `{"signature":"abc","d":{"c":1,"a":2,"agents":"abc"},"b":3}`,
 			opt:  &json_util.SortOptions{NoSignProperties: true},
 			want: `{"b":3,"d":{"a":2,"c":1}}`,
 		},
