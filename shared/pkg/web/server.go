@@ -27,7 +27,7 @@ type Server struct {
 func (s *Server) Start() string {
 	gin.SetMode(s.RunMode)
 
-	addr := net.JoinHostPort("localhost", strconv.Itoa(s.HttpPort))
+	addr := net.JoinHostPort("0.0.0.0", strconv.Itoa(s.HttpPort))
 
 	server := &http.Server{
 		Addr:           addr,
