@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Instance Database
+	Instance Database // TODO: rename this to "DB" to avoid confusion with RSS3 Instance
 )
 
 type Database interface {

@@ -1,4 +1,4 @@
-package api
+package index
 
 import (
 	"context"
@@ -20,11 +20,11 @@ import (
 
 type GetIndexRequest struct{}
 
-//nolint:funlen // SQL logic will be wrapped up later
 func GetIndexHandlerFunc(c *gin.Context) {
+	w := web.Gin{C: c}
+
 	value, exists := c.Get(middleware.KeyInstance)
 	if !exists {
-		w := web.Gin{C: c}
 		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidParams, nil)
 
 		return
@@ -32,41 +32,18 @@ func GetIndexHandlerFunc(c *gin.Context) {
 
 	platformInstance, ok := value.(*rss3uri.PlatformInstance)
 	if !ok {
-		w := web.Gin{C: c}
 		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidParams, nil)
 
 		return
 	}
 
 	if platformInstance.Prefix != constants.PrefixNameAccount || platformInstance.Platform != constants.PlatformSymbolEthereum {
-		w := web.Gin{C: c}
 		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidParams, nil)
 
 		return
 	}
 
-	// Begin a transaction
-	tx := database.Instance.Tx(context.Background())
-	defer tx.Rollback()
-
-	account, err := database.Instance.QueryAccount(
-		tx,
-		platformInstance.GetIdentity(),
-		int(constants.PlatformSymbol(platformInstance.GetSuffix()).ID()),
-	)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			w := web.Gin{C: c}
-			w.JSONResponse(http.StatusNotFound, status.CodeError, nil)
-
-			return
-		}
-
-		w := web.Gin{C: c}
-		w.JSONResponse(http.StatusInternalServerError, status.CodeError, nil)
-
-		return
-	}
+	indexFile, httpStatus, bizStatus := GetIndexFile(platformInstance)
 
 	// Query link list
 	linkList, err := database.Instance.QueryLinkList(tx, 1, account.ID, int(constants.PrefixIDAccount), account.Platform)
@@ -121,22 +98,56 @@ func GetIndexHandlerFunc(c *gin.Context) {
 		},
 		Items: protocol.IndexItems{
 			Notes: protocol.IndexItemsNotes{
-				IdentifierCustom: fmt.Sprintf("%s/list/note/%d", identifier, notePageIndex),
+				IdentifierCustom: fmt.Sprintf("%s/list/note/%d", identifier, 0),
 				Identifier:       fmt.Sprintf("%s/list/note", identifier),
 			},
 			Assets: protocol.IndexItemsAssets{
-				IdentifierCustom: fmt.Sprintf("%s/list/asset/%d", identifier, assetPageIndex),
+				IdentifierCustom: fmt.Sprintf("%s/list/asset/%d", identifier, 0),
 				Identifier:       fmt.Sprintf("%s/list/asset", identifier),
 			},
 		},
 	}
 
+	// Start the transaction
+	tx := database.Instance.Tx(context.Background())
+	defer tx.Rollback()
+
+	// Query the account
+	account, err := database.Instance.QueryAccount(
+		tx,
+		instance.GetIdentity(),
+		int(constants.PlatformSymbol(instance.GetSuffix()).ID()),
+	)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, http.StatusConflict, status.CodeError
+		}
+
+		return nil, http.StatusInternalServerError, status.CodeError
+	}
+
+	indexFile.Profile.Name = account.Name
+	indexFile.Profile.Avatars = account.Avatars
+	indexFile.Profile.Bio = account.Bio
+
+	// Query the linklists
+	// TODO: query linklist table for different types of links
+	// TODO: put max page index into linklist table's metadata field
+	followingMaxPageIndex, err := database.Instance.QueryLinkWithMaxPageIndex(tx, 1, account.ID, account.Platform)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, http.StatusInternalServerError, status.CodeError
+	}
+
+	indexFile.Links.Identifiers = append(indexFile.Links.Identifiers, protocol.IndexLinkIdentifier{
+		Type:             "following",
+		IdentifierCustom: fmt.Sprintf("%s/list/link/following/%d", identifier, followingMaxPageIndex),
+		Identifier:       fmt.Sprintf("%s/list/link/following", identifier),
+	})
+
+	// Query the account platforms
 	accountPlatforms, err := database.Instance.QueryAccountPlatforms(tx, account.ID, account.Platform)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		w := web.Gin{C: c}
-		w.JSONResponse(http.StatusInternalServerError, status.CodeError, nil)
-
-		return
+		return nil, http.StatusInternalServerError, status.CodeError
 	}
 
 	for _, accountPlatform := range accountPlatforms {
@@ -149,28 +160,23 @@ func GetIndexHandlerFunc(c *gin.Context) {
 		})
 	}
 
+	// Query the signature
 	signature, err := database.Instance.QuerySignature(
 		tx,
 		fmt.Sprintf("%s@%s", account.ID, constants.PlatformID(account.Platform).Symbol()),
 	)
-
 	if err != nil {
-		w := web.Gin{C: c}
-		w.JSONResponse(http.StatusInternalServerError, status.CodeError, nil)
-
-		return
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		w := web.Gin{C: c}
-		w.JSONResponse(http.StatusInternalServerError, status.CodeError, nil)
-
-		return
+		return nil, http.StatusInternalServerError, status.CodeError
 	}
 
 	indexFile.Signature = signature.Signature
 	indexFile.Base.DateCreated = signature.CreatedAt.Format(time.RFC3339)
 	indexFile.Base.DateUpdated = signature.UpdatedAt.Format(time.RFC3339)
 
-	c.JSON(http.StatusOK, &indexFile)
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		return nil, http.StatusInternalServerError, status.CodeError
+	}
+
+	return &indexFile, http.StatusOK, status.CodeSuccess
 }
