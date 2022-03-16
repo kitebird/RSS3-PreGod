@@ -12,6 +12,8 @@ import (
 
 type arCrawler struct {
 	crawler.CrawlerResult
+	fromHeight int64
+	toHeight   int64
 }
 
 func NewArCrawler() crawler.Crawler {
@@ -21,25 +23,42 @@ func NewArCrawler() crawler.Crawler {
 			Notes:  []*model.ItemId{},
 			Items:  []*model.Item{},
 		},
+		0,
+		0,
 	}
 }
 
 func (ar *arCrawler) Work(param crawler.WorkParam) error {
-	networkId := constants.NetworkSymbolArweaveMainnet.GetID()
-
 	startBlockHeight := int64(1)
-	latestBlockHeight, err := GetLatestBlockHeight()
+	step := param.Step
+	tempDelay := param.SleepInterval
 
-	if err != nil {
-		logger.Error(err)
+	for {
+		latestBlockHeight, err := GetLatestBlockHeight()
+		if err != nil {
+			return err
+		}
 
-		return err
+		endBlockHeight := startBlockHeight + step
+		if latestBlockHeight <= endBlockHeight {
+			time.Sleep(tempDelay)
+
+			latestBlockHeight, err = GetLatestBlockHeight()
+			if err != nil {
+				return err
+			}
+
+			endBlockHeight = latestBlockHeight
+			step = 10
+		}
+
+		ar.getArticles(startBlockHeight, endBlockHeight, param.Identity)
 	}
+}
 
-	articles, err := GetArticles(startBlockHeight, latestBlockHeight, param.Identity)
+func (ar *arCrawler) getArticles(from, to int64, owner string) error {
+	articles, err := GetArticles(from, to, owner)
 	if err != nil {
-		logger.Error(err)
-
 		return err
 	}
 
@@ -58,7 +77,7 @@ func (ar *arCrawler) Work(param crawler.WorkParam) error {
 		}
 
 		ni := model.NewItem(
-			networkId,
+			constants.NetworkSymbolArweaveMainnet.GetID(),
 			article.Digest,
 			model.Metadata{
 				"network": constants.NetworkSymbolArweaveMainnet,

@@ -19,8 +19,11 @@ type WorkParam struct {
 	PlatformID constants.PlatformID // optional
 	Limit      int                  // optional, aka Count, limit the number of items to be crawled
 
-	TimeStamp   time.Time // optional
-	BlockHeight int64     // optional
+	TimeStamp     time.Time     // optional
+	BlockHeight   int64         // optional
+	Step          int64         // optional
+	MinStep       int64         // optional
+	SleepInterval time.Duration // optional
 }
 
 type Crawler interface {
