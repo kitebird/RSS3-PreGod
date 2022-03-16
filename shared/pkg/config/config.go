@@ -28,6 +28,8 @@ type RedisStruct struct {
 	Addr     string `koanf:"addr"`
 	Password string `koanf:"password"`
 	DB       int    `koanf:"db"`
+
+	TLSEnabled bool `koanf:"tls_enabled"`
 }
 
 type PostgresStruct struct {
