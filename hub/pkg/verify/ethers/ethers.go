@@ -9,14 +9,10 @@ import (
 )
 
 // Verifies the signature of a message from a given address.
-func VerifyMessage(msg, sig, addr string) (bool, error) {
+func VerifyMessage(msgBytes []byte, sig, addr string) (bool, error) {
 	// check format is correct
 	if !common.IsHexAddress(addr) {
 		return false, fmt.Errorf("Invalid hex address: %s", addr)
-	}
-
-	if len(sig) != 65 {
-		return false, fmt.Errorf("Invalid signature length (must be of 65): %d", len(sig))
 	}
 
 	address := common.HexToAddress(addr)
@@ -24,6 +20,10 @@ func VerifyMessage(msg, sig, addr string) (bool, error) {
 	sigBytes, err := hexutil.Decode(sig)
 	if err != nil {
 		return false, fmt.Errorf("Decode sig string failed. Invalid signature: %s", err.Error())
+	}
+
+	if len(sigBytes) != 65 {
+		return false, fmt.Errorf("Invalid signature length (must be of 65): %d", len(sigBytes))
 	}
 
 	// legacy issue:
@@ -34,7 +34,7 @@ func VerifyMessage(msg, sig, addr string) (bool, error) {
 
 	sigBytes[64] -= 27
 
-	recoveredPubkey, err := crypto.SigToPub(signHash([]byte(msg)), sigBytes)
+	recoveredPubkey, err := crypto.SigToPub(signHash(msgBytes), sigBytes)
 	if err != nil || recoveredPubkey == nil {
 		return false, fmt.Errorf("Convert sig to pub failed. Invalid signature: %s", err.Error())
 	}
