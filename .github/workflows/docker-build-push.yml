@@ -143,8 +143,10 @@ jobs:
         with:
           cmd: yq -i '.spec.template.spec.containers[0].image = "${{ steps.meta.outputs.tags }}"' ./deploy/dev/deploy.yaml
       - run: aws eks update-kubeconfig --region us-west-2 --name development
-      - run: kubectl apply -f deploy/dev
-      - run: kubectl -n pregod rollout restart deploy pregod-hub
+      - run: |
+          kubectl apply -f deploy/dev
+          kubectl -n pregod rollout restart deploy pregod-hub
+          kubectl -n pregod rollout status deploy pregod-hub
 
   deploy-prod:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -175,4 +177,6 @@ jobs:
         with:
           cmd: yq -i '.spec.template.spec.containers[0].image = "${{ steps.meta.outputs.tags }}"' ./deploy/prod/deploy.yaml
       - run: aws eks update-kubeconfig --region us-west-2 --name production
-      - run: kubectl apply -f deploy/prod
+      - run: |
+          kubectl apply -f deploy/prod
+          kubectl -n pregod rollout status deploy pregod-hub
