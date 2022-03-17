@@ -21,6 +21,16 @@ func GetItemHandlerFunc(c *gin.Context) {
 	}
 
 	// TODO Query data
+	// ai := rss3uri.NewAccountInstance(request.Identity, request.PlatformID.Symbol())
 
+	// r, err := db.GetAccountInstance(ai)
+	// if err != nil {
+	// 	//TODO
+	// 	panic(err)
+	// }
+
+	// if r != nil {
+	// 	db.GetNotes(ai)
+	// }
 	c.JSON(http.StatusOK, request)
 }

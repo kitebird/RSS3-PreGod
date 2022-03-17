@@ -1,6 +1,9 @@
 {
   "cSpell.words": [
     "arweave",
+    "aribtrum",
+    "Arbitrum",
+    "arbiscan",
     "AVAX",
     "bson",
     "gorm",
@@ -13,5 +16,7 @@
     "valyala"
   ],
   "go.lintTool": "golangci-lint",
-  "go.lintFlags": ["--fast"]
+  "go.lintFlags": [
+    "--fast"
+  ]
 }

@@ -13,7 +13,7 @@ type GetBioRequest struct {
 }
 
 func GetBioHandlerFunc(c *gin.Context) {
-	request := GetItemRequest{}
+	request := GetBioRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		return
 	}

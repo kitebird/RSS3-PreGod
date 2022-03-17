@@ -17,7 +17,7 @@ type ProtocolStruct struct {
 	Version string `koanf:"version"`
 }
 
-type HubServerStruct struct {
+type ServerStruct struct {
 	RunMode      string        `koanf:"run_mode"`
 	HttpPort     int           `koanf:"http_port"`
 	ReadTimeout  time.Duration `koanf:"read_timeout"`
@@ -101,15 +101,8 @@ type JikeStruct struct {
 type TwitterStruct struct {
 	Tokens []string `koanf:"break_down_tokens"`
 }
-type IndexerServerStruct struct {
-	RunMode      string        `koanf:"run_mode"`
-	HttpPort     int           `koanf:"http_port"`
-	ReadTimeout  time.Duration `koanf:"read_timeout"`
-	WriteTimeout time.Duration `koanf:"write_timeout"`
-}
-
 type IndexerStruct struct {
-	Server IndexerServerStruct `koanf:"server"`
+	Server ServerStruct `koanf:"server"`
 
 	Misc     MiscStruct     `koanf:"misc"`
 	Jike     JikeStruct     `koanf:"jike"`
@@ -119,14 +112,14 @@ type IndexerStruct struct {
 }
 
 type ConfigStruct struct {
-	Protocol  ProtocolStruct  `koanf:"protocol"`
-	HubServer HubServerStruct `koanf:"hub_server"`
-	Redis     RedisStruct     `koanf:"redis"`
-	Postgres  PostgresStruct  `koanf:"postgres"`
-	Mongo     MongoStruct     `koanf:"mongo"`
-	Logger    LoggerStruct    `koanf:"logger"`
-	Network   NetWorkStruct   `koanf:"network"`
-	Indexer   IndexerStruct   `koanf:"indexer"`
+	Protocol  ProtocolStruct `koanf:"protocol"`
+	HubServer ServerStruct   `koanf:"hub_server"`
+	Redis     RedisStruct    `koanf:"redis"`
+	Postgres  PostgresStruct `koanf:"postgres"`
+	Mongo     MongoStruct    `koanf:"mongo"`
+	Logger    LoggerStruct   `koanf:"logger"`
+	Network   NetWorkStruct  `koanf:"network"`
+	Indexer   IndexerStruct  `koanf:"indexer"`
 }
 
 var (

@@ -55,8 +55,8 @@ func main() {
 	lowQ := crawler.NewTaskQueue()
 	highQ := crawler.NewTaskQueue()
 
-	w := processor.NewProcessor(lowQ, highQ)
-	go w.ListenAndServe()
+	proc := processor.NewProcessor(lowQ, highQ)
+	go proc.ListenAndServe()
 
 	// TODO: listen tasks from mq
 	// TODO: gracefully exit
@@ -70,8 +70,7 @@ func main() {
 		Handler:      router.InitRouter(),
 	}
 
-	addr := srv.Start()
+	srv.Start()
 
-	logger.Infof("Start http server listening on http://%s", addr)
 	defer logger.Logger.Sync()
 }
