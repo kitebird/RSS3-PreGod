@@ -89,6 +89,15 @@ func (d *database) QueryLinkList(db *gorm.DB, _type int, identity string, prefix
 	return &linkList, nil
 }
 
+func (d *database) QueryLinkLists(db *gorm.DB, identity string, prefixID, suffixID int) ([]model.LinkList, error) {
+	linkLists := make([]model.LinkList, 0)
+	if err := db.Find(&linkLists).Error; err != nil {
+		return nil, err
+	}
+
+	return linkLists, nil
+}
+
 func (d *database) QuerySignature(db *gorm.DB, fileURI string) (*model.Signature, error) {
 	signature := model.Signature{}
 	if err := db.Where("file_uri = ?", fileURI).First(&signature).Error; err != nil {
