@@ -7,6 +7,14 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
+type Crawler interface {
+	Work(WorkParam) error
+	// GetResult return &{Assets, Notes, Items}
+	GetResult() *CrawlerResult
+	// GetBio
+	GetUserBio(WorkParam) (string, error)
+}
+
 type CrawlerResult struct {
 	Assets []*model.ItemId
 	Notes  []*model.ItemId
@@ -23,12 +31,16 @@ type WorkParam struct {
 	BlockHeight int64     // optional
 }
 
-type Crawler interface {
-	Work(WorkParam) error
-	// GetResult return &{Assets, Notes, Items}
-	GetResult() *CrawlerResult
+// CrawlerResult inherits the function by default
+
+func (cr *CrawlerResult) Work(WorkParam) error {
+	return nil
 }
 
-func NewTaskQueue() chan *WorkParam {
-	return make(chan *WorkParam)
+func (cr *CrawlerResult) GetResult() *CrawlerResult {
+	return cr
+}
+
+func (cr *CrawlerResult) GetUserBio(WorkParam) (string, error) {
+	return "", nil
 }

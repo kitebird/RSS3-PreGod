@@ -7,15 +7,15 @@ import (
 )
 
 type jikeCrawler struct {
-	rss3Items []*model.Item
-
-	rss3Notes []*model.ItemId
+	crawler.CrawlerResult
 }
 
 func NewJikeCrawler() crawler.Crawler {
 	return &jikeCrawler{
-		rss3Items: []*model.Item{},
-		rss3Notes: []*model.ItemId{},
+		crawler.CrawlerResult{
+			Items: []*model.Item{},
+			Notes: []*model.ItemId{},
+		},
 	}
 }
 
@@ -41,9 +41,9 @@ func (mc *jikeCrawler) Work(param crawler.WorkParam) error {
 			item.Attachments,
 			item.Timestamp,
 		)
-		mc.rss3Items = append(mc.rss3Items, ni)
+		mc.Items = append(mc.Items, ni)
 
-		mc.rss3Notes = append(mc.rss3Notes, &model.ItemId{
+		mc.Notes = append(mc.Notes, &model.ItemId{
 			NetworkID: param.NetworkID,
 			Proof:     item.Link,
 		})
@@ -54,7 +54,17 @@ func (mc *jikeCrawler) Work(param crawler.WorkParam) error {
 
 func (mc *jikeCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Notes: mc.rss3Notes,
-		Items: mc.rss3Items,
+		Notes: mc.Notes,
+		Items: mc.Items,
 	}
+}
+
+func (tc *jikeCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
+	userProfile, err := GetUserProfile(param.Identity)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userProfile.Bio, nil
 }

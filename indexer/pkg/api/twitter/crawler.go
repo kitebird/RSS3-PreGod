@@ -66,14 +66,28 @@ func (tc *twitterCrawler) Work(param crawler.WorkParam) error {
 		)
 
 		tc.Items = append(tc.Items, ni)
+		tc.Notes = append(tc.Notes, &model.ItemId{
+			NetworkID: networkId,
+			Proof:     "",
+		})
 	}
 
 	return nil
 }
 
-func (pc *twitterCrawler) GetResult() *crawler.CrawlerResult {
+func (tc *twitterCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Assets: pc.Assets,
-		Notes:  pc.Notes,
+		Assets: tc.Assets,
+		Notes:  tc.Notes,
 	}
+}
+
+func (tc *twitterCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
+	userShow, err := GetUserShow(param.Identity)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userShow.Description, nil
 }

@@ -8,15 +8,15 @@ import (
 )
 
 type misskeyCrawler struct {
-	rss3Items []*model.Item
-
-	rss3Notes []*model.ItemId
+	crawler.CrawlerResult
 }
 
 func NewMisskeyCrawler() crawler.Crawler {
 	return &misskeyCrawler{
-		rss3Items: []*model.Item{},
-		rss3Notes: []*model.ItemId{},
+		crawler.CrawlerResult{
+			Items: []*model.Item{},
+			Notes: []*model.ItemId{},
+		},
 	}
 }
 
@@ -44,9 +44,9 @@ func (mc *misskeyCrawler) Work(param crawler.WorkParam) error {
 			note.Attachments,
 			note.CreatedAt,
 		)
-		mc.rss3Items = append(mc.rss3Items, ni)
+		mc.Items = append(mc.Items, ni)
 
-		mc.rss3Notes = append(mc.rss3Notes, &model.ItemId{
+		mc.Notes = append(mc.Notes, &model.ItemId{
 			NetworkID: param.NetworkID,
 			Proof:     note.Link,
 		})
@@ -57,7 +57,7 @@ func (mc *misskeyCrawler) Work(param crawler.WorkParam) error {
 
 func (mc *misskeyCrawler) GetResult() *crawler.CrawlerResult {
 	return &crawler.CrawlerResult{
-		Notes: mc.rss3Notes,
-		Items: mc.rss3Items,
+		Notes: mc.Notes,
+		Items: mc.Items,
 	}
 }

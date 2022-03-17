@@ -33,18 +33,21 @@ func init() {
 	}
 }
 
-func dispatchTasks(q chan *crawler.WorkParam, ti time.Duration) {
+func dispatchTasks(q chan *processor.ProcessTaskParam, ti time.Duration) {
 	// TODO: Get all accounts
 	instances := []rss3uri.PlatformInstance{}
 	for _, i := range instances {
 		for _, n := range i.Platform.ID().GetNetwork() {
 			time.Sleep(ti)
-			q <- &crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n}
+			q <- &processor.ProcessTaskParam{
+				TaskType:  processor.ProcessTaskTypeItemStroge,
+				WorkParam: crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n},
+			}
 		}
 	}
 }
 
-func pollTasks(q chan *crawler.WorkParam) {
+func pollTasks(q chan *processor.ProcessTaskParam) {
 	for {
 		dispatchTasks(q, time.Minute)
 		time.Sleep(24 * time.Hour)
@@ -52,10 +55,12 @@ func pollTasks(q chan *crawler.WorkParam) {
 }
 
 func main() {
-	lowQ := crawler.NewTaskQueue()
-	highQ := crawler.NewTaskQueue()
+	urgentQ := processor.NewTaskQueue()
+	lowQ := processor.NewTaskQueue()
+	highQ := processor.NewTaskQueue()
 
-	w := processor.NewProcessor(lowQ, highQ)
+	// 这里待会要考虑一下封装
+	w := processor.NewProcessor(urgentQ, lowQ, highQ)
 	go w.ListenAndServe()
 
 	// TODO: listen tasks from mq
