@@ -20,14 +20,21 @@ type agent struct {
 
 // Verifies if the current json file has a valid signature.
 func Signature(jsonBytes []byte, address, instanceUrl string) (bool, error) {
-	jsonBytes, err := json_util.SortJsonByKeys(jsonBytes, &json_util.SortOptions{NoSignProperties: true})
+
+	jsonBytesNoSignature, err := json_util.SortJsonByKeys(jsonBytes, &json_util.SortOptions{NoSignProperties: true})
 	if err != nil {
 		return false, err
 	}
 
+	var rawJi map[string]interface{}
 	var ji map[string]interface{}
 
-	err = json.Unmarshal(jsonBytes, &ji)
+	err = json.Unmarshal(jsonBytes, &rawJi)
+	if err != nil {
+		return false, err
+	}
+
+	err = json.Unmarshal(jsonBytesNoSignature, &ji)
 	if err != nil {
 		return false, err
 	}
@@ -37,12 +44,12 @@ func Signature(jsonBytes []byte, address, instanceUrl string) (bool, error) {
 	}
 
 	// check if signature is present
-	if ji["signature"] == nil {
+	if rawJi["signature"] == nil {
 		return false, fmt.Errorf("json has no signature field")
 	}
 
 	// check if signature is valid
-	signature, ok := ji["signature"].(string)
+	signature, ok := rawJi["signature"].(string)
 	if !ok {
 		return false, fmt.Errorf("signature field is not a string")
 	}
@@ -57,15 +64,23 @@ func Signature(jsonBytes []byte, address, instanceUrl string) (bool, error) {
 	}
 
 	// check if agents is valid
-	agents, ok := ji["agents"].([]agent)
-	if !ok {
+	// map[string]interface{} cannot be converted directly to struct,
+	// so we need use JSON as a middleware
+	var agents []agent
+	agentsBytes, err := json.Marshal(ji["agents"])
+	if err != nil {
+		return false, err
+	}
+	err = json.Unmarshal(agentsBytes, &agents)
+	if err != nil {
 		return false, fmt.Errorf("'agents' field is not valid")
 	}
 
 	// check if any of the agents has a valid signature
 	for _, agent := range agents {
 		// verify if user has authorization to sign
-		ethersOk, _ := ethers.VerifyMessage(getAgentSignatureMessage(agent.App, agent.Pubkey, instanceUrl), agent.Authorization, address)
+		signMsg := getAgentSignatureMessage(agent.App, agent.Pubkey, instanceUrl)
+		ethersOk, _ := ethers.VerifyMessage(signMsg, signature, address)
 
 		// verify if file signature is valid
 		naclOk, _ := nacl.Verify(jsonBytes, []byte(agent.Signature), []byte(agent.Pubkey))
