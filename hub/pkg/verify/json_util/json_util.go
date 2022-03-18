@@ -46,15 +46,15 @@ func removeSignProperties(i interface{}) {
 	switch v := (i).(type) {
 	case map[string]interface{}:
 		for k := range v {
-			if k == "signature" || k == "agents" {
+			if k == "signature" /*|| k == "agents"*/ {
 				delete(v, k)
-			} else {
-				removeSignProperties(v[k])
+				//} else {
+				//	removeSignProperties(v[k])
 			}
 		}
-	case []interface{}:
-		for _, v := range v {
-			removeSignProperties(v)
-		}
+		//case []interface{}:
+		//	for _, v := range v {
+		//		removeSignProperties(v)
+		//	}
 	}
 }

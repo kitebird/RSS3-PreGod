@@ -54,20 +54,25 @@ func Signature(jsonBytes []byte, address, instanceUrl string) (bool, error) {
 		return false, fmt.Errorf("signature field is not a string")
 	}
 
+	// Extract instance identifier
+	//identifier, ok := ji["identifier"].(string)
+	//if !ok {
+	//	return false, fmt.Errorf("identifier field is not a string")
+	//}
+
 	// check if agents is present
-	if ji["agents"] == nil {
-		// check stringified json signature
-		ethersOk, err := ethers.VerifyMessage(jsonBytes, signature, address)
-		if ethersOk {
-			return true, err
-		}
+	// check stringified json signature
+	signMsgBytes := append(getDirectSignatureMessage( /*identifier*/ instanceUrl), jsonBytesNoSignature...)
+	ethersOk, err := ethers.VerifyMessage(signMsgBytes, signature, address)
+	if ethersOk {
+		return true, err
 	}
 
 	// check if agents is valid
-	// map[string]interface{} cannot be converted directly to struct,
+	// map[string]interface{} cannot be converted to struct directly,
 	// so we need use JSON as a middleware
 	var agents []agent
-	agentsBytes, err := json.Marshal(ji["agents"])
+	agentsBytes, err := json.Marshal(rawJi["agents"])
 	if err != nil {
 		return false, err
 	}
@@ -106,6 +111,16 @@ func getAgentSignatureMessage(appname, pubkey, instanceUrl string) []byte {
 	buf.WriteString(") to modify my files and I would like to authorize this agent (")
 	buf.WriteString(pubkey)
 	buf.WriteString(")")
+
+	return buf.Bytes()
+}
+
+func getDirectSignatureMessage(identifier string) []byte {
+	var buf bytes.Buffer
+
+	buf.WriteString("[RSS3] I am confirming the results of changes to my file ")
+	buf.WriteString(identifier)
+	buf.WriteString(": ")
 
 	return buf.Bytes()
 }
