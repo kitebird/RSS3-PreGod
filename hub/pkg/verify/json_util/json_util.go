@@ -42,6 +42,11 @@ func SortJsonByKeys(jsonBytes []byte, opt *SortOptions) ([]byte, error) {
 }
 
 // Removes signature related properties from a given json.
+// What's the trick:
+// - on direct sign mode, signature itself
+//   should be removed before signature verify
+// - on agent sign mode, agents' signature
+//   should be removed before signature verify
 func removeSignProperties(i interface{}) {
 	switch v := (i).(type) {
 	case map[string]interface{}:
