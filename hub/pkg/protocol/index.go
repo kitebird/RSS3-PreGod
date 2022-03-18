@@ -114,7 +114,7 @@ func NewIndexLinkIdentifier(identifier string, linkType constants.LinkTypeID, ma
 	return &IndexLinkIdentifier{
 		Type:             linkType.String(),
 		IdentifierCustom: fmt.Sprintf("%s/list/link/%s/%d", identifier, linkType, maxPageIndex),
-		Identifier:       fmt.Sprintf("%s/list/link/%s", linkType, identifier),
+		Identifier:       fmt.Sprintf("%s/list/link/%s", identifier, linkType),
 	}
 }
 

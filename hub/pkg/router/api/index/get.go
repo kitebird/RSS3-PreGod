@@ -84,7 +84,7 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 	}
 
 	// Query the linklists
-	linkLists, err := database.Instance.QueryLinkLists(
+	linkLists, err := database.Instance.QueryLinkListsByOwner(
 		tx, account.ID, int(constants.PrefixIDAccount), account.Platform,
 	)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
