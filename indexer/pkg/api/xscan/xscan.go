@@ -1,7 +1,6 @@
 package xscan
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -14,16 +13,16 @@ import (
 
 var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 
-func GetApiKey(chainType constants.NetworkSymbol) string {
+func GetApiKey(networkId constants.NetworkID) string {
 	var err error
 	if err = config.Setup(); err != nil {
 		return ""
 	}
 
 	var apiKey string
-	if chainType == constants.NetworkSymbolEthereumMainnet {
+	if networkId == constants.NetworkIDEthereumMainnet {
 		apiKey, err = jsoni.MarshalToString(config.Config.Indexer.EtherScan.ApiKey)
-	} else if chainType == constants.NetworkSymbolPolygon {
+	} else if networkId == constants.NetworkIDPolygon {
 		apiKey, err = jsoni.MarshalToString(config.Config.Indexer.PolygonScan.ApiKey)
 	}
 
@@ -34,14 +33,14 @@ func GetApiKey(chainType constants.NetworkSymbol) string {
 	return strings.Trim(apiKey, "\"")
 }
 
-func GetLatestBlockHeight(chainType constants.NetworkSymbol) (int64, error) {
-	apiKey := GetApiKey(chainType)
+func GetLatestBlockHeight(networkId constants.NetworkID) (int64, error) {
+	apiKey := GetApiKey(networkId)
 
 	var url string
-	if chainType == constants.NetworkSymbolEthereumMainnet {
-		url = fmt.Sprintf("https://api.etherscan.io/api/?module=proxy&action=eth_blockNumber&apikey=%s", apiKey)
-	} else if chainType == constants.NetworkSymbolPolygon {
-		url = fmt.Sprintf("https://api.polygonscan.com/api/?module=proxy&action=eth_blockNumber&apikey=%s", apiKey)
+	if networkId == constants.NetworkIDEthereumMainnet {
+		url = "https://api.etherscan.io/api/?module=proxy&action=eth_blockNumber&apikey=" + apiKey
+	} else if networkId == constants.NetworkIDPolygon {
+		url = "https://api.polygonscan.com/api/?module=proxy&action=eth_blockNumber&apikey=" + apiKey
 	}
 
 	response, err := httpx.Get(url, nil)

@@ -51,7 +51,13 @@
       "api_key": "+1"
     },
     "arbitrum": {
-      "arbiscan_key": "+1"
+      "api_key": "+1"
+    },
+    "etherscan": {
+      "api_key": "+1"
+    },
+    "polygonscan": {
+      "api_key": "+1"
     },
     "jike": {
       "area_code": "+1",

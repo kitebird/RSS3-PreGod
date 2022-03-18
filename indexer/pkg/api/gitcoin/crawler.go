@@ -2,7 +2,9 @@ package gitcoin
 
 import (
 	"strings"
+	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/xscan"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/zksync"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
@@ -89,9 +91,13 @@ func (gc *gitcoinCrawler) updateHostingProject(adminAddress string) (inactive bo
 	return
 }
 
-func (gc *gitcoinCrawler) Work(owner string, network constants.NetworkID) error {
-	tokens, err := zksync.GetTokens()
+func (gc *gitcoinCrawler) ZksyncWork(param crawler.WorkParam) error {
+	startBlockHeight := int64(1)
+	step := param.Step
+	tempDelay := param.SleepInterval
 
+	// token cache
+	tokens, err := zksync.GetTokens()
 	if err != nil {
 		return err
 	}
@@ -100,7 +106,79 @@ func (gc *gitcoinCrawler) Work(owner string, network constants.NetworkID) error 
 		gc.zksTokensCache[token.Id] = token
 	}
 
-	return nil
+	for {
+		latestBlockHeight, err := zksync.GetLatestBlockHeight()
+		if err != nil {
+			return err
+		}
+
+		endBlockHeight := startBlockHeight + step
+		if latestBlockHeight <= endBlockHeight {
+			time.Sleep(tempDelay)
+
+			latestBlockHeight, err = zksync.GetLatestBlockHeight()
+			if err != nil {
+				return err
+			}
+
+			endBlockHeight = latestBlockHeight
+			step = param.MinStep
+		}
+
+		donations, err := gc.GetZkSyncDonations(startBlockHeight, endBlockHeight)
+		if err != nil {
+			return err
+		}
+
+		setDB(donations)
+	}
+}
+
+func (gc *gitcoinCrawler) XscanWork(param crawler.WorkParam) error {
+	startBlockHeight := int64(1)
+
+	networkId := param.NetworkID
+	step := param.Step
+	minStep := param.MinStep
+	sleepInterval := param.SleepInterval
+
+	for {
+		latestBlockHeight, err := xscan.GetLatestBlockHeight(networkId)
+		if err != nil {
+			return err
+		}
+
+		endBlockHeight := startBlockHeight + step
+		if latestBlockHeight <= endBlockHeight {
+			time.Sleep(sleepInterval)
+
+			latestBlockHeight, err = xscan.GetLatestBlockHeight(networkId)
+			if err != nil {
+				return err
+			}
+
+			endBlockHeight = latestBlockHeight
+			step = minStep
+		}
+
+		var chainType ChainType
+		if networkId == constants.NetworkIDEthereumMainnet {
+			chainType = ETH
+		} else if networkId == constants.NetworkIDPolygon {
+			chainType = Polygon
+		}
+
+		donations, err := GetEthDonations(startBlockHeight, endBlockHeight, chainType)
+		if err != nil {
+			return err
+		}
+
+		setDB(donations)
+	}
+}
+
+func setDB(donations []DonationInfo) {
+	// TODO: set db
 }
 
 func (gc *gitcoinCrawler) GetResult() *crawler.CrawlerResult {
