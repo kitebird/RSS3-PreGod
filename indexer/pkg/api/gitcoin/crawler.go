@@ -8,6 +8,8 @@ import (
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/xscan"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/zksync"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
@@ -145,7 +147,7 @@ func (gc *gitcoinCrawler) zksyncRun() error {
 			return err
 		}
 
-		setDB(donations)
+		setDB(donations, constants.NetworkIDZksync)
 	}
 }
 
@@ -194,12 +196,37 @@ func (gc *gitcoinCrawler) xscanWork(networkId constants.NetworkID) error {
 			return err
 		}
 
-		setDB(donations)
+		setDB(donations, networkId)
 	}
 }
 
-func setDB(donations []DonationInfo) {
-	// TODO: set db
+func setDB(donations []DonationInfo, networkId constants.NetworkID) {
+	for _, v := range donations {
+		tsp, err := time.Parse(time.RFC3339, v.Timestamp)
+		if err != nil {
+			tsp = time.Now()
+		}
+
+		item := model.NewItem(
+			networkId,
+			v.TxHash,
+			model.Metadata{
+				"Donor":            v.Donor,
+				"AdminAddress":     v.AdminAddress,
+				"TokenAddress":     v.TokenAddress,
+				"Symbol":           v.Symbol,
+				"Amount":           v.FormatedAmount,
+				"DonationApproach": v.Approach,
+			},
+			nil,
+			nil,
+			"",
+			"",
+			[]model.Attachment{},
+			tsp,
+		)
+		db.InsertItem(item)
+	}
 }
 
 func (gc *gitcoinCrawler) ZkStart() error {
