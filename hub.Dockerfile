@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine AS BUILDER
+FROM golang:1.18alpine AS BUILDER
 
 # Set the Current Working Directory inside the container
 WORKDIR /rss3-pregod
