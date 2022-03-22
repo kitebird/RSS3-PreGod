@@ -7,34 +7,47 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
 
+type processTaskHandler interface {
+	Fun() error
+}
+
 type ProcessTaskParam struct {
+	processTaskHandler
 	TaskType  ProcessTaskType
 	WorkParam crawler.WorkParam
 }
 
-type ProcessTaskUnit interface {
-	Fun() error
+type ProcessTaskResult struct {
+	TaskType   ProcessTaskType
+	TaskResult ProcessTaskErrorCode
 }
 
-type Processor interface {
-	ListenAndServe()
-}
-
-type processor struct {
+type Processor struct {
 	// Emergency use, highest priority, such as user data not found
-	UrgentQ chan ProcessTaskUnit
+	UrgentQ chan *ProcessTaskParam
 	// General use, such as access to authenticate user information
-	highQ chan ProcessTaskUnit
+	HighQ chan *ProcessTaskParam
 	// Unaffected condition use, such as polling query data
-	lowQ chan ProcessTaskUnit
+	LowQ chan *ProcessTaskParam
 }
 
-func NewProcessor(uq, lq, hq chan ProcessTaskUnit) Processor {
-	return &processor{uq, lq, hq}
+var GlobalProcessor *Processor
+
+func Setup() error {
+	GlobalProcessor = NewProcessor()
+	go GlobalProcessor.ListenAndServe()
+
+	return nil
 }
 
-func NewTaskQueue() chan ProcessTaskUnit {
-	return make(chan ProcessTaskUnit)
+func NewProcessor() *Processor {
+	processor := new(Processor)
+
+	processor.UrgentQ = make(chan *ProcessTaskParam)
+	processor.HighQ = make(chan *ProcessTaskParam)
+	processor.LowQ = make(chan *ProcessTaskParam)
+
+	return processor
 }
 
 func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
@@ -52,15 +65,15 @@ func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 	}
 }
 
-func (w *processor) ListenAndServe() {
+func (w *Processor) ListenAndServe() {
 	select {
-	case t := <-w.highQ:
+	case t := <-w.HighQ:
 		t.Fun()
 	default:
 		select {
-		case t := <-w.highQ:
+		case t := <-w.HighQ:
 			t.Fun()
-		case t := <-w.lowQ:
+		case t := <-w.LowQ:
 			t.Fun()
 		}
 	}

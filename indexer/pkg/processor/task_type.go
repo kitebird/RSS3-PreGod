@@ -7,3 +7,10 @@ const (
 	ProcessTaskTypeItemStroge    ProcessTaskType = 1
 	ProcessTaskTypeUserBioStroge ProcessTaskType = 2
 )
+
+type ProcessTaskErrorCode int
+
+const (
+	ProcessTaskErrorCodeSuccess   ProcessTaskErrorCode = iota
+	ProcessTaskErrorCodeFoundData ProcessTaskErrorCode = 1
+)

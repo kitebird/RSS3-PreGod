@@ -66,5 +66,12 @@ func (tc *jikeCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
 		return "", err
 	}
 
-	return userProfile.Bio, nil
+	userBios := []string{userProfile.Bio}
+	userBioJson, err := crawler.GetUserBioJson(userBios)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userBioJson, nil
 }

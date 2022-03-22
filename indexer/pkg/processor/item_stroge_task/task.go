@@ -1,27 +1,29 @@
-package processor
+package item_stroge_task
 
 import (
 	"fmt"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
-type itemStrogeTask struct {
-	ProcessTaskParam
+type ItemStrogeTask struct {
+	processor.ProcessTaskParam
 }
 
-func NewItemStrogeParam() ProcessTaskUnit {
-	return &itemStrogeTask{
-		ProcessTaskParam{
-			TaskType: ProcessTaskTypeItemStroge,
+func NewItemStrogeParam(workParam crawler.WorkParam) *ItemStrogeTask {
+	return &ItemStrogeTask{
+		processor.ProcessTaskParam{
+			TaskType:  processor.ProcessTaskTypeItemStroge,
+			WorkParam: workParam,
 		},
 	}
 }
 
-func (pt *itemStrogeTask) Fun() error {
+func (pt *ItemStrogeTask) Fun() error {
 	var err error
 
 	var c crawler.Crawler
@@ -30,7 +32,7 @@ func (pt *itemStrogeTask) Fun() error {
 
 	instance := rss3uri.NewAccountInstance(pt.WorkParam.Identity, pt.WorkParam.PlatformID.Symbol())
 
-	c = MakeCrawlers(pt.WorkParam.NetworkID)
+	c = processor.MakeCrawlers(pt.WorkParam.NetworkID)
 	if c == nil {
 		err = fmt.Errorf("unsupported network id: %d", pt.WorkParam.NetworkID)
 

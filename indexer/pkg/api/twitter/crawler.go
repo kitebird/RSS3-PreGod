@@ -89,5 +89,12 @@ func (tc *twitterCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
 		return "", err
 	}
 
-	return userShow.Description, nil
+	userBios := []string{userShow.Description}
+	userBioJson, err := crawler.GetUserBioJson(userBios)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userBioJson, nil
 }

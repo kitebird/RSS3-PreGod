@@ -26,4 +26,6 @@ type Note struct {
 }
 
 type UserShow struct {
+	Id   string
+	Bios []string
 }

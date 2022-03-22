@@ -3,6 +3,8 @@ package crawler
 import (
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
+
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 )
@@ -12,6 +14,8 @@ type Crawler interface {
 	// GetResult return &{Assets, Notes, Items}
 	GetResult() *CrawlerResult
 	// GetBio
+	// Since some apps have multiple bios,
+	// they need to be converted into json and then collectively transmitted
 	GetUserBio(WorkParam) (string, error)
 }
 
@@ -43,4 +47,21 @@ func (cr *CrawlerResult) GetResult() *CrawlerResult {
 
 func (cr *CrawlerResult) GetUserBio(WorkParam) (string, error) {
 	return "", nil
+}
+
+type UserBios struct {
+	Bios []string `json:"bios"`
+}
+
+func GetUserBioJson(bios []string) (string, error) {
+	jsoni := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	userbios := UserBios{Bios: bios}
+	userBioJson, err := jsoni.MarshalToString(userbios)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userBioJson, nil
 }

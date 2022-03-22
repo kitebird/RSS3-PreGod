@@ -61,3 +61,25 @@ func (mc *misskeyCrawler) GetResult() *crawler.CrawlerResult {
 		Items: mc.Items,
 	}
 }
+
+func (mc *misskeyCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
+	accountInfo, err := formatUserAccount(param.Identity)
+	if err != nil {
+		return "", err
+	}
+
+	userShow, err := GetUserShow(accountInfo)
+
+	if err != nil {
+		return "", err
+	}
+
+	userBios := userShow.Bios
+	userBioJson, err := crawler.GetUserBioJson(userBios)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userBioJson, nil
+}
