@@ -87,29 +87,9 @@ func main() {
 	ar.Start()
 
 	// gitcoin crawler
-	ethParam := gitcoin.Param{
-		FromHeight:    1,
-		Step:          10000,
-		MinStep:       10,
-		Confirmations: 10,
-		SleepInterval: 600,
-	}
-
-	polygonParam := gitcoin.Param{
-		FromHeight:    1,
-		Step:          10000,
-		MinStep:       10,
-		Confirmations: 10,
-		SleepInterval: 600,
-	}
-
-	zkParam := gitcoin.Param{
-		FromHeight:    1,
-		Step:          10000,
-		MinStep:       10,
-		Confirmations: 10,
-		SleepInterval: 600,
-	}
+	ethParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
+	polygonParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
+	zkParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
 	gc := gitcoin.NewGitcoinCrawler(ethParam, polygonParam, zkParam)
 
 	gc.PolygonStart()

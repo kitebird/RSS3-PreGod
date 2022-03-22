@@ -14,13 +14,27 @@ import (
 )
 
 type Param struct {
-	FromHeight    int64
-	Step          int64
-	MinStep       int64
-	Confirmations int64
-	SleepInterval time.Duration
-	Interrupt     chan os.Signal
-	Complete      chan error
+	FromHeight     int64
+	Step           int64
+	MinStep        int64
+	Confirmations  int64
+	SleepInterval  time.Duration
+	LastUpdateTime time.Time
+	NextUpdateTime time.Time
+	Interrupt      chan os.Signal
+}
+
+func NewParam(from, step, minStep, confirmations, sleepInterval int64) Param {
+	return Param{
+		FromHeight:     from,
+		Step:           step,
+		MinStep:        minStep,
+		Confirmations:  confirmations,
+		SleepInterval:  time.Duration(sleepInterval),
+		LastUpdateTime: time.UnixMicro(0),
+		NextUpdateTime: time.UnixMicro(0),
+		Interrupt:      make(chan os.Signal, 1),
+	}
 }
 
 type gitcoinCrawler struct {
@@ -105,18 +119,18 @@ func (gc *gitcoinCrawler) updateHostingProject(adminAddress string) (inactive bo
 }
 
 func (gc *gitcoinCrawler) zksyncRun() error {
-	startBlockHeight := gc.zk.FromHeight
-	step := gc.zk.Step
 	tempDelay := gc.zk.SleepInterval
 
 	// token cache
-	tokens, err := zksync.GetTokens()
-	if err != nil {
-		return err
-	}
+	if len(gc.zksTokensCache) == 0 {
+		tokens, err := zksync.GetTokens()
+		if err != nil {
+			return err
+		}
 
-	for _, token := range tokens {
-		gc.zksTokensCache[token.Id] = token
+		for _, token := range tokens {
+			gc.zksTokensCache[token.Id] = token
+		}
 	}
 
 	latestBlockHeight, err := zksync.GetLatestBlockHeight()
@@ -127,28 +141,31 @@ func (gc *gitcoinCrawler) zksyncRun() error {
 	latestConfirmedBlockHeight := latestBlockHeight - gc.zk.Confirmations
 
 	// scan the latest block content periodically
-	for {
-		endBlockHeight := startBlockHeight + step
-		if latestConfirmedBlockHeight <= endBlockHeight {
-			time.Sleep(tempDelay)
+	endBlockHeight := gc.zk.FromHeight + gc.zk.Step
+	if latestConfirmedBlockHeight <= endBlockHeight {
+		time.Sleep(tempDelay)
 
-			latestBlockHeight, err = zksync.GetLatestBlockHeight()
-			if err != nil {
-				return err
-			}
-
-			endBlockHeight = latestBlockHeight - gc.zk.Confirmations
-			step = gc.zk.MinStep
-		}
-
-		// get zksync donations
-		donations, err := gc.GetZkSyncDonations(startBlockHeight, endBlockHeight)
+		latestBlockHeight, err = zksync.GetLatestBlockHeight()
 		if err != nil {
 			return err
 		}
 
-		setDB(donations, constants.NetworkIDZksync)
+		endBlockHeight = latestBlockHeight - gc.zk.Confirmations
+		gc.zk.Step = gc.zk.MinStep
 	}
+
+	// get zksync donations
+	donations, err := gc.GetZkSyncDonations(gc.zk.FromHeight, endBlockHeight)
+	if err != nil {
+		return err
+	}
+
+	setDB(donations, constants.NetworkIDZksync)
+
+	// set new from height
+	gc.zk.FromHeight = endBlockHeight
+
+	return nil
 }
 
 func (gc *gitcoinCrawler) xscanWork(networkId constants.NetworkID) error {
@@ -232,44 +249,38 @@ func setDB(donations []DonationInfo, networkId constants.NetworkID) {
 func (gc *gitcoinCrawler) ZkStart() error {
 	signal.Notify(gc.zk.Interrupt, os.Interrupt)
 
-	go func() {
-		gc.zk.Complete <- gc.zksyncRun()
-	}()
-
-	select {
-	case err := <-gc.zk.Complete:
-		return err
-	default:
-		return nil
+	for {
+		select {
+		case <-gc.zk.Interrupt:
+			return nil
+		default:
+			gc.zksyncRun()
+		}
 	}
 }
 
 func (gc *gitcoinCrawler) EthStart() error {
 	signal.Notify(gc.eth.Interrupt, os.Interrupt)
 
-	go func() {
-		gc.eth.Complete <- gc.xscanWork(constants.NetworkIDEthereumMainnet)
-	}()
-
-	select {
-	case err := <-gc.eth.Complete:
-		return err
-	default:
-		return nil
+	for {
+		select {
+		case <-gc.eth.Interrupt:
+			return nil
+		default:
+			gc.xscanWork(constants.NetworkIDEthereumMainnet)
+		}
 	}
 }
 
 func (gc *gitcoinCrawler) PolygonStart() error {
 	signal.Notify(gc.polygon.Interrupt, os.Interrupt)
 
-	go func() {
-		gc.polygon.Complete <- gc.xscanWork(constants.NetworkIDPolygon)
-	}()
-
-	select {
-	case err := <-gc.polygon.Complete:
-		return err
-	default:
-		return nil
+	for {
+		select {
+		case <-gc.polygon.Interrupt:
+			return nil
+		default:
+			gc.xscanWork(constants.NetworkIDPolygon)
+		}
 	}
 }
