@@ -10,8 +10,8 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/database/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/middleware"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/protocol"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/isotime"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
@@ -63,7 +63,7 @@ func PutIndexHandlerFunc(c *gin.Context) {
 	defer tx.Rollback()
 
 	httpStatus, bizStatus = runUpdateTask(updateAccount, tx, &indexFile, oIndexFile)
-	if bizStatus != status.CodeSuccess {
+	if bizStatus != status.CodeOK {
 		logger.Error(bizStatus)
 		w.JSONResponse(httpStatus, bizStatus, nil)
 
@@ -71,7 +71,7 @@ func PutIndexHandlerFunc(c *gin.Context) {
 	}
 
 	httpStatus, bizStatus = runUpdateTask(updateAccountPlatform, tx, &indexFile, oIndexFile)
-	if bizStatus != status.CodeSuccess {
+	if bizStatus != status.CodeOK {
 		logger.Error(bizStatus)
 		w.JSONResponse(httpStatus, bizStatus, nil)
 
@@ -79,7 +79,7 @@ func PutIndexHandlerFunc(c *gin.Context) {
 	}
 
 	httpStatus, bizStatus = runUpdateTask(updateSignature, tx, &indexFile, oIndexFile)
-	if bizStatus != status.CodeSuccess {
+	if bizStatus != status.CodeOK {
 		logger.Error(bizStatus)
 		w.JSONResponse(httpStatus, bizStatus, nil)
 
@@ -87,12 +87,12 @@ func PutIndexHandlerFunc(c *gin.Context) {
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		w.JSONResponse(http.StatusInternalServerError, status.CodeError, nil)
+		w.JSONResponse(http.StatusInternalServerError, status.CodeDatabaseError, nil)
 
 		return
 	}
 
-	w.JSONResponse(http.StatusOK, status.CodeSuccess, indexFile)
+	w.JSONResponse(http.StatusOK, status.CodeOK, indexFile)
 
 	// TODO: compare more diffs
 
@@ -112,7 +112,7 @@ func updateSignature(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protoco
 	if err != nil {
 		logger.Error(err)
 
-		return http.StatusInternalServerError, status.CodeError
+		return http.StatusInternalServerError, status.CodeInvalidInstance
 	}
 
 	needUpdate := false
@@ -124,14 +124,14 @@ func updateSignature(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protoco
 	if err != nil {
 		logger.Error(err)
 
-		return http.StatusBadRequest, status.CodeError
+		return http.StatusBadRequest, status.CodeFileFieldError
 	}
 
 	newDateUpdated, err := time.Parse(isotime.ISO8601, indexFile.DateUpdated)
 	if err != nil {
 		logger.Error(err)
 
-		return http.StatusBadRequest, status.CodeError
+		return http.StatusBadRequest, status.CodeFileFieldError
 	}
 
 	// TODO
@@ -144,7 +144,7 @@ func updateSignature(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protoco
 	if oldDateUpdated.After(newDateUpdated) || newDateUpdated.Before(time.Now().Add(-time.Hour*2)) {
 		logger.Error("invalid date")
 
-		return http.StatusBadRequest, status.CodeError
+		return http.StatusBadRequest, status.CodeFileFieldError
 	} else {
 		needUpdate = true
 		toUpdate.UpdatedAt = newDateUpdated
@@ -156,11 +156,11 @@ func updateSignature(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protoco
 		}).UpdateColumns(&toUpdate).Error; err != nil {
 			logger.Error(err)
 
-			return http.StatusInternalServerError, status.CodeError
+			return http.StatusInternalServerError, status.CodeDatabaseError
 		}
 	}
 
-	return http.StatusOK, status.CodeSuccess
+	return http.StatusOK, status.CodeOK
 }
 
 func updateAccount(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protocol.Index) (int, status.Code) {
@@ -168,7 +168,7 @@ func updateAccount(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protocol.
 	if err != nil {
 		logger.Error(err)
 
-		return http.StatusInternalServerError, status.CodeError
+		return http.StatusInternalServerError, status.CodeInvalidInstance
 	}
 
 	needUpdate := false
@@ -203,11 +203,11 @@ func updateAccount(db *gorm.DB, indexFile *protocol.Index, oIndexFile *protocol.
 		}).Updates(&toUpdate).Error; err != nil {
 			logger.Error(err)
 
-			return http.StatusInternalServerError, status.CodeError
+			return http.StatusInternalServerError, status.CodeDatabaseError
 		}
 	}
 
-	return http.StatusOK, status.CodeSuccess
+	return http.StatusOK, status.CodeOK
 }
 
 // nolint:funlen,gocognit // TODO
@@ -229,7 +229,7 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 	if err != nil {
 		logger.Error(err)
 
-		return http.StatusInternalServerError, status.CodeError
+		return http.StatusInternalServerError, status.CodeInvalidInstance
 	}
 
 	for _, account := range indexFile.Profile.Accounts {
@@ -239,7 +239,7 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 			if err != nil {
 				logger.Error(err)
 
-				return http.StatusInternalServerError, status.CodeError
+				return http.StatusInternalServerError, status.CodeInvalidInstance
 			}
 
 			toCreate = append(toCreate, model.AccountPlatform{
@@ -256,7 +256,7 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 		if err != nil {
 			logger.Error(err)
 
-			return http.StatusInternalServerError, status.CodeError
+			return http.StatusInternalServerError, status.CodeInvalidInstance
 		}
 
 		if signature != account.Signature {
@@ -276,7 +276,7 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 			if err != nil {
 				logger.Error(err)
 
-				return http.StatusInternalServerError, status.CodeError
+				return http.StatusInternalServerError, status.CodeInvalidInstance
 			}
 
 			toDelete = append(toDelete, model.AccountPlatform{
@@ -294,7 +294,7 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 			if err := db.Where(&toDelete[i]).Delete(&model.AccountPlatform{}).Error; err != nil {
 				logger.Error(err)
 
-				return http.StatusInternalServerError, status.CodeError
+				return http.StatusInternalServerError, status.CodeDatabaseError
 			}
 		}
 	}
@@ -303,7 +303,7 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 		if err := db.Updates(&toUpdate).Error; err != nil {
 			logger.Error(err)
 
-			return http.StatusInternalServerError, status.CodeError
+			return http.StatusInternalServerError, status.CodeDatabaseError
 		}
 	}
 
@@ -311,11 +311,11 @@ func updateAccountPlatform(db *gorm.DB, indexFile *protocol.Index, oIndexFile *p
 		if err := db.Create(&toCreate).Error; err != nil {
 			logger.Error(err)
 
-			return http.StatusInternalServerError, status.CodeError
+			return http.StatusInternalServerError, status.CodeDatabaseError
 		}
 	}
 
-	return http.StatusOK, status.CodeSuccess
+	return http.StatusOK, status.CodeOK
 }
 
 func isArrayEqual(a, b []string) bool {

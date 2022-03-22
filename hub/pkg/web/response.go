@@ -3,7 +3,7 @@ package web
 import (
 	"net/http"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/status"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func (g *Gin) JSONResponse(httpCode int, errCode status.Code, data interface{}) 
 
 	g.C.JSON(httpCode, Response{
 		Code:    errCode,
-		Message: status.GetMessage(errCode),
+		Message: errCode.Message(),
 		Data:    data,
 	})
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/database"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/middleware"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/protocol"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/isotime"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
@@ -32,13 +32,13 @@ func GetIndexHandlerFunc(c *gin.Context) {
 
 	platformInstance, ok := value.(*rss3uri.PlatformInstance)
 	if !ok {
-		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidParams, nil)
+		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidInstance, nil)
 
 		return
 	}
 
 	if platformInstance.Prefix != constants.PrefixNameAccount || platformInstance.Platform != constants.PlatformSymbolEthereum {
-		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidParams, nil)
+		w.JSONResponse(http.StatusBadRequest, status.CodeInvalidInstance, nil)
 
 		return
 	}
@@ -67,10 +67,10 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 	)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, http.StatusConflict, status.CodeError
+			return nil, http.StatusConflict, status.CodeIndexNotExist
 		}
 
-		return nil, http.StatusInternalServerError, status.CodeError
+		return nil, http.StatusInternalServerError, status.CodeDatabaseError
 	}
 
 	if account.Name.Valid {
@@ -88,7 +88,7 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 		tx, account.ID, int(constants.PrefixIDAccount), account.Platform,
 	)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, http.StatusInternalServerError, status.CodeError
+		return nil, http.StatusInternalServerError, status.CodeDatabaseError
 	}
 
 	for _, linkList := range linkLists {
@@ -98,7 +98,7 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 	// Query the account platforms
 	accountPlatforms, err := database.Instance.QueryAccountPlatforms(tx, account.ID, account.Platform)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, http.StatusInternalServerError, status.CodeError
+		return nil, http.StatusInternalServerError, status.CodeDatabaseError
 	}
 
 	for _, accountPlatform := range accountPlatforms {
@@ -111,8 +111,8 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 	signature, err := database.Instance.QuerySignature(
 		tx, fmt.Sprintf("%s@%s", account.ID, constants.PlatformID(account.Platform).Symbol()),
 	)
-	if err != nil {
-		return nil, http.StatusInternalServerError, status.CodeError
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, http.StatusInternalServerError, status.CodeDatabaseError
 	}
 
 	indexFile.Signature = signature.Signature
@@ -121,8 +121,8 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
-		return nil, http.StatusInternalServerError, status.CodeError
+		return nil, http.StatusInternalServerError, status.CodeDatabaseError
 	}
 
-	return indexFile, http.StatusOK, status.CodeSuccess
+	return indexFile, http.StatusOK, status.CodeOK
 }
