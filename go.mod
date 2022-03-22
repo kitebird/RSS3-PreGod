@@ -14,7 +14,6 @@ require (
 	github.com/knadh/koanf v1.4.0
 	github.com/lib/pq v1.10.4
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.4.1
@@ -65,7 +64,6 @@ require (
 	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
