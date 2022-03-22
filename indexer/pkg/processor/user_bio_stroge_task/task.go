@@ -3,6 +3,7 @@ package user_bio_stroge_task
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
 type UserBioStrogeTask struct {
@@ -38,16 +39,31 @@ func NewUserBioStrogeResult() *UserBioStrogeResult {
 }
 
 func (pt *UserBioStrogeTask) Fun() error {
+	var err error
+
 	var c crawler.Crawler
 
-	userBio, err := c.GetUserBio(pt.WorkParam)
+	var userBio string
+
 	result := NewUserBioStrogeResult()
 
-	if err != nil {
-		result.TaskResult = processor.ProcessTaskErrorCodeFoundData
-		ResultQ <- result
+	c = processor.MakeCrawlers(pt.WorkParam.NetworkID)
+	if c == nil {
+		result.TaskResult = processor.ProcessTaskErrorCodeNotSupportedNetwork
 
-		return err
+		logger.Errorf("unsupported network id: %d", pt.WorkParam.NetworkID)
+
+		goto RETURN
+	}
+
+	logger.Infof("c:%v", &c)
+
+	userBio, err = c.GetUserBio(pt.WorkParam)
+
+	if err != nil {
+		result.TaskResult = processor.ProcessTaskErrorCodeNotFoundData
+
+		goto RETURN
 	}
 
 	if len(userBio) > 0 {
@@ -62,7 +78,14 @@ func (pt *UserBioStrogeTask) Fun() error {
 		result.UserBio = userBio
 	}
 
+RETURN:
 	ResultQ <- result
 
-	return nil
+	if err != nil {
+		logger.Error(err)
+
+		return err
+	} else {
+		return nil
+	}
 }

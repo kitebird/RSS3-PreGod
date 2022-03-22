@@ -11,6 +11,7 @@ const (
 type ProcessTaskErrorCode int
 
 const (
-	ProcessTaskErrorCodeSuccess   ProcessTaskErrorCode = iota
-	ProcessTaskErrorCodeFoundData ProcessTaskErrorCode = 1
+	ProcessTaskErrorCodeSuccess             ProcessTaskErrorCode = iota
+	ProcessTaskErrorCodeNotFoundData        ProcessTaskErrorCode = 1
+	ProcessTaskErrorCodeNotSupportedNetwork ProcessTaskErrorCode = 2
 )

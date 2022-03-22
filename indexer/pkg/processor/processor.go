@@ -2,9 +2,12 @@ package processor
 
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/jike"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/misskey"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/twitter"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
 type processTaskHandler interface {
@@ -24,11 +27,11 @@ type ProcessTaskResult struct {
 
 type Processor struct {
 	// Emergency use, highest priority, such as user data not found
-	UrgentQ chan *ProcessTaskParam
+	UrgentQ chan processTaskHandler
 	// General use, such as access to authenticate user information
-	HighQ chan *ProcessTaskParam
+	HighQ chan processTaskHandler
 	// Unaffected condition use, such as polling query data
-	LowQ chan *ProcessTaskParam
+	LowQ chan processTaskHandler
 }
 
 var GlobalProcessor *Processor
@@ -43,9 +46,11 @@ func Setup() error {
 func NewProcessor() *Processor {
 	processor := new(Processor)
 
-	processor.UrgentQ = make(chan *ProcessTaskParam)
-	processor.HighQ = make(chan *ProcessTaskParam)
-	processor.LowQ = make(chan *ProcessTaskParam)
+	processor.UrgentQ = make(chan processTaskHandler)
+	processor.HighQ = make(chan processTaskHandler)
+	processor.LowQ = make(chan processTaskHandler)
+
+	logger.Infof("NewProcessor init:%v", processor)
 
 	return processor
 }
@@ -60,6 +65,10 @@ func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 		return moralis.NewMoralisCrawler()
 	case constants.NetworkIDJike:
 		return jike.NewJikeCrawler()
+	case constants.NetworkIDTwitter:
+		return twitter.NewTwitterCrawler()
+	case constants.NetworkIDMisskey:
+		return misskey.NewMisskeyCrawler()
 	default:
 		return nil
 	}

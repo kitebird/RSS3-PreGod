@@ -21,6 +21,7 @@ func GetItemHandlerFunc(c *gin.Context) {
 	}
 
 	// TODO Query data
+	// 旧用户查询数据库，新用户拉取
 
 	c.JSON(http.StatusOK, request)
 }
