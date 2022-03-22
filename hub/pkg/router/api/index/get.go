@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/database"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/middleware"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/protocol"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/status"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/hub/pkg/web"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/isotime"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 	"github.com/gin-gonic/gin"
@@ -116,8 +116,8 @@ func getIndexFile(instance *rss3uri.PlatformInstance) (*protocol.Index, int, sta
 	}
 
 	indexFile.Signature = signature.Signature
-	indexFile.Base.DateCreated = signature.CreatedAt.Format(time.RFC3339)
-	indexFile.Base.DateUpdated = signature.UpdatedAt.Format(time.RFC3339)
+	indexFile.Base.DateCreated = signature.CreatedAt.Format(isotime.ISO8601)
+	indexFile.Base.DateUpdated = signature.UpdatedAt.Format(isotime.ISO8601)
 
 	// Commit the transaction
 	if err := tx.Commit().Error; err != nil {
