@@ -134,9 +134,8 @@ func GetUserProfile(name string) (*UserProfile, error) {
 	profile := new(UserProfile)
 
 	parsedObject := parsedJson.GetObject("user")
-
-	profile.ScreenName = parsedObject.Get("screenName").String()
-	profile.Bio = parsedObject.Get("bio").String()
+	profile.ScreenName = util.TrimQuote(parsedObject.Get("screenName").String())
+	profile.Bio = util.TrimQuote(parsedObject.Get("bio").String())
 
 	return profile, err
 }
