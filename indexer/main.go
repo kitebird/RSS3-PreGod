@@ -92,9 +92,9 @@ func main() {
 	zkParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
 	gc := gitcoin.NewGitcoinCrawler(ethParam, polygonParam, zkParam)
 
-	gc.PolygonStart()
-	gc.EthStart()
-	gc.ZkStart()
+	go gc.PolygonStart()
+	go gc.EthStart()
+	go gc.ZkStart()
 
 	defer logger.Logger.Sync()
 }

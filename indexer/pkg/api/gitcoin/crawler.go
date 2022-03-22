@@ -14,26 +14,22 @@ import (
 )
 
 type Param struct {
-	FromHeight     int64
-	Step           int64
-	MinStep        int64
-	Confirmations  int64
-	SleepInterval  time.Duration
-	LastUpdateTime time.Time
-	NextUpdateTime time.Time
-	Interrupt      chan os.Signal
+	FromHeight    int64
+	Step          int64
+	MinStep       int64
+	Confirmations int64
+	SleepInterval time.Duration
+	Interrupt     chan os.Signal
 }
 
 func NewParam(from, step, minStep, confirmations, sleepInterval int64) Param {
 	return Param{
-		FromHeight:     from,
-		Step:           step,
-		MinStep:        minStep,
-		Confirmations:  confirmations,
-		SleepInterval:  time.Duration(sleepInterval),
-		LastUpdateTime: time.UnixMicro(0),
-		NextUpdateTime: time.UnixMicro(0),
-		Interrupt:      make(chan os.Signal, 1),
+		FromHeight:    from,
+		Step:          step,
+		MinStep:       minStep,
+		Confirmations: confirmations,
+		SleepInterval: time.Duration(sleepInterval),
+		Interrupt:     make(chan os.Signal, 1),
 	}
 }
 
@@ -119,8 +115,6 @@ func (gc *gitcoinCrawler) updateHostingProject(adminAddress string) (inactive bo
 }
 
 func (gc *gitcoinCrawler) zksyncRun() error {
-	tempDelay := gc.zk.SleepInterval
-
 	// token cache
 	if len(gc.zksTokensCache) == 0 {
 		tokens, err := zksync.GetTokens()
@@ -143,7 +137,7 @@ func (gc *gitcoinCrawler) zksyncRun() error {
 	// scan the latest block content periodically
 	endBlockHeight := gc.zk.FromHeight + gc.zk.Step
 	if latestConfirmedBlockHeight <= endBlockHeight {
-		time.Sleep(tempDelay)
+		time.Sleep(gc.zk.SleepInterval)
 
 		latestBlockHeight, err = zksync.GetLatestBlockHeight()
 		if err != nil {
@@ -168,53 +162,50 @@ func (gc *gitcoinCrawler) zksyncRun() error {
 	return nil
 }
 
-func (gc *gitcoinCrawler) xscanWork(networkId constants.NetworkID) error {
-	startBlockHeight := int64(1)
-
-	var p Param
+func (gc *gitcoinCrawler) xscanRun(networkId constants.NetworkID) error {
+	var p *Param
 	if networkId == constants.NetworkIDEthereumMainnet {
-		p = gc.eth
+		p = &gc.eth
 	} else if networkId == constants.NetworkIDPolygon {
-		p = gc.polygon
+		p = &gc.polygon
 	}
 
-	step := p.Step
-	minStep := p.MinStep
-	sleepInterval := p.SleepInterval
+	latestBlockHeight, err := xscan.GetLatestBlockHeight(networkId)
+	if err != nil {
+		return err
+	}
 
-	for {
-		latestBlockHeight, err := xscan.GetLatestBlockHeight(networkId)
+	endBlockHeight := p.FromHeight + p.Step
+	if latestBlockHeight <= endBlockHeight {
+		time.Sleep(p.SleepInterval)
+
+		latestBlockHeight, err = xscan.GetLatestBlockHeight(networkId)
 		if err != nil {
 			return err
 		}
 
-		endBlockHeight := startBlockHeight + step
-		if latestBlockHeight <= endBlockHeight {
-			time.Sleep(sleepInterval)
-
-			latestBlockHeight, err = xscan.GetLatestBlockHeight(networkId)
-			if err != nil {
-				return err
-			}
-
-			endBlockHeight = latestBlockHeight
-			step = minStep
-		}
-
-		var chainType ChainType
-		if networkId == constants.NetworkIDEthereumMainnet {
-			chainType = ETH
-		} else if networkId == constants.NetworkIDPolygon {
-			chainType = Polygon
-		}
-
-		donations, err := GetEthDonations(startBlockHeight, endBlockHeight, chainType)
-		if err != nil {
-			return err
-		}
-
-		setDB(donations, networkId)
+		endBlockHeight = latestBlockHeight
+		p.Step = p.MinStep
 	}
+
+	var chainType ChainType
+	if networkId == constants.NetworkIDEthereumMainnet {
+		chainType = ETH
+	} else if networkId == constants.NetworkIDPolygon {
+		chainType = Polygon
+	}
+
+	donations, err := GetEthDonations(p.FromHeight, endBlockHeight, chainType)
+	if err != nil {
+		return err
+	}
+
+	setDB(donations, networkId)
+
+	// set new from height
+	p.FromHeight = endBlockHeight
+
+	return nil
 }
 
 func setDB(donations []DonationInfo, networkId constants.NetworkID) {
@@ -267,7 +258,7 @@ func (gc *gitcoinCrawler) EthStart() error {
 		case <-gc.eth.Interrupt:
 			return nil
 		default:
-			gc.xscanWork(constants.NetworkIDEthereumMainnet)
+			gc.xscanRun(constants.NetworkIDEthereumMainnet)
 		}
 	}
 }
@@ -280,7 +271,7 @@ func (gc *gitcoinCrawler) PolygonStart() error {
 		case <-gc.polygon.Interrupt:
 			return nil
 		default:
-			gc.xscanWork(constants.NetworkIDPolygon)
+			gc.xscanRun(constants.NetworkIDPolygon)
 		}
 	}
 }
