@@ -9,7 +9,8 @@ COPY . .
 # Install basic packages
 RUN apk add \
     gcc \
-    g++
+    g++ \
+    git
 
 # Download all the dependencies
 RUN go get ./indexer/
