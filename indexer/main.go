@@ -28,8 +28,9 @@ func init() {
 		log.Fatalf("cache.Setup err: %v", err)
 	}
 
-	if err := db.Setup(); err != nil {
-		log.Fatalf("db.Setup err: %v", err)
+
+	if err := processor.Setup(); err != nil {
+		log.Fatalf("processor.Setup err: %v", err)
 	}
 }
 
@@ -39,10 +40,9 @@ func dispatchTasks(q chan *processor.ProcessTaskParam, ti time.Duration) {
 	for _, i := range instances {
 		for _, n := range i.Platform.ID().GetNetwork() {
 			time.Sleep(ti)
-			q <- &processor.ProcessTaskParam{
-				TaskType:  processor.ProcessTaskTypeItemStroge,
-				WorkParam: crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n},
-			}
+
+			itemStrogeTask := item_stroge_task.NewItemStrogeParam(crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n})
+			q <- &itemStrogeTask.ProcessTaskParam
 		}
 	}
 }

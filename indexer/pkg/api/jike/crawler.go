@@ -60,6 +60,10 @@ func (mc *jikeCrawler) GetResult() *crawler.CrawlerResult {
 }
 
 func (tc *jikeCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
+	if err := Login(); err != nil {
+		return "", err
+	}
+
 	userProfile, err := GetUserProfile(param.Identity)
 
 	if err != nil {

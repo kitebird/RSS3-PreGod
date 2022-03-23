@@ -3,9 +3,6 @@ package api
 import (
 	"net/http"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor/user_bio_stroge_task"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/gin-gonic/gin"
 )
@@ -22,9 +19,9 @@ func GetBioHandlerFunc(c *gin.Context) {
 	}
 
 	// TODO Query data
-	userBioStrogeTask := user_bio_stroge_task.NewUserBioStrogeTask(crawler.WorkParam{xx, xx, xx})
-	processor.GlobalProcessor.UrgentQ <- userBioStrogeTask
-	result := <-user_bio_stroge_task.ResultQ
+	// userBioStrogeTask := user_bio_stroge_task.NewUserBioStrogeTask(crawler.WorkParam{xx, xx, xx})
+	// processor.GlobalProcessor.UrgentQ <- userBioStrogeTask
+	// result := <-user_bio_stroge_task.ResultQ
 
 	c.JSON(http.StatusOK, request)
 }
