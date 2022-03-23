@@ -133,10 +133,10 @@ func GetUserProfile(name string) (*UserProfile, error) {
 
 	profile := new(UserProfile)
 
-	parsedObject := parsedJson.GetObject("user")
+	parsedObject := parsedJson.Get("user")
 
-	profile.ScreenName = parsedObject.Get("screenName").String()
-	profile.Bio = parsedObject.Get("bio").String()
+	profile.ScreenName = string(parsedObject.GetStringBytes("screenName"))
+	profile.Bio = string(parsedObject.GetStringBytes("bio"))
 
 	return profile, err
 }
@@ -272,7 +272,7 @@ func GetUserTimeline(name string) ([]Timeline, error) {
 	result := make([]Timeline, len(parsedObject))
 
 	for i, node := range parsedObject {
-		id := util.TrimQuote(node.Get("id").String())
+		id := util.TrimQuote(string(node.GetStringBytes("id")))
 		result[i].Id = id
 
 		t, timeErr := time.Parse(time.RFC3339, util.TrimQuote(node.Get("createdAt").String()))
@@ -282,9 +282,9 @@ func GetUserTimeline(name string) ([]Timeline, error) {
 			return nil, timeErr
 		}
 
-		result[i].Author = util.TrimQuote(parsedJson.Get("username").String())
+		result[i].Author = util.TrimQuote(string(parsedJson.GetStringBytes("username")))
 		result[i].Timestamp = t
-		result[i].Summary = util.TrimQuote(node.Get("content").String())
+		result[i].Summary = util.TrimQuote(string(node.GetStringBytes("content")))
 		result[i].Link = fmt.Sprintf("https://web.okjike.com/originalPost/%s", id)
 		result[i].Attachments = *getAttachment(node)
 	}
@@ -300,7 +300,7 @@ func GetUserTimeline(name string) ([]Timeline, error) {
 
 //nolint:unused // might need it in the future
 func formatFeed(node *fastjson.Value) string {
-	text := util.TrimQuote(node.Get("content").String())
+	text := util.TrimQuote(string(node.GetStringBytes("content")))
 
 	if node.Exists("pictures") {
 		for _, picture := range node.GetArray("pictures") {
@@ -318,13 +318,13 @@ func formatFeed(node *fastjson.Value) string {
 		}
 	}
 
-	if node.Exists("target") && node.Get("type").String() == "REPOST" {
+	if node.Exists("target") && string(node.GetStringBytes("type")) == "REPOST" {
 		target := node.Get("target")
 		// a status key means the feed is unavailable, e.g, DELETED
 		if !target.Exists("status") {
 			var user string
 			if target.Exists("user", "screenName") {
-				user = util.TrimQuote(target.Get("user", "screenName").String())
+				user = util.TrimQuote(string(target.GetStringBytes("user", "screenName")))
 			}
 
 			text += fmt.Sprintf("\nRT %s: %s", user, formatFeed(target))
@@ -357,7 +357,7 @@ func getAttachment(node *fastjson.Value) *[]model.Attachment {
 
 			// store quote_text
 
-			content = util.TrimQuote(node.Get("content").String())
+			content = util.TrimQuote(string(node.GetStringBytes("content")))
 			qText := *model.NewAttachment(content, nil, "text/plain", "quote_text", 0, syncAt)
 
 			attachments = append(attachments, qAddress, qText)
@@ -388,11 +388,11 @@ func getPicture(node *fastjson.Value) *[]model.Attachment {
 		var url string
 
 		if picture.Exists("thumbnailUrl") {
-			url = util.TrimQuote(picture.Get("thumbnailUrl").String())
+			url = util.TrimQuote(string(picture.GetStringBytes("thumbnailUrl")))
 		}
 
 		if picture.Exists("picUrl") {
-			url = util.TrimQuote(picture.Get("picUrl").String())
+			url = util.TrimQuote(string(picture.GetStringBytes("picUrl")))
 		}
 
 		header, err := httpx.Head(url)
