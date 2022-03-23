@@ -15,7 +15,11 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/web"
+	"github.com/RichardKnop/machinery/v1/tasks"
+	jsoniter "github.com/json-iterator/go"
 )
+
+var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func init() {
 	if err := config.Setup(); err != nil {
@@ -33,37 +37,45 @@ func init() {
 	if err := db.Setup(); err != nil {
 		log.Fatalf("db.Setup err: %v", err)
 	}
+
+	if err := processor.Setup(); err != nil {
+		log.Fatalf("processor.Setup err: %v", err)
+	}
 }
 
-func dispatchTasks(q chan *crawler.WorkParam, ti time.Duration) {
+func dispatchTasks(ti time.Duration) {
 	// TODO: Get all accounts
 	instances := []rss3uri.PlatformInstance{}
 	for _, i := range instances {
 		for _, n := range i.Platform.ID().GetNetwork() {
 			time.Sleep(ti)
-			q <- &crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n}
+
+			// marshal WorkParam to string so it's supported by machinery
+			param, err := jsoni.MarshalToString(crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n})
+
+			if err != nil {
+				logger.Errorf("dispatchTasks WorkParam mashalling error: %v", err)
+
+				return
+			}
+
+			crawlerTask := tasks.Signature{
+				// the name is defined by RegisterTasks() in processor/processor.go
+				Name: "dispatch",
+				Args: []tasks.Arg{
+					{
+						Type:  "string",
+						Value: param,
+					},
+				},
+			}
+
+			processor.SendTask(crawlerTask)
 		}
 	}
 }
 
-func pollTasks(q chan *crawler.WorkParam) {
-	for {
-		dispatchTasks(q, time.Minute)
-		time.Sleep(24 * time.Hour)
-	}
-}
-
 func main() {
-	lowQ := crawler.NewTaskQueue()
-	highQ := crawler.NewTaskQueue()
-
-	w := processor.NewProcessor(lowQ, highQ)
-	go w.ListenAndServe()
-
-	// TODO: listen tasks from mq
-	// TODO: gracefully exit
-	go pollTasks(lowQ)
-
 	srv := &web.Server{
 		RunMode:      config.Config.Indexer.Server.RunMode,
 		HttpPort:     config.Config.Indexer.Server.HttpPort,
@@ -97,4 +109,7 @@ func main() {
 	go gc.ZkStart()
 
 	defer logger.Logger.Sync()
+
+	// TODO: adjust interval
+	dispatchTasks(time.Minute)
 }
