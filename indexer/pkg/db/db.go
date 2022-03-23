@@ -56,6 +56,22 @@ func GetAssets(instance rss3uri.Instance) (*[]model.Item, error) {
 	return getAccountItems(instance, constants.ItemTypeAsset)
 }
 
+func Exists(i rss3uri.Instance) (bool, error) {
+	n, err := mgm.Coll(&model.AccountItemList{}).CountDocuments(
+		mgm.Ctx(),
+		bson.M{"account_instance": i.String()},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if n == 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
 func GetAccountInstance(instance rss3uri.Instance) (*model.AccountItemList, error) {
 	r := &model.AccountItemList{}
 	err := mgm.Coll(&model.AccountItemList{}).FindOne(
