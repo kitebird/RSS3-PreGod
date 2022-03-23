@@ -19,7 +19,7 @@ type WorkParam struct {
 	PlatformID constants.PlatformID // optional
 	Limit      int                  // optional, aka Count, limit the number of items to be crawled
 
-	TimeStamp time.Time // optional
+	LastIndexedTsp time.Time // optional, if provided, only index items newer than this time
 }
 
 type Crawler interface {

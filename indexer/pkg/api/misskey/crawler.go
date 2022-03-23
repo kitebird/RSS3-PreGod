@@ -8,7 +8,7 @@ import (
 )
 
 func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.CrawlerResult, error) {
-	noteList, err := GetUserNoteList(param.Identity, param.Limit, param.TimeStamp)
+	noteList, err := GetUserNoteList(param.Identity, param.Limit, param.LastIndexedTsp)
 
 	if err != nil {
 		logger.Errorf("%v : unable to retrieve misskey note list for %s", err, param.Identity)

@@ -12,6 +12,7 @@ type TimelineRequest struct {
 	IncludeReplies bool   `json:"includeReplies"`
 	Renote         bool   `json:"renote"`
 	UntilDate      int64  `json:"untilDate"`
+	SinceDate      int64  `json:"sinceDate"`
 	Limit          int    `json:"limit"`
 	ExcludeNsfw    bool   `json:"excludeNsfw"`
 }
