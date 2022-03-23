@@ -1,7 +1,10 @@
 package processor
 
 import (
+	"time"
+
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/backends/result"
 	machineryConfig "github.com/RichardKnop/machinery/v1/config"
@@ -61,4 +64,16 @@ func SendTask(task tasks.Signature) (*result.AsyncResult, error) {
 	}
 
 	return asyncResult, nil
+}
+
+func GetLastIndexedTsp(instance *rss3uri.PlatformInstance) (time.Time, error) {
+
+	// TODO: get the last indexed tsp from `instance_status_metadata` table
+
+	return time.Time{}, nil
+}
+
+func UpdateLastIndexedTsp(instance *rss3uri.PlatformInstance) {
+
+	// TODO: update the last indexed tsp in `instance_status_metadata` table
 }

@@ -43,15 +43,19 @@ func init() {
 	}
 }
 
-func dispatchTasks(ti time.Duration) {
+func dispatchTasks(pauseDuration time.Duration) {
 	// TODO: Get all accounts
 	instances := []rss3uri.PlatformInstance{}
 	for _, i := range instances {
 		for _, n := range i.Platform.ID().GetNetwork() {
-			time.Sleep(ti)
+			time.Sleep(pauseDuration)
+
+			param := crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n}
+
+			param.LastIndexedTsp, _ = processor.GetLastIndexedTsp(&i)
 
 			// marshal WorkParam to string so it's supported by machinery
-			param, err := jsoni.MarshalToString(crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n})
+			payload, err := jsoni.MarshalToString(param)
 
 			if err != nil {
 				logger.Errorf("dispatchTasks WorkParam mashalling error: %v", err)
@@ -65,12 +69,16 @@ func dispatchTasks(ti time.Duration) {
 				Args: []tasks.Arg{
 					{
 						Type:  "string",
-						Value: param,
+						Value: payload,
 					},
 				},
 			}
 
-			processor.SendTask(crawlerTask)
+			_, err = processor.SendTask(crawlerTask)
+
+			if err != nil {
+				processor.UpdateLastIndexedTsp(&i)
+			}
 		}
 	}
 }
