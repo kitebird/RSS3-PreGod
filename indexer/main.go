@@ -84,9 +84,7 @@ func main() {
 		Handler:      router.InitRouter(),
 	}
 
-	addr := srv.Start()
-
-	logger.Infof("Start http server listening on http://%s", addr)
+	srv.Start()
 
 	// arweave crawler
 	ar := arweave.NewArCrawler(

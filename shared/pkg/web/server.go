@@ -43,6 +43,8 @@ func (s *Server) Start() string {
 		}
 	}()
 
+	logger.Infof("Start http server listening on http://%s", addr)
+
 	gracefullyExit(server)
 
 	return addr

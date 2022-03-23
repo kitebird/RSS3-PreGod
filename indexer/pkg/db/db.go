@@ -49,14 +49,30 @@ func AppendNotes(instance rss3uri.Instance, notes []*model.ItemId) {
 }
 
 func GetNotes(instance rss3uri.Instance) (*[]model.Item, error) {
-	return getAccountItems(instance, constants.InstanceTypeNote)
+	return getAccountItems(instance, constants.ItemTypeNote)
 }
 
 func GetAssets(instance rss3uri.Instance) (*[]model.Item, error) {
-	return getAccountItems(instance, constants.InstanceTypeAsset)
+	return getAccountItems(instance, constants.ItemTypeAsset)
 }
 
-func getAccountInstance(instance rss3uri.Instance) (*model.AccountItemList, error) {
+func Exists(i rss3uri.Instance) (bool, error) {
+	n, err := mgm.Coll(&model.AccountItemList{}).CountDocuments(
+		mgm.Ctx(),
+		bson.M{"account_instance": i.String()},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if n == 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
+func GetAccountInstance(instance rss3uri.Instance) (*model.AccountItemList, error) {
 	r := &model.AccountItemList{}
 	err := mgm.Coll(&model.AccountItemList{}).FindOne(
 		mgm.Ctx(),
@@ -70,16 +86,16 @@ func getAccountInstance(instance rss3uri.Instance) (*model.AccountItemList, erro
 	}
 }
 
-func getAccountItems(instance rss3uri.Instance, t constants.InstanceTypeID) (*[]model.Item, error) {
-	r, err := getAccountInstance(instance)
+func getAccountItems(instance rss3uri.Instance, t constants.ItemType) (*[]model.Item, error) {
+	r, err := GetAccountInstance(instance)
 	if err != nil {
 		return nil, err
 	}
 
 	idList := []model.ItemId{}
-	if t == constants.InstanceTypeAsset {
+	if t == constants.ItemTypeAsset {
 		idList = r.Assets
-	} else if t == constants.InstanceTypeNote {
+	} else if t == constants.ItemTypeNote {
 		idList = r.Notes
 	} else {
 		return nil, fmt.Errorf("unsupported instance query")
