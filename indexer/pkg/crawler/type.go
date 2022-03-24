@@ -3,10 +3,9 @@ package crawler
 import (
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
-
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type Crawler interface {

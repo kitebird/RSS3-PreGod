@@ -387,7 +387,6 @@ func getPicture(node *fastjson.Value) *[]model.Attachment {
 		var url string
 
 		if picture.Exists("thumbnailUrl") {
-
 			url = string(picture.GetStringBytes("thumbnailUrl"))
 		}
 
