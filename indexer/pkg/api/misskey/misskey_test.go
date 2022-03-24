@@ -21,13 +21,13 @@ func TestGetNoteList(t *testing.T) {
 
 	var benchmarkList []benchmark
 
-	tsp, _ := time.Parse(time.RFC3339, "2022-03-11T12:51:04.739Z")
+	tsp, _ := time.Parse(time.RFC3339, "2022-03-11T12:50:23.428Z")
 
 	benchmarkList = append(benchmarkList, benchmark{
-		id:        "8xpzevfn1o",
+		id:        "8xpzdzk41i",
 		tsp:       tsp,
-		text:      "And my car Carrot.<img class=\"media\" src=\"https://file.nya.one/misskey/webpublic-5cd68bdc-941a-4df4-b5d9-1445dc5b88ea.jpg\">",
-		fileCount: 1,
+		text:      "Yo, I'm Henry from RSS3.",
+		fileCount: 0,
 	})
 
 	tsp, _ = time.Parse(time.RFC3339, "2022-03-11T12:50:50.604Z")
@@ -39,16 +39,16 @@ func TestGetNoteList(t *testing.T) {
 		fileCount: 1,
 	})
 
-	tsp, _ = time.Parse(time.RFC3339, "2022-03-11T12:50:23.428Z")
+	tsp, _ = time.Parse(time.RFC3339, "2022-03-11T12:51:04.739Z")
 
 	benchmarkList = append(benchmarkList, benchmark{
-		id:        "8xpzdzk41i",
+		id:        "8xpzevfn1o",
 		tsp:       tsp,
-		text:      "Yo, I'm Henry from RSS3.",
-		fileCount: 0,
+		text:      "And my car Carrot.<img class=\"media\" src=\"https://file.nya.one/misskey/webpublic-5cd68bdc-941a-4df4-b5d9-1445dc5b88ea.jpg\">",
+		fileCount: 1,
 	})
 
-	noteList, err := misskey.GetUserNoteList("henry@nya.one", 100, time.Now())
+	noteList, err := misskey.GetUserNoteList("henry@nya.one", 100, time.Now().Add(-time.Hour*24*365))
 
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(noteList))

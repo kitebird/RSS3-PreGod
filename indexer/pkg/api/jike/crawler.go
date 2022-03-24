@@ -23,7 +23,7 @@ func (mc *jikeCrawler) Work(param crawler.WorkParam) error {
 	timeline, err := GetUserTimeline(param.Identity)
 
 	if err != nil {
-		return err
+		return *result, err
 	}
 
 	for _, item := range timeline {

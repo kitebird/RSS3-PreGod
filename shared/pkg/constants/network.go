@@ -23,6 +23,7 @@ const (
 	NetworkIDJike            NetworkID = 14
 	NetworkIDPlayStation     NetworkID = 15
 	NetworkIDGitHub          NetworkID = 16
+	NetworkIDZksync          NetworkID = 17
 
 	NetworkSymbolUnknown                       = "unknown"
 	NetworkSymbolEthereumMainnet NetworkSymbol = "ethereum_mainnet"
@@ -41,10 +42,11 @@ const (
 	NetworkSymbolJike            NetworkSymbol = "jike"
 	NetworkSymbolPlayStation     NetworkSymbol = "playstation"
 	NetworkSymbolGitHub          NetworkSymbol = "github"
+	NetworkSymbolZksync          NetworkSymbol = "zksync"
 )
 
 var (
-	networkIDMap = map[NetworkSymbol]NetworkID{
+	NetworkIDMap = map[NetworkSymbol]NetworkID{
 		NetworkSymbolUnknown:         NetworkIDUnknown,
 		NetworkSymbolEthereumMainnet: NetworkIDEthereumMainnet,
 		NetworkSymbolPolygon:         NetworkIDPolygon,
@@ -66,7 +68,7 @@ var (
 )
 
 func IsValidNetworkName(value string) bool {
-	id, has := networkIDMap[NetworkSymbol(value)]
+	id, has := NetworkIDMap[NetworkSymbol(value)]
 	if has && id != NetworkIDUnknown {
 		return true
 	}
@@ -75,7 +77,7 @@ func IsValidNetworkName(value string) bool {
 }
 
 func (id NetworkSymbol) GetID() NetworkID {
-	return networkIDMap[NetworkSymbol(id)]
+	return NetworkIDMap[NetworkSymbol(id)]
 }
 
 func GetEthereumPlatformNetworks() []NetworkID {

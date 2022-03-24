@@ -72,7 +72,6 @@ func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 	default:
 		return nil
 	}
-}
 
 func (w *Processor) ListenAndServe() {
 	for {

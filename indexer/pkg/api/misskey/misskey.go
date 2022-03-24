@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/httpx"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	jsoniter "github.com/json-iterator/go"
@@ -57,7 +56,7 @@ func GetUserShow(accountInfo []string) (*UserShow, error) {
 	return userShow, nil
 }
 
-func GetUserNoteList(address string, count int, tsp time.Time) ([]Note, error) {
+func GetUserNoteList(address string, count int, since time.Time) ([]Note, error) {
 	accountInfo, err := formatUserAccount(address)
 
 	if err != nil {

@@ -1,9 +1,5 @@
 package util
 
-func TrimQuote(s string) string {
-	return s[1 : len(s)-1]
-}
-
 var keyOffset = make(map[string]int)
 
 func GotKey(strategy string, indexer_id string, keys []string) string {

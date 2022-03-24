@@ -26,7 +26,7 @@ func (mc *misskeyCrawler) Work(param crawler.WorkParam) error {
 	if err != nil {
 		logger.Errorf("%v : unable to retrieve misskey note list for %s", err, param.Identity)
 
-		return err
+		return *result, err
 	}
 
 	for _, note := range noteList {

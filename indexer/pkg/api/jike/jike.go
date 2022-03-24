@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/httpx"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
@@ -272,19 +271,19 @@ func GetUserTimeline(name string) ([]Timeline, error) {
 	result := make([]Timeline, len(parsedObject))
 
 	for i, node := range parsedObject {
-		id := util.TrimQuote(string(node.GetStringBytes("id")))
+		id := string(node.GetStringBytes("id"))
 		result[i].Id = id
 
-		t, timeErr := time.Parse(time.RFC3339, util.TrimQuote(node.Get("createdAt").String()))
+		t, timeErr := time.Parse(time.RFC3339, string(node.GetStringBytes("createdAt")))
 		if err != nil {
 			logger.Errorf("Jike GetUserTimeline timestamp parsing err: %v", timeErr)
 
 			return nil, timeErr
 		}
 
-		result[i].Author = util.TrimQuote(string(parsedJson.GetStringBytes("username")))
+		result[i].Author = string(parsedJson.GetStringBytes("username"))
 		result[i].Timestamp = t
-		result[i].Summary = util.TrimQuote(string(node.GetStringBytes("content")))
+		result[i].Summary = string(node.GetStringBytes("content"))
 		result[i].Link = fmt.Sprintf("https://web.okjike.com/originalPost/%s", id)
 		result[i].Attachments = *getAttachment(node)
 	}
@@ -300,21 +299,21 @@ func GetUserTimeline(name string) ([]Timeline, error) {
 
 //nolint:unused // might need it in the future
 func formatFeed(node *fastjson.Value) string {
-	text := util.TrimQuote(string(node.GetStringBytes("content")))
+	text := string(node.GetStringBytes("content"))
 
 	if node.Exists("pictures") {
 		for _, picture := range node.GetArray("pictures") {
 			var url string
 
 			if picture.Exists("picUrl") {
-				url = picture.Get("picUrl").String()
+				url = string(picture.GetStringBytes("picUrl"))
 			}
 
 			if picture.Exists("thumbnailUrl") {
-				url = picture.Get("thumbnailUrl").String()
+				url = string(picture.GetStringBytes("thumbnailUrl"))
 			}
 
-			text += fmt.Sprintf("<img class=\"media\" src=\"%s\">", util.TrimQuote(url))
+			text += fmt.Sprintf("<img class=\"media\" src=\"%s\">", string(url))
 		}
 	}
 
@@ -324,7 +323,7 @@ func formatFeed(node *fastjson.Value) string {
 		if !target.Exists("status") {
 			var user string
 			if target.Exists("user", "screenName") {
-				user = util.TrimQuote(string(target.GetStringBytes("user", "screenName")))
+				user = string(target.GetStringBytes("user", "screenName"))
 			}
 
 			text += fmt.Sprintf("\nRT %s: %s", user, formatFeed(target))
@@ -349,7 +348,7 @@ func getAttachment(node *fastjson.Value) *[]model.Attachment {
 			node = node.Get("target")
 			// store quote_address
 
-			content = "https://web.okjike.com/originalPost/" + util.TrimQuote(node.Get("id").String())
+			content = "https://web.okjike.com/originalPost/" + string(node.GetStringBytes("id"))
 
 			syncAt := time.Now()
 
@@ -357,7 +356,7 @@ func getAttachment(node *fastjson.Value) *[]model.Attachment {
 
 			// store quote_text
 
-			content = util.TrimQuote(string(node.GetStringBytes("content")))
+			content = string(node.GetStringBytes("content"))
 			qText := *model.NewAttachment(content, nil, "text/plain", "quote_text", 0, syncAt)
 
 			attachments = append(attachments, qAddress, qText)
@@ -388,11 +387,12 @@ func getPicture(node *fastjson.Value) *[]model.Attachment {
 		var url string
 
 		if picture.Exists("thumbnailUrl") {
-			url = util.TrimQuote(string(picture.GetStringBytes("thumbnailUrl")))
+
+			url = string(picture.GetStringBytes("thumbnailUrl"))
 		}
 
 		if picture.Exists("picUrl") {
-			url = util.TrimQuote(string(picture.GetStringBytes("picUrl")))
+			url = string(picture.GetStringBytes("picUrl"))
 		}
 
 		header, err := httpx.Head(url)

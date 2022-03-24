@@ -37,7 +37,13 @@ func (s *Server) Start() string {
 		MaxHeaderBytes: 1 << 20, // 1MB
 	}
 
-	go server.ListenAndServe()
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			logger.Fatal(err)
+		}
+	}()
+
+	logger.Infof("Start http server listening on http://%s", addr)
 
 	gracefullyExit(server)
 

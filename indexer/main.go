@@ -4,6 +4,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/arweave"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/gitcoin"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
@@ -13,7 +15,11 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/web"
+	"github.com/RichardKnop/machinery/v1/tasks"
+	jsoniter "github.com/json-iterator/go"
 )
+
+var jsoni = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func init() {
 	if err := config.Setup(); err != nil {
@@ -28,6 +34,10 @@ func init() {
 		log.Fatalf("cache.Setup err: %v", err)
 	}
 
+
+	if err := processor.Setup(); err != nil {
+		log.Fatalf("processor.Setup err: %v", err)
+	}
 
 	if err := processor.Setup(); err != nil {
 		log.Fatalf("processor.Setup err: %v", err)
@@ -63,10 +73,27 @@ func main() {
 	w := processor.NewProcessor(urgentQ, lowQ, highQ)
 	go w.ListenAndServe()
 
-	// TODO: listen tasks from mq
-	// TODO: gracefully exit
-	go pollTasks(lowQ)
+			crawlerTask := tasks.Signature{
+				// the name is defined by RegisterTasks() in processor/processor.go
+				Name: "dispatch",
+				Args: []tasks.Arg{
+					{
+						Type:  "string",
+						Value: payload,
+					},
+				},
+			}
 
+			_, err = processor.SendTask(crawlerTask)
+
+			if err != nil {
+				processor.UpdateLastIndexedTsp(&i)
+			}
+		}
+	}
+}
+
+func main() {
 	srv := &web.Server{
 		RunMode:      config.Config.Indexer.Server.RunMode,
 		HttpPort:     config.Config.Indexer.Server.HttpPort,
@@ -75,8 +102,30 @@ func main() {
 		Handler:      router.InitRouter(),
 	}
 
-	addr := srv.Start()
+	srv.Start()
 
-	logger.Infof("Start http server listening on http://%s", addr)
+	// arweave crawler
+	ar := arweave.NewArCrawler(
+		1,
+		500,
+		10,
+		2,
+		600,
+		"Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c")
+	ar.Start()
+
+	// gitcoin crawler
+	ethParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
+	polygonParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
+	zkParam := gitcoin.NewParam(1, 10000, 10, 10, 600)
+	gc := gitcoin.NewGitcoinCrawler(ethParam, polygonParam, zkParam)
+
+	go gc.PolygonStart()
+	go gc.EthStart()
+	go gc.ZkStart()
+
 	defer logger.Logger.Sync()
+
+	// TODO: adjust interval
+	dispatchTasks(time.Minute)
 }

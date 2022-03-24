@@ -1,47 +1,89 @@
 package arweave
 
 import (
+	"errors"
+	"os"
+	"os/signal"
 	"strconv"
 	"time"
 
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db/model"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
+var ErrTimeout = errors.New("received timeout")
+var ErrInterrupt = errors.New("received interrupt")
+
 type arCrawler struct {
-	crawler.CrawlerResult
+	fromHeight    int64
+	confirmations int64
+	step          int64
+	minStep       int64
+	sleepInterval time.Duration
+	identity      string
+	interrupt     chan os.Signal
+	complete      chan error
 }
 
-func NewArCrawler() crawler.Crawler {
+func NewArCrawler(fromHeight, step, minStep, confirmations, sleepInterval int64, identity string) *arCrawler {
 	return &arCrawler{
-		crawler.CrawlerResult{
-			Assets: []*model.ItemId{},
-			Notes:  []*model.ItemId{},
-			Items:  []*model.Item{},
-		},
+		fromHeight,
+		confirmations,
+		step,
+		minStep,
+		time.Duration(sleepInterval),
+		identity,
+		make(chan os.Signal, 1),
+		make(chan error),
 	}
 }
 
-func (ar *arCrawler) Work(param crawler.WorkParam) error {
-	networkId := constants.NetworkSymbolArweaveMainnet.GetID()
+func (ar *arCrawler) run() error {
+	startBlockHeight := ar.fromHeight
+	step := ar.step
+	tempDelay := ar.sleepInterval
 
-	startBlockHeight := int64(1)
+	// get latest block height
 	latestBlockHeight, err := GetLatestBlockHeight()
-
 	if err != nil {
-		logger.Error(err)
-
 		return err
 	}
 
-	articles, err := GetArticles(startBlockHeight, latestBlockHeight, param.Identity)
-	if err != nil {
-		logger.Error(err)
+	latestConfirmedBlockHeight := latestBlockHeight - ar.confirmations
 
+	for {
+		// handle interrupt
+		if ar.gotInterrupt() {
+			return ErrInterrupt
+		}
+
+		// get articles
+		endBlockHeight := startBlockHeight + step
+		if latestConfirmedBlockHeight <= endBlockHeight {
+			time.Sleep(tempDelay)
+
+			latestBlockHeight, err = GetLatestBlockHeight()
+			if err != nil {
+				return err
+			}
+
+			latestConfirmedBlockHeight = latestBlockHeight - ar.confirmations
+			step = 10
+		}
+
+		ar.getArticles(startBlockHeight, latestConfirmedBlockHeight, ar.identity)
+	}
+}
+
+func (ar *arCrawler) getArticles(from, to int64, owner string) error {
+	articles, err := GetArticles(from, to, owner)
+	if err != nil {
 		return err
 	}
+
+	items := make([]*model.Item, 0)
 
 	for _, article := range articles {
 		attachment := model.Attachment{
@@ -58,7 +100,7 @@ func (ar *arCrawler) Work(param crawler.WorkParam) error {
 		}
 
 		ni := model.NewItem(
-			networkId,
+			constants.NetworkSymbolArweaveMainnet.GetID(),
 			article.Digest,
 			model.Metadata{
 				"network": constants.NetworkSymbolArweaveMainnet,
@@ -72,16 +114,42 @@ func (ar *arCrawler) Work(param crawler.WorkParam) error {
 			tsp,
 		)
 
-		ar.Items = append(ar.Items, ni)
+		items = append(items, ni)
 	}
+
+	setDB(items)
 
 	return nil
 }
 
-func (ar *arCrawler) GetResult() *crawler.CrawlerResult {
-	return &crawler.CrawlerResult{
-		Assets: ar.Assets,
-		Notes:  ar.Notes,
-		Items:  ar.Items,
+func setDB(items []*model.Item) {
+	for _, item := range items {
+		db.InsertItem(item)
+	}
+}
+
+func (ar *arCrawler) Start() error {
+	signal.Notify(ar.interrupt, os.Interrupt)
+
+	go func() {
+		ar.complete <- ar.run()
+	}()
+
+	select {
+	case err := <-ar.complete:
+		return err
+	default:
+		return nil
+	}
+}
+
+func (ar *arCrawler) gotInterrupt() bool {
+	select {
+	case <-ar.interrupt:
+		signal.Stop(ar.interrupt)
+
+		return true
+	default:
+		return false
 	}
 }
