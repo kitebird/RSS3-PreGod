@@ -59,12 +59,12 @@ func (mc *jikeCrawler) GetResult() *crawler.CrawlerResult {
 	}
 }
 
-func (tc *jikeCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
+func (tc *jikeCrawler) GetUserBio(Identity string) (string, error) {
 	if err := Login(); err != nil {
 		return "", err
 	}
 
-	userProfile, err := GetUserProfile(param.Identity)
+	userProfile, err := GetUserProfile(Identity)
 
 	if err != nil {
 		return "", err

@@ -8,6 +8,7 @@ import (
 
 type UserBioStrogeTask struct {
 	processor.ProcessTaskParam
+	ResultQ chan *UserBioStrogeResult
 }
 
 type UserBioStrogeResult struct {
@@ -16,14 +17,13 @@ type UserBioStrogeResult struct {
 	UserBio string
 }
 
-var ResultQ = make(chan *UserBioStrogeResult)
-
 func NewUserBioStrogeTask(workParam crawler.WorkParam) *UserBioStrogeTask {
 	return &UserBioStrogeTask{
 		processor.ProcessTaskParam{
 			TaskType:  processor.ProcessTaskTypeUserBioStroge,
 			WorkParam: workParam,
 		},
+		make(chan *UserBioStrogeResult),
 	}
 }
 
@@ -58,7 +58,7 @@ func (pt *UserBioStrogeTask) Fun() error {
 
 	logger.Infof("c:%v", &c)
 
-	userBio, err = c.GetUserBio(pt.WorkParam)
+	userBio, err = c.GetUserBio(pt.WorkParam.Identity)
 
 	if err != nil {
 		result.TaskResult = processor.ProcessTaskErrorCodeNotFoundData
@@ -67,19 +67,18 @@ func (pt *UserBioStrogeTask) Fun() error {
 	}
 
 	if len(userBio) > 0 {
+		// TODO：add userbio into redis
 		// redis.SetUserBio(userBio)
 		// ctx := context.Background()
-
 		// key := fmt.Sprintf("%s_%s_%s", pt.WorkParam.Identity,
 		// 	pt.WorkParam.PlatformID.Symbol(),
 		// )
-
 		// cache.Set(ctx, key, userBio, 2)
 		result.UserBio = userBio
 	}
 
 RETURN:
-	ResultQ <- result
+	pt.ResultQ <- result
 
 	if err != nil {
 		logger.Error(err)

@@ -75,11 +75,10 @@ func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 }
 
 func (w *Processor) ListenAndServe() {
-	select {
-	case t := <-w.HighQ:
-		t.Fun()
-	default:
+	for {
 		select {
+		case t := <-w.UrgentQ:
+			t.Fun()
 		case t := <-w.HighQ:
 			t.Fun()
 		case t := <-w.LowQ:

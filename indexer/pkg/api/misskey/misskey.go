@@ -21,6 +21,7 @@ var (
 
 func GetUserShow(accountInfo []string) (*UserShow, error) {
 	url := "https://" + accountInfo[1] + "/api/users/show"
+	logger.Infof("url: %s", url)
 
 	username := fmt.Sprintf(`{"username":"%s"}`, accountInfo[0])
 

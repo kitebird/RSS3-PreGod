@@ -10,13 +10,13 @@ import (
 )
 
 type Crawler interface {
-	Work(WorkParam) error
+	Work(param WorkParam) error
 	// GetResult return &{Assets, Notes, Items}
 	GetResult() *CrawlerResult
 	// GetBio
 	// Since some apps have multiple bios,
 	// they need to be converted into json and then collectively transmitted
-	GetUserBio(WorkParam) (string, error)
+	GetUserBio(Identity string) (string, error)
 }
 
 type CrawlerResult struct {
@@ -37,7 +37,7 @@ type WorkParam struct {
 
 // CrawlerResult inherits the function by default
 
-func (cr *CrawlerResult) Work(WorkParam) error {
+func (cr *CrawlerResult) Work(param WorkParam) error {
 	return nil
 }
 
@@ -45,7 +45,7 @@ func (cr *CrawlerResult) GetResult() *CrawlerResult {
 	return cr
 }
 
-func (cr *CrawlerResult) GetUserBio(WorkParam) (string, error) {
+func (cr *CrawlerResult) GetUserBio(Identity string) (string, error) {
 	return "", nil
 }
 

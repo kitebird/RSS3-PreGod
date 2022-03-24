@@ -82,8 +82,8 @@ func (tc *twitterCrawler) GetResult() *crawler.CrawlerResult {
 	}
 }
 
-func (tc *twitterCrawler) GetUserBio(param crawler.WorkParam) (string, error) {
-	userShow, err := GetUserShow(param.Identity)
+func (tc *twitterCrawler) GetUserBio(Identity string) (string, error) {
+	userShow, err := GetUserShow(Identity)
 
 	if err != nil {
 		return "", err
