@@ -7,15 +7,14 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/arweave"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/gitcoin"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor/item_stroge_task"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/router"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/cache"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/config"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/web"
-	"github.com/RichardKnop/machinery/v1/tasks"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -34,7 +33,6 @@ func init() {
 		log.Fatalf("cache.Setup err: %v", err)
 	}
 
-
 	if err := processor.Setup(); err != nil {
 		log.Fatalf("processor.Setup err: %v", err)
 	}
@@ -44,7 +42,7 @@ func init() {
 	}
 }
 
-func dispatchTasks(q chan *processor.ProcessTaskParam, ti time.Duration) {
+func dispatchTasks(q chan processor.ProcessTaskHandler, ti time.Duration) {
 	// TODO: Get all accounts
 	instances := []rss3uri.PlatformInstance{}
 	for _, i := range instances {
@@ -52,12 +50,12 @@ func dispatchTasks(q chan *processor.ProcessTaskParam, ti time.Duration) {
 			time.Sleep(ti)
 
 			itemStrogeTask := item_stroge_task.NewItemStrogeParam(crawler.WorkParam{Identity: i.Identity, PlatformID: i.Platform.ID(), NetworkID: n})
-			q <- &itemStrogeTask.ProcessTaskParam
+			q <- itemStrogeTask.ProcessTaskHandler
 		}
 	}
 }
 
-func pollTasks(q chan *processor.ProcessTaskParam) {
+func pollTasks(q chan processor.ProcessTaskHandler) {
 	for {
 		dispatchTasks(q, time.Minute)
 		time.Sleep(24 * time.Hour)
@@ -65,35 +63,9 @@ func pollTasks(q chan *processor.ProcessTaskParam) {
 }
 
 func main() {
-	urgentQ := processor.NewTaskQueue()
-	lowQ := processor.NewTaskQueue()
-	highQ := processor.NewTaskQueue()
 
-	// 这里待会要考虑一下封装
-	w := processor.NewProcessor(urgentQ, lowQ, highQ)
-	go w.ListenAndServe()
+	go pollTasks(processor.GlobalProcessor.LowQ)
 
-			crawlerTask := tasks.Signature{
-				// the name is defined by RegisterTasks() in processor/processor.go
-				Name: "dispatch",
-				Args: []tasks.Arg{
-					{
-						Type:  "string",
-						Value: payload,
-					},
-				},
-			}
-
-			_, err = processor.SendTask(crawlerTask)
-
-			if err != nil {
-				processor.UpdateLastIndexedTsp(&i)
-			}
-		}
-	}
-}
-
-func main() {
 	srv := &web.Server{
 		RunMode:      config.Config.Indexer.Server.RunMode,
 		HttpPort:     config.Config.Indexer.Server.HttpPort,
@@ -125,7 +97,4 @@ func main() {
 	go gc.ZkStart()
 
 	defer logger.Logger.Sync()
-
-	// TODO: adjust interval
-	dispatchTasks(time.Minute)
 }

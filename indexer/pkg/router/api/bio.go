@@ -16,9 +16,9 @@ type GetBioRequest struct {
 	PlatformId constants.PlatformID `form:"platform_id" binding:"required"`
 }
 
-struct GetBioResponse struct {
+// struct GetBioResponse struct {
 
-}
+// }
 
 var (
 	// Since the transmitted parameter is only PlatformId

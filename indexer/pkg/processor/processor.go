@@ -10,12 +10,12 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
-type processTaskHandler interface {
+type ProcessTaskHandler interface {
 	Fun() error
 }
 
 type ProcessTaskParam struct {
-	processTaskHandler
+	ProcessTaskHandler
 	TaskType  ProcessTaskType
 	WorkParam crawler.WorkParam
 }
@@ -27,11 +27,11 @@ type ProcessTaskResult struct {
 
 type Processor struct {
 	// Emergency use, highest priority, such as user data not found
-	UrgentQ chan processTaskHandler
+	UrgentQ chan ProcessTaskHandler
 	// General use, such as access to authenticate user information
-	HighQ chan processTaskHandler
+	HighQ chan ProcessTaskHandler
 	// Unaffected condition use, such as polling query data
-	LowQ chan processTaskHandler
+	LowQ chan ProcessTaskHandler
 }
 
 var GlobalProcessor *Processor
@@ -46,9 +46,9 @@ func Setup() error {
 func NewProcessor() *Processor {
 	processor := new(Processor)
 
-	processor.UrgentQ = make(chan processTaskHandler)
-	processor.HighQ = make(chan processTaskHandler)
-	processor.LowQ = make(chan processTaskHandler)
+	processor.UrgentQ = make(chan ProcessTaskHandler)
+	processor.HighQ = make(chan ProcessTaskHandler)
+	processor.LowQ = make(chan ProcessTaskHandler)
 
 	logger.Infof("NewProcessor init:%v", processor)
 
@@ -72,6 +72,7 @@ func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 	default:
 		return nil
 	}
+}
 
 func (w *Processor) ListenAndServe() {
 	for {

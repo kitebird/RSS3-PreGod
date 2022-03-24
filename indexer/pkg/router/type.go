@@ -1,12 +1,12 @@
-package router
+// package router
 
-type 
+// type 
 
-const (
+// const (
 
-)
+// )
 
-type ResponseError struct {
-	Code int
-	Msg  string
-}
+// type ResponseError struct {
+// 	Code int
+// 	Msg  string
+// }

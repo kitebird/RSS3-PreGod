@@ -11,6 +11,20 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
+type moralisCrawler struct {
+	crawler.CrawlerResult
+}
+
+func NewMoralisCrawler() crawler.Crawler {
+	return &moralisCrawler{
+		crawler.CrawlerResult{
+			Items:  []*model.Item{},
+			Assets: []*model.ItemId{},
+			Notes:  []*model.ItemId{},
+		},
+	}
+}
+
 //nolint:funlen // disable line length check
 func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.CrawlerResult, error) {
 	chainType := GetChainType(param.NetworkID)

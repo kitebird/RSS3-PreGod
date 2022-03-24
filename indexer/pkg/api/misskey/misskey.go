@@ -45,7 +45,7 @@ func GetUserShow(accountInfo []string) (*UserShow, error) {
 	}
 
 	userShow := new(UserShow)
-	userShow.Id = util.TrimQuote(string(parsedJson.GetStringBytes("id")))
+	userShow.Id = string(parsedJson.GetStringBytes("id"))
 	userShow.Bios = append(userShow.Bios, string(parsedJson.GetStringBytes("description")))
 	fields := parsedJson.GetArray("fields")
 
@@ -75,7 +75,7 @@ func GetUserNoteList(address string, count int, since time.Time) ([]Note, error)
 
 	request.UserId = userShow.Id
 	request.Limit = count
-	request.UntilDate = tsp.Unix() * 1000
+	request.SinceDate = since.Unix() * 1000
 	request.ExcludeNsfw = true
 	request.Renote = true
 	request.IncludeReplies = false
@@ -101,14 +101,14 @@ func GetUserNoteList(address string, count int, since time.Time) ([]Note, error)
 	for _, note := range parsedObject {
 		ns := new(Note)
 
-		ns.Summary = util.TrimQuote(string(note.GetStringBytes("text")))
+		ns.Summary = string(note.GetStringBytes("text"))
 		formatContent(note, ns, accountInfo[1])
 
-		ns.Id = util.TrimQuote(string(note.GetStringBytes("id")))
-		ns.Author = util.TrimQuote(string(note.GetStringBytes("userId")))
+		ns.Id = string(note.GetStringBytes("id"))
+		ns.Author = string(note.GetStringBytes("userId"))
 		ns.Link = fmt.Sprintf("https://%s/notes/%s", accountInfo[1], ns.Id)
 
-		t, timeErr := time.Parse(time.RFC3339, util.TrimQuote(string(note.GetStringBytes("createdAt"))))
+		t, timeErr := time.Parse(time.RFC3339, string(note.GetStringBytes("createdAt")))
 
 		if timeErr != nil {
 			return nil, timeErr
@@ -137,9 +137,9 @@ func formatContent(note *fastjson.Value, ns *Note, instance string) {
 
 	// format renote if any
 	if renoteId != "null" {
-		renoteUser := util.TrimQuote(string(note.GetStringBytes("renote", "user", "username")))
+		renoteUser := string(note.GetStringBytes("renote", "user", "username"))
 
-		renoteText := util.TrimQuote(string(note.GetStringBytes("renote", "text")))
+		renoteText := string(note.GetStringBytes("renote", "text"))
 
 		ns.Summary = fmt.Sprintf("%s Renote @%s: %s", ns.Summary, renoteUser, renoteText)
 
@@ -157,8 +157,8 @@ func formatContent(note *fastjson.Value, ns *Note, instance string) {
 
 func formatEmoji(emojiList []*fastjson.Value, ns *Note) {
 	for _, emoji := range emojiList {
-		name := util.TrimQuote(string(emoji.GetStringBytes("name")))
-		url := util.TrimQuote(string(emoji.GetStringBytes("url")))
+		name := string(emoji.GetStringBytes("name"))
+		url := string(emoji.GetStringBytes("url"))
 
 		ns.Summary = strings.Replace(ns.Summary, name, fmt.Sprintf("<img class=\"emoji\" src=\"%s\" alt=\":%s:\">", url, name), -1)
 
@@ -176,10 +176,10 @@ func formatImage(imageList []*fastjson.Value, ns *Note) {
 	var sizeInBytes = 0
 
 	for _, image := range imageList {
-		_type := util.TrimQuote(string(image.GetStringBytes("type")))
+		_type := string(image.GetStringBytes("type"))
 
 		if strings.HasPrefix(_type, "image/") {
-			url := util.TrimQuote(string(image.GetStringBytes("url")))
+			url := string(image.GetStringBytes("url"))
 
 			ns.Summary += fmt.Sprintf("<img class=\"media\" src=\"%s\">", url)
 
