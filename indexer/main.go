@@ -37,9 +37,6 @@ func init() {
 		log.Fatalf("processor.Setup err: %v", err)
 	}
 
-	if err := processor.Setup(); err != nil {
-		log.Fatalf("processor.Setup err: %v", err)
-	}
 }
 
 func dispatchTasks(q chan processor.ProcessTaskHandler, ti time.Duration) {
