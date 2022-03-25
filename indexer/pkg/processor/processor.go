@@ -6,54 +6,53 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/moralis"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/api/twitter"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/constants"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
-type ProcessTaskHandler interface {
-	Fun() error
-}
+// type ProcessTaskHandler interface {
+// 	Fun() error
+// }
 
 type ProcessTaskParam struct {
-	ProcessTaskHandler
 	TaskType  ProcessTaskType
 	WorkParam crawler.WorkParam
 }
 
 type ProcessTaskResult struct {
 	TaskType   ProcessTaskType
-	TaskResult ProcessTaskErrorCode
+	TaskResult util.ErrorCode
 }
 
-type Processor struct {
-	// Emergency use, highest priority, such as user data not found
-	UrgentQ chan ProcessTaskHandler
-	// General use, such as access to authenticate user information
-	HighQ chan ProcessTaskHandler
-	// Unaffected condition use, such as polling query data
-	LowQ chan ProcessTaskHandler
-}
+// type Processor struct {
+// 	// Emergency use, highest priority, such as user data not found
+// 	UrgentQ chan ProcessTaskHandler
+// 	// General use, such as access to authenticate user information
+// 	HighQ chan ProcessTaskHandler
+// 	// Unaffected condition use, such as polling query data
+// 	LowQ chan ProcessTaskHandler
+// }
 
-var GlobalProcessor *Processor
+// var GlobalProcessor *Processor
 
-func Setup() error {
-	GlobalProcessor = NewProcessor()
-	go GlobalProcessor.ListenAndServe()
+// func Setup() error {
+// 	GlobalProcessor = NewProcessor()
+// 	go GlobalProcessor.ListenAndServe()
 
-	return nil
-}
+// 	return nil
+// }
 
-func NewProcessor() *Processor {
-	processor := new(Processor)
+// func NewProcessor() *Processor {
+// 	processor := new(Processor)
 
-	processor.UrgentQ = make(chan ProcessTaskHandler)
-	processor.HighQ = make(chan ProcessTaskHandler)
-	processor.LowQ = make(chan ProcessTaskHandler)
+// 	processor.UrgentQ = make(chan ProcessTaskHandler)
+// 	processor.HighQ = make(chan ProcessTaskHandler)
+// 	processor.LowQ = make(chan ProcessTaskHandler)
 
-	logger.Infof("NewProcessor init:%v", processor)
+// 	logger.Infof("NewProcessor init:%v", processor)
 
-	return processor
-}
+// 	return processor
+// }
 
 func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 	switch network {
@@ -74,15 +73,15 @@ func MakeCrawlers(network constants.NetworkID) crawler.Crawler {
 	}
 }
 
-func (w *Processor) ListenAndServe() {
-	for {
-		select {
-		case t := <-w.UrgentQ:
-			t.Fun()
-		case t := <-w.HighQ:
-			t.Fun()
-		case t := <-w.LowQ:
-			t.Fun()
-		}
-	}
-}
+// func (w *Processor) ListenAndServe() {
+// 	for {
+// 		select {
+// 		case t := <-w.UrgentQ:
+// 			t.Fun()
+// 		case t := <-w.HighQ:
+// 			t.Fun()
+// 		case t := <-w.LowQ:
+// 			t.Fun()
+// 		}
+// 	}
+// }

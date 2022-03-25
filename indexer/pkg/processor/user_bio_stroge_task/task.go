@@ -3,12 +3,12 @@ package user_bio_stroge_task
 import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
+	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/util"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 )
 
 type UserBioStrogeTask struct {
 	processor.ProcessTaskParam
-	ResultQ chan *UserBioStrogeResult
 }
 
 type UserBioStrogeResult struct {
@@ -23,7 +23,6 @@ func NewUserBioStrogeTask(workParam crawler.WorkParam) *UserBioStrogeTask {
 			TaskType:  processor.ProcessTaskTypeUserBioStroge,
 			WorkParam: workParam,
 		},
-		make(chan *UserBioStrogeResult),
 	}
 }
 
@@ -31,14 +30,14 @@ func NewUserBioStrogeResult() *UserBioStrogeResult {
 	return &UserBioStrogeResult{
 		processor.ProcessTaskResult{
 			TaskType:   processor.ProcessTaskTypeUserBioStroge,
-			TaskResult: processor.ProcessTaskErrorCodeSuccess,
+			TaskResult: util.ErrorCodeSuccess,
 		},
 
 		"",
 	}
 }
 
-func (pt *UserBioStrogeTask) Fun() error {
+func (pt *UserBioStrogeTask) Fun() *UserBioStrogeResult {
 	var err error
 
 	var c crawler.Crawler
@@ -49,21 +48,21 @@ func (pt *UserBioStrogeTask) Fun() error {
 
 	c = processor.MakeCrawlers(pt.WorkParam.NetworkID)
 	if c == nil {
-		result.TaskResult = processor.ProcessTaskErrorCodeNotSupportedNetwork
+		result.TaskResult = util.ErrorCodeNotSupportedNetwork
 
-		logger.Errorf("unsupported network id: %d", pt.WorkParam.NetworkID)
+		logger.Errorf("unsupported network id[%d]", pt.WorkParam.NetworkID)
 
-		goto RETURN
+		return result
 	}
-
-	logger.Infof("c:%v", &c)
 
 	userBio, err = c.GetUserBio(pt.WorkParam.Identity)
 
 	if err != nil {
-		result.TaskResult = processor.ProcessTaskErrorCodeNotFoundData
+		result.TaskResult = util.ErrorCodeNotFoundData
 
-		goto RETURN
+		logger.Errorf("[%d] can't find", pt.WorkParam.Identity)
+
+		return result
 	}
 
 	if len(userBio) > 0 {
@@ -77,14 +76,5 @@ func (pt *UserBioStrogeTask) Fun() error {
 		result.UserBio = userBio
 	}
 
-RETURN:
-	pt.ResultQ <- result
-
-	if err != nil {
-		logger.Error(err)
-
-		return err
-	} else {
-		return nil
-	}
+	return result
 }

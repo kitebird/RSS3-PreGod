@@ -6,7 +6,6 @@ import (
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/crawler"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/db"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/indexer/pkg/processor"
-	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/logger"
 	"github.com/NaturalSelectionLabs/RSS3-PreGod/shared/pkg/rss3uri"
 )
 
@@ -36,7 +35,7 @@ func (pt *ItemStrogeTask) Fun() error {
 	if c == nil {
 		err = fmt.Errorf("unsupported network id: %d", pt.WorkParam.NetworkID)
 
-		goto RETURN
+		return err
 	}
 
 	err = c.Work(pt.WorkParam)
@@ -44,7 +43,7 @@ func (pt *ItemStrogeTask) Fun() error {
 	if err != nil {
 		err = fmt.Errorf("crawler fails while working: %s", err)
 
-		goto RETURN
+		return err
 	}
 
 	r = c.GetResult()
@@ -62,12 +61,5 @@ func (pt *ItemStrogeTask) Fun() error {
 		db.AppendNotes(instance, r.Notes)
 	}
 
-RETURN:
-	if err != nil {
-		logger.Error(err)
-
-		return err
-	} else {
-		return nil
-	}
+	return nil
 }
