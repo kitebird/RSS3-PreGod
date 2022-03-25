@@ -64,7 +64,7 @@ func TestGetTransacitons(t *testing.T) {
 func TestGetArticles(t *testing.T) {
 	t.Parallel()
 
-	articles, err := arweave.GetArticles(877250, 877250, arweave.MirrorUploader)
+	articles, err := arweave.GetMirrorContents(877250, 877250, arweave.MirrorUploader)
 	// assert for nil
 	assert.Nil(t, err)
 	assert.NotEmpty(t, articles)

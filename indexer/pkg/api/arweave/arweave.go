@@ -70,8 +70,8 @@ func GetTransactions(from, to int64, owner ArAccount) ([]byte, error) {
 	return httpx.Post(arweaveGraphqlEndpoint, headers, data)
 }
 
-// GetArticles gets all articles from arweave using filters.
-func GetArticles(from, to int64, owner ArAccount) ([]MirrorArticle, error) {
+// GetMirrorContents gets all articles from arweave using filters.
+func GetMirrorContents(from, to int64, owner ArAccount) ([]MirrorContent, error) {
 	response, err := GetTransactions(from, to, owner)
 	if err != nil {
 		return nil, nil
@@ -86,7 +86,7 @@ func GetArticles(from, to int64, owner ArAccount) ([]MirrorArticle, error) {
 
 	// edges
 	edges := parsedJson.GetArray("data", "transactions", "edges")
-	result := make([]MirrorArticle, len(edges))
+	result := make([]MirrorContent, len(edges))
 
 	for i := 0; i < len(edges); i++ {
 		result[i], err = parseGraphqlNode(edges[i].String())
@@ -98,15 +98,15 @@ func GetArticles(from, to int64, owner ArAccount) ([]MirrorArticle, error) {
 	return result, nil
 }
 
-func parseGraphqlNode(node string) (MirrorArticle, error) {
+func parseGraphqlNode(node string) (MirrorContent, error) {
 	var parser fastjson.Parser
 
 	parsedJson, err := parser.Parse(node)
 	if err != nil {
-		return MirrorArticle{}, err
+		return MirrorContent{}, err
 	}
 
-	article := MirrorArticle{}
+	article := MirrorContent{}
 
 	tags := parsedJson.GetArray("node", "tags")
 	for _, tag := range tags {

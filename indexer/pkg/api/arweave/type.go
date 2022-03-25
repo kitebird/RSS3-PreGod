@@ -2,8 +2,8 @@ package arweave
 
 import "fmt"
 
-// MirrorArticle stores all indexed articles from arweave.
-type MirrorArticle struct {
+// MirrorContent stores all indexed articles from arweave.
+type MirrorContent struct {
 	Title          string
 	TimeStamp      int64
 	Content        string
@@ -14,7 +14,7 @@ type MirrorArticle struct {
 	TxHash         string
 }
 
-func (a MirrorArticle) String() string {
+func (a MirrorContent) String() string {
 	return fmt.Sprintf(`Title: %s, TimeStamp: %d, Author: %s, Link: %s, Digest: %s, OriginalDigest: %s, TxHash: %s`,
 		a.Title, a.TimeStamp, a.Author, a.Link, a.Digest, a.OriginalDigest, a.TxHash)
 }

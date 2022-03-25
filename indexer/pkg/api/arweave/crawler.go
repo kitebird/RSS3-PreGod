@@ -68,14 +68,13 @@ func (ar *arCrawler) run() error {
 			step = ar.cfg.step
 		}
 
-		//TODO: Sleep here
-		ar.getArticles(startBlockHeight, latestConfirmedBlockHeight, ar.identity)
+		time.Sleep(500 * time.Millisecond)
+		ar.parseMirrorArticles(startBlockHeight, latestConfirmedBlockHeight, ar.identity)
 	}
 }
 
-// TODO: make it parseMirror args
-func (ar *arCrawler) getArticles(from, to int64, owner ArAccount) error {
-	articles, err := GetArticles(from, to, owner)
+func (ar *arCrawler) parseMirrorArticles(from, to int64, owner ArAccount) error {
+	articles, err := GetMirrorContents(from, to, owner)
 	if err != nil {
 		return err
 	}

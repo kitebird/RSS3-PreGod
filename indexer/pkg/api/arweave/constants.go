@@ -11,7 +11,7 @@ const (
 const (
 	DefaultCrawlStep     = 10
 	DefaultFromHeight    = 1
-	DefaultConfirmations = 500 //TODO: Shall we make it less?
+	DefaultConfirmations = 10
 )
 
 var DefaultCrawlConfig = &crawlConfig{
