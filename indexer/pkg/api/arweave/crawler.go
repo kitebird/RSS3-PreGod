@@ -22,15 +22,16 @@ type crawlConfig struct {
 	step          int64
 	sleepInterval time.Duration
 }
-type arCrawler struct {
+
+type crawler struct {
 	identity  ArAccount
 	interrupt chan os.Signal
 	complete  chan error
 	cfg       *crawlConfig
 }
 
-func NewArCrawler(identity ArAccount, crawlCfg *crawlConfig) *arCrawler {
-	return &arCrawler{
+func NewCrawler(identity ArAccount, crawlCfg *crawlConfig) *crawler {
+	return &crawler{
 		identity,
 		make(chan os.Signal, 1),
 		make(chan error),
@@ -38,7 +39,7 @@ func NewArCrawler(identity ArAccount, crawlCfg *crawlConfig) *arCrawler {
 	}
 }
 
-func (ar *arCrawler) run() error {
+func (ar *crawler) run() error {
 	startBlockHeight := ar.cfg.fromHeight
 	step := ar.cfg.step
 	tempDelay := ar.cfg.sleepInterval
@@ -73,7 +74,7 @@ func (ar *arCrawler) run() error {
 	}
 }
 
-func (ar *arCrawler) parseMirrorArticles(from, to int64, owner ArAccount) error {
+func (ar *crawler) parseMirrorArticles(from, to int64, owner ArAccount) error {
 	articles, err := GetMirrorContents(from, to, owner)
 	if err != nil {
 		return err
@@ -123,7 +124,7 @@ func setDB(items []*model.Item) {
 	}
 }
 
-func (ar *arCrawler) Start() error {
+func (ar *crawler) Start() error {
 	signal.Notify(ar.interrupt, os.Interrupt)
 
 	go func() {
@@ -138,7 +139,7 @@ func (ar *arCrawler) Start() error {
 	}
 }
 
-func (ar *arCrawler) gotInterrupt() bool {
+func (ar *crawler) gotInterrupt() bool {
 	select {
 	case <-ar.interrupt:
 		signal.Stop(ar.interrupt)
