@@ -20,6 +20,8 @@ type Attachment struct {
 	SyncAt     time.Time `json:"sync_at" bson:"sync_at"`
 }
 
+// Exclude `network` and `proof`
+// TODO: format all crawlers
 type Metadata map[string]interface{}
 
 type Item struct {
@@ -27,6 +29,7 @@ type Item struct {
 
 	ItemId            ItemId             `json:"item_id" bson:"item_id"` // Index
 	Metadata          Metadata           `json:"metadata" bson:"metadata"`
+	RelatedURLs       []string           `json:"related_urls" bson:"related_urls"` // TODO: Complete all related urls
 	Tags              constants.ItemTags `json:"tags" bson:"tags"`
 	Authors           []string           `json:"authors" bson:"authors"`
 	Title             string             `json:"title" bson:"title"`
@@ -47,7 +50,7 @@ func NewAttachment(content string, address []string, mimetype string, t string, 
 }
 
 func NewItem(networkId constants.NetworkID, proof string, metadata Metadata,
-	tags constants.ItemTags, authors []string, title string, summary string,
+	relatedUrls []string, tags constants.ItemTags, authors []string, title string, summary string,
 	attachments []Attachment, platformCreatedAt time.Time) *Item {
 	return &Item{
 		ItemId: ItemId{
@@ -55,6 +58,7 @@ func NewItem(networkId constants.NetworkID, proof string, metadata Metadata,
 			Proof:     proof,
 		},
 		Metadata:          metadata,
+		RelatedURLs:       relatedUrls,
 		Tags:              tags,
 		Authors:           authors,
 		Title:             title,

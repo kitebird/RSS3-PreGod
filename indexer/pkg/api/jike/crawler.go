@@ -21,6 +21,7 @@ func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.Cra
 				"network": constants.NetworkSymbolJike,
 				"from":    item.Author,
 			},
+			[]string{},
 			constants.ItemTagsJikePost,
 			[]string{item.Author},
 			"",

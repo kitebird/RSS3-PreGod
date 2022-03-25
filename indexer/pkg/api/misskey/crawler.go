@@ -24,6 +24,7 @@ func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.Cra
 				"network": constants.NetworkSymbolMisskey,
 				"from":    note.Author,
 			},
+			[]string{},
 			constants.ItemTagsMisskeyNote,
 			[]string{note.Author},
 			"",

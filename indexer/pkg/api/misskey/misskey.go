@@ -118,7 +118,6 @@ func formatContent(note *fastjson.Value, ns *Note, instance string) {
 	renoteId := string(note.GetStringBytes("renoteId"))
 
 	// format renote if any
-	fmt.Println("renoteId")
 	if len(renoteId) > 0 {
 		renoteUser := string(note.GetStringBytes("renote", "user", "username"))
 

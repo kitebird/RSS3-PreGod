@@ -67,9 +67,7 @@ func SendTask(task tasks.Signature) (*result.AsyncResult, error) {
 }
 
 func GetLastIndexedTsp(instance *rss3uri.PlatformInstance) (time.Time, error) {
-
 	// TODO: get the last indexed tsp from `instance_status_metadata` table
-
 	return time.Time{}, nil
 }
 

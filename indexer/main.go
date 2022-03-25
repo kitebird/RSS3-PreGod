@@ -95,13 +95,7 @@ func main() {
 	srv.Start()
 
 	// arweave crawler
-	ar := arweave.NewArCrawler(
-		1,
-		500,
-		10,
-		2,
-		600,
-		"Ky1c1Kkt-jZ9sY1hvLF5nCf6WWdBhIU5Un_BMYh-t3c")
+	ar := arweave.NewArCrawler(arweave.MirrorUploader, arweave.DefaultCrawlConfig)
 	ar.Start()
 
 	// gitcoin crawler

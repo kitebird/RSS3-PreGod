@@ -51,6 +51,7 @@ func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.Cra
 				"from": "0x0",
 				"to":   poapResp.Owner,
 			},
+			[]string{},
 			constants.ItemTagsNFTPOAP,
 			[]string{author.String()},
 			"",

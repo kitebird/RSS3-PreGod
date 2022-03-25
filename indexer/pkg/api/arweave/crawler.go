@@ -16,42 +16,37 @@ import (
 var ErrTimeout = errors.New("received timeout")
 var ErrInterrupt = errors.New("received interrupt")
 
-type arCrawler struct {
+type crawlConfig struct {
 	fromHeight    int64
 	confirmations int64
 	step          int64
-	minStep       int64
 	sleepInterval time.Duration
-	identity      string
-	interrupt     chan os.Signal
-	complete      chan error
+}
+type arCrawler struct {
+	identity  ArAccount
+	interrupt chan os.Signal
+	complete  chan error
+	cfg       *crawlConfig
 }
 
-func NewArCrawler(fromHeight, step, minStep, confirmations, sleepInterval int64, identity string) *arCrawler {
+func NewArCrawler(identity ArAccount, crawlCfg *crawlConfig) *arCrawler {
 	return &arCrawler{
-		fromHeight,
-		confirmations,
-		step,
-		minStep,
-		time.Duration(sleepInterval),
 		identity,
 		make(chan os.Signal, 1),
 		make(chan error),
+		crawlCfg,
 	}
 }
 
 func (ar *arCrawler) run() error {
-	startBlockHeight := ar.fromHeight
-	step := ar.step
-	tempDelay := ar.sleepInterval
+	startBlockHeight := ar.cfg.fromHeight
+	step := ar.cfg.step
+	tempDelay := ar.cfg.sleepInterval
 
-	// get latest block height
-	latestBlockHeight, err := GetLatestBlockHeight()
+	latestConfirmedBlockHeight, err := GetLatestBlockHeightWithConfirmations(ar.cfg.confirmations)
 	if err != nil {
 		return err
 	}
-
-	latestConfirmedBlockHeight := latestBlockHeight - ar.confirmations
 
 	for {
 		// handle interrupt
@@ -59,25 +54,27 @@ func (ar *arCrawler) run() error {
 			return ErrInterrupt
 		}
 
-		// get articles
 		endBlockHeight := startBlockHeight + step
 		if latestConfirmedBlockHeight <= endBlockHeight {
 			time.Sleep(tempDelay)
 
-			latestBlockHeight, err = GetLatestBlockHeight()
+			latestConfirmedBlockHeight, err = GetLatestBlockHeightWithConfirmations(ar.cfg.confirmations)
 			if err != nil {
 				return err
 			}
 
-			latestConfirmedBlockHeight = latestBlockHeight - ar.confirmations
-			step = 10
+			step = DefaultCrawlStep
+		} else {
+			step = ar.cfg.step
 		}
 
+		//TODO: Sleep here
 		ar.getArticles(startBlockHeight, latestConfirmedBlockHeight, ar.identity)
 	}
 }
 
-func (ar *arCrawler) getArticles(from, to int64, owner string) error {
+// TODO: make it parseMirror args
+func (ar *arCrawler) getArticles(from, to int64, owner ArAccount) error {
 	articles, err := GetArticles(from, to, owner)
 	if err != nil {
 		return err
@@ -94,6 +91,7 @@ func (ar *arCrawler) getArticles(from, to int64, owner string) error {
 
 		tsp, err := time.Parse(time.RFC3339, strconv.FormatInt(article.TimeStamp, 10))
 		if err != nil {
+			//TODO: may send to a error queue or whatever in the future
 			logger.Error(err)
 
 			tsp = time.Now()
@@ -101,11 +99,9 @@ func (ar *arCrawler) getArticles(from, to int64, owner string) error {
 
 		ni := model.NewItem(
 			constants.NetworkSymbolArweaveMainnet.GetID(),
-			article.Digest,
-			model.Metadata{
-				"network": constants.NetworkSymbolArweaveMainnet,
-				"proof":   article.Digest,
-			},
+			article.TxHash,
+			nil,
+			[]string{"https://arweave.net/" + article.TxHash, "https://mirror.xyz/" + article.Author + "/" + article.OriginalDigest},
 			constants.ItemTagsMirrorEntry,
 			[]string{article.Author},
 			article.Title,

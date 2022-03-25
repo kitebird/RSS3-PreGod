@@ -86,6 +86,7 @@ func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.Cra
 				"from":    v.From,
 				"to":      v.To,
 			},
+			[]string{},
 			constants.ItemTagsNFT,
 			[]string{author.String()},
 			"",

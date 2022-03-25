@@ -11,9 +11,10 @@ type MirrorArticle struct {
 	Link           string
 	Digest         string
 	OriginalDigest string
+	TxHash         string
 }
 
 func (a MirrorArticle) String() string {
-	return fmt.Sprintf(`Title: %s, TimeStamp: %d, Author: %s, Link: %s, Digest: %s, OriginalDigest: %s`,
-		a.Title, a.TimeStamp, a.Author, a.Link, a.Digest, a.OriginalDigest)
+	return fmt.Sprintf(`Title: %s, TimeStamp: %d, Author: %s, Link: %s, Digest: %s, OriginalDigest: %s, TxHash: %s`,
+		a.Title, a.TimeStamp, a.Author, a.Link, a.Digest, a.OriginalDigest, a.TxHash)
 }

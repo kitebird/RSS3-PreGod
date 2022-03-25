@@ -30,6 +30,16 @@ func GetLatestBlockHeight() (int64, error) {
 	return blockHeight, nil
 }
 
+func GetLatestBlockHeightWithConfirmations(confirmations int64) (int64, error) {
+	// get latest block height
+	latestBlockHeight, err := GetLatestBlockHeight()
+	if err != nil {
+		return 0, err
+	}
+
+	return latestBlockHeight - confirmations, nil
+}
+
 // GetContentByTxHash gets transaction content by tx hash.
 func GetContentByTxHash(hash string) ([]byte, error) {
 	var headers = map[string]string{
@@ -41,7 +51,7 @@ func GetContentByTxHash(hash string) ([]byte, error) {
 }
 
 // GetTransactions gets all transactions using filters.
-func GetTransactions(from, to int64, owner string) ([]byte, error) {
+func GetTransactions(from, to int64, owner ArAccount) ([]byte, error) {
 	var headers = map[string]string{
 		"Accept-Encoding": "gzip, deflate, br",
 		"Content-Type":    "application/json",
@@ -61,7 +71,7 @@ func GetTransactions(from, to int64, owner string) ([]byte, error) {
 }
 
 // GetArticles gets all articles from arweave using filters.
-func GetArticles(from, to int64, owner string) ([]MirrorArticle, error) {
+func GetArticles(from, to int64, owner ArAccount) ([]MirrorArticle, error) {
 	response, err := GetTransactions(from, to, owner)
 	if err != nil {
 		return nil, nil
@@ -133,6 +143,8 @@ func parseGraphqlNode(node string) (MirrorArticle, error) {
 	article.TimeStamp = parsedJson.GetInt64("content", "timestamp")
 	// content
 	article.Content = string(parsedJson.GetStringBytes("content", "body")) // timestamp
+	// txHash
+	article.TxHash = string(id)
 
 	return article, nil
 }

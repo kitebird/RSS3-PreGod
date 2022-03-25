@@ -44,6 +44,7 @@ func Crawl(param *crawler.WorkParam, result *crawler.CrawlerResult) (crawler.Cra
 			networkId,
 			"",
 			model.Metadata{},
+			[]string{},
 			constants.ItemTagsTweet,
 			[]string{author.String()},
 			"",

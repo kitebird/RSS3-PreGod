@@ -226,6 +226,7 @@ func setDB(donations []DonationInfo, networkId constants.NetworkID) {
 				"Amount":           v.FormatedAmount,
 				"DonationApproach": v.Approach,
 			},
+			[]string{},
 			nil,
 			nil,
 			"",
