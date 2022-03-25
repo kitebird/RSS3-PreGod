@@ -17,6 +17,7 @@ func GetBioHandlerFunc(c *gin.Context) {
 	request := GetBioRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		logger.Errorf("%s", err.Error())
+		return
 	}
 
 	// TODO
